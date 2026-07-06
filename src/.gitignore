@@ -1,0 +1,15 @@
+# LaTeX build byproducts
+*.aux
+*.idx
+*.ilg
+*.ind
+*.log
+*.loo
+*.out
+*.toc
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+
+# Built PDFs live at the repository root, not in src/.
+*.pdf

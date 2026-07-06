@@ -1,0 +1,342 @@
+% ============================================================
+%  inferencenotes.sty
+%  Shared house style for "Notes in Statistical Inference"
+%  (STAT S4204). Single source of truth for every macro and
+%  formatting rule; loaded by main.tex and inherited by each
+%  lecture subfile.
+% ============================================================
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{inferencenotes}[2026/07/06 STAT S4204 lecture-notes style]
+
+% ---------- Fonts, layout, math ----------
+\RequirePackage[T1]{fontenc}
+\RequirePackage[utf8]{inputenc}
+\RequirePackage{lmodern}
+\RequirePackage[letterpaper,top=1in,bottom=1in,inner=1.15in,outer=1in,
+  headheight=14pt]{geometry}
+\RequirePackage{amsmath,amssymb}
+\RequirePackage{changepage}
+\RequirePackage[most]{tcolorbox}
+\RequirePackage{enumitem}
+\RequirePackage{graphicx}
+\RequirePackage{tikz}
+\RequirePackage{setspace}
+\RequirePackage[dvipsnames]{xcolor}
+\RequirePackage{makeidx}
+\RequirePackage[hidelinks]{hyperref}
+\RequirePackage{fancyhdr}
+\makeindex
+
+\graphicspath{{figures/}}
+\onehalfspacing
+\setlength{\parindent}{0pt}
+
+% Columbia palette (shared with the handbook projects)
+\definecolor{cuBlue}{HTML}{1F4E79}
+% --- figure palette: vivid, distinct academic colours (Ivy); FIGURES ONLY ---
+%     strokes/marks are saturated for legibility; use light tints (e.g. figLim!12) for fills.
+\definecolor{figTerm}{HTML}{1D4F91}% primary objects / estimators -- Columbia blue
+\definecolor{figLim}{HTML}{00693E}%  limits, bands, regions -- Dartmouth green
+\definecolor{figBad}{HTML}{B31B1B}%  contradictions / forbidden -- carnelian
+% optional monochrome Columbia-blue scheme (light / medium=figTerm / dark) for a single-hue figure
+\definecolor{cuBlueLt}{HTML}{B9D9EB}% Columbia blue (light)
+\definecolor{cuBlueDk}{HTML}{003865}% Columbia athletic dark blue
+
+% ---------- Small helpers ----------
+\newcommand{\HPS}[1]{{\footnotesize\textsc{hps}\,#1}}  % Hoel--Port--Stone (1971) locator
+\newcommand{\xref}[1]{\hyperlink{#1}{#1}}            % live id cross-reference (same subfile)
+% cross-LECTURE reference: live link in the book, plain text in a standalone subfile compile
+% (where the other lecture's anchor is not loaded, so a live \hyperlink would warn).
+\newcommand{\xrefL}[1]{\ifSubfilesClassLoaded{#1}{\hyperlink{#1}{#1}}}
+\newcommand{\eps}{\varepsilon}
+
+% ---------- Statistics notation ----------
+\newcommand{\E}{\mathrm{E}}                   % expectation (instructor writes E{...})
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\Cov}{\operatorname{Cov}}
+\newcommand{\Corr}{\operatorname{Corr}}
+\newcommand{\one}{\mathbf{1}}                 % indicator
+\newcommand{\iid}{\mathrm{i.i.d.}}
+\newcommand{\indep}{\perp\!\!\!\perp}         % independence
+
+% ---------- Supplementary apparatus: footnotes + appendix pointers ----------
+\newcommand{\note}[1]{\footnote{#1}}          % short aside; point to the appendix for longer content
+\newcommand{\appref}[1]{\hyperlink{#1}{\S#1}} % live link to an appendix item (id N.A.k)
+
+% ---------- Proof body: left rule only ----------
+\newtcolorbox{pfbody}{blanker, breakable, left=11pt, right=2pt, top=4pt, bottom=4pt,
+  borderline west={0.9pt}{2pt}{black}, before skip=4pt, after skip=4pt}
+
+% ---------- Solution bodies: assigned = green, unassigned = Columbia blue, no box ----------
+\definecolor{hwUnassignedBlue}{HTML}{1D4F91}
+\newtcolorbox{solbody}{blanker, breakable, left=11pt, right=2pt, top=4pt, bottom=4pt,
+  borderline west={1.1pt}{2pt}{green!60!black}, before skip=4pt, after skip=4pt}
+\newtcolorbox{solbodyblue}{blanker, breakable, left=11pt, right=2pt, top=4pt, bottom=4pt,
+  borderline west={1.1pt}{2pt}{hwUnassignedBlue}, before skip=4pt, after skip=4pt}
+\newtcolorbox{solbodyexam}{blanker, breakable, left=11pt, right=2pt, top=4pt, bottom=4pt,
+  borderline west={1.3pt}{2pt}{cuBlueLt}, before skip=4pt, after skip=4pt}
+
+% ---------- Object (PRIMARY): small-bold "Type id" / \Large title / indented body ----------
+\newenvironment{Obj}[3]{%
+  \registerobj{#1}{#2}{#3}%
+  \par\medskip\noindent{\small\bfseries #1~\hypertarget{#2}{#2}}\\[1pt]{\Large #3}\nopagebreak%
+  \begin{adjustwidth}{1.6em}{0pt}\ignorespaces}{\par\end{adjustwidth}}
+
+% ---------- Object (SECONDARY/light): \large italic title, smaller body. Example/Remark/Concept ----------
+\newenvironment{ObjL}[3]{%
+  \par\medskip\noindent{\small\bfseries #1~\hypertarget{#2}{#2}}\\[1pt]{\large\itshape #3}\nopagebreak%
+  \begin{adjustwidth}{1.6em}{0pt}\small\ignorespaces}{\par\end{adjustwidth}}
+
+% ---------- Proof: numbered steps, ruled body, filled square, caption-size notes ----------
+\newenvironment{Prf}[3]{%
+  \par\smallskip\begin{adjustwidth}{1.6em}{0pt}%
+  \noindent{\small\bfseries Proof~#1}\\[1pt]{\itshape #2}\par\nobreak\smallskip
+  \gdef\PfNotes{#3}%
+  \begin{adjustwidth}{1.4em}{0pt}\begin{pfbody}%
+  \begin{enumerate}[leftmargin=1.9em,labelsep=0.55em,itemsep=5pt,topsep=1pt,
+     parsep=1pt,label=\textnormal{(\arabic*)}]}{%
+  \end{enumerate}\nobreak\par\noindent\hfill$\blacksquare$\end{pfbody}%
+  \ifx\PfNotes\empty\else\par{\footnotesize\PfNotes}\fi
+  \end{adjustwidth}\end{adjustwidth}}
+
+% ---------- Deferred / cited proof: label + italic title + pointer ----------
+\newcommand{\PrfRef}[3]{%
+  \par\smallskip\begin{adjustwidth}{1.6em}{0pt}%
+  \noindent{\small\bfseries Proof~#1}\\[1pt]{\itshape #2}\par\smallskip
+  {\footnotesize $\hookrightarrow$\enspace #3}\par\end{adjustwidth}}
+
+% ---------- Counterexample "fails" line ----------
+\newcommand{\fails}[1]{\par\vspace{1.5pt}{\footnotesize\textsc{fails:}\enspace #1}}
+
+% ---------- Exercise + worked Solution (foundations problem sets) ----------
+% \begin{Exercise}{id}{tag}  ...  \end{Exercise}     tag = source/difficulty, or {} for none.
+\newenvironment{Exercise}[2]{%
+  \par\medskip\noindent{\small\bfseries Exercise~\hypertarget{#1}{#1}}%
+  \gdef\ExTag{#2}\ifx\ExTag\empty\else\enspace{\footnotesize[\,#2\,]}\fi\\[1pt]\nopagebreak%
+  \begin{adjustwidth}{1.6em}{0pt}\ignorespaces}{\par\end{adjustwidth}}
+% \begin{Solution} ... \end{Solution}   LEFT GREEN rule (homework green), auto-square.
+\newenvironment{Solution}{%
+  \par\smallskip\begin{adjustwidth}{1.6em}{0pt}%
+  \noindent{\small\scshape Solution.}\par\nobreak\smallskip
+  \begin{solbody}\setlength{\parskip}{0.5em}\ignorespaces}{%
+  \nobreak\par\noindent\hfill$\blacksquare$\end{solbody}\end{adjustwidth}}
+% \begin{SolutionBlue} ... \end{SolutionBlue}   LEFT BLUE rule for unassigned problems.
+\newenvironment{SolutionBlue}{%
+  \par\smallskip\begin{adjustwidth}{1.6em}{0pt}%
+  \noindent{\small\scshape Solution.}\par\nobreak\smallskip
+  \begin{solbodyblue}\setlength{\parskip}{0.5em}\ignorespaces}{%
+  \nobreak\par\noindent\hfill$\blacksquare$\end{solbodyblue}\end{adjustwidth}}
+% \begin{SolutionExam} ... \end{SolutionExam}   LEFT COLUMBIA LIGHT BLUE rule for exam problems.
+\newenvironment{SolutionExam}{%
+  \par\smallskip\begin{adjustwidth}{1.6em}{0pt}%
+  \noindent{\small\scshape Solution.}\par\nobreak\smallskip
+  \begin{solbodyexam}\setlength{\parskip}{0.5em}\ignorespaces}{%
+  \nobreak\par\noindent\hfill$\blacksquare$\end{solbodyexam}\end{adjustwidth}}
+
+% ---------- Reflection body: a LEFT GRAY rule (the homework's gray identity), no box ----------
+\newtcolorbox{refbody}{blanker, breakable, left=11pt, right=2pt, top=4pt, bottom=4pt,
+  borderline west={1.1pt}{2pt}{black!50}, before skip=4pt, after skip=4pt}
+% \begin{Reflection} ... \end{Reflection}   LEFT GRAY rule; the teaching apparatus (no square).
+\newenvironment{Reflection}{%
+  \par\smallskip\begin{adjustwidth}{1.6em}{0pt}%
+  \noindent{\small\scshape Reflections.}\par\nobreak\smallskip
+  \begin{refbody}\setlength{\parskip}{0.6em}\ignorespaces}{%
+  \par\end{refbody}\end{adjustwidth}}
+% Reflection run-in mini-header (Goal., Idea., What's needed., Takeaway., ...).
+\newcommand{\rh}[1]{\par\smallskip\noindent\textbf{#1}\enspace\ignorespaces}
+
+% ---------- Spoken aside: the instructor's verbatim words, woven from the recording ----------
+% \begin{Spoken}{<locator, e.g. 41:30>} ... \end{Spoken}
+% DOUBLE dark-blue left rule; the quotation in small italics; auto attribution
+% "in lecture, <locator>" (locator may be empty). Place immediately after the
+% object the remark comments on; quotes verbatim from sources/<date>/audio-transcript.md.
+\newtcolorbox{spokenbody}{blanker, breakable, left=13pt, right=2pt, top=3pt, bottom=3pt,
+  borderline west={0.5pt}{1pt}{cuBlueDk}, borderline west={0.5pt}{3.5pt}{cuBlueDk},
+  before skip=6pt, after skip=6pt}
+\newenvironment{Spoken}[1]{%
+  \gdef\SpokenLoc{#1}%
+  \par\smallskip\begin{adjustwidth}{1.6em}{0pt}\begin{spokenbody}%
+  \small\itshape\ignorespaces}{%
+  \par\vspace{2pt}{\normalfont\footnotesize\scshape\raggedleft
+  ---\ in lecture\ifx\SpokenLoc\empty\else,\ \SpokenLoc\fi\par}%
+  \end{spokenbody}\end{adjustwidth}}
+
+% ---------- Exercises Part: problem heading (bold "Problem id" + italic source); TOC + hypertarget ----------
+% \prob{id}{source/tag}  ...problem text...  then \begin{Solution}/\begin{Reflection}.
+\newcommand{\prob}[2]{\par\bigskip\phantomsection
+  \markright{#1\quad #2}%
+  \noindent{\large\bfseries Problem~\hypertarget{prob:#1}{#1}}%
+  \gdef\ProbSrc{#2}\ifx\ProbSrc\empty\else\enspace{\normalsize\itshape #2}\fi\par\nobreak\smallskip}
+% Cite an item of the course "List of Facts".
+% Stable key: fact:<key>. Display number: auto-generated F01, F02, ...
+\newcounter{coursefact}
+\renewcommand{\thecoursefact}{F\ifnum\value{coursefact}<10 0\fi\arabic{coursefact}}
+\newcommand{\coursefact}[3]{%
+  \item \refstepcounter{coursefact}\hypertarget{fact:#1}{}\label{factnum:#1}%
+  {\emergencystretch=2em\relax
+   \textbf{\thecoursefact.}\enspace #2\unskip\hfill(#3)\par}%
+}
+\newcommand{\factidref}[1]{\hyperlink{fact:#1}{\ref*{factnum:#1}}}
+\newcommand{\factref}[2]{\hyperlink{fact:#1}{#2}}
+\newcommand{\factanchor}[1]{\hypertarget{fact:#1}{}}
+% ---------- Placeholder solution (for problems deferred beyond the current notes) ----------
+\newcommand{\deferredsoln}{\par\smallskip\begin{adjustwidth}{1.6em}{0pt}%
+  \noindent{\small\scshape Solution.}\par\nobreak\smallskip
+  \begin{solbody}\itshape Deferred. This problem depends on material not yet covered in the
+  lectures; a full solution and reflection will follow once that material is in
+  place.\end{solbody}\end{adjustwidth}}
+\newcommand{\deferredsolnblue}{\par\smallskip\begin{adjustwidth}{1.6em}{0pt}%
+  \noindent{\small\scshape Solution.}\par\nobreak\smallskip
+  \begin{solbodyblue}\itshape Deferred. This problem depends on material not yet covered in the
+  lectures; a full solution and reflection will follow once that material is in
+  place.\end{solbodyblue}\end{adjustwidth}}
+
+% ---------- Figure: graphic, then caption below (bold label, small-caps title, optional desc) ----------
+\newenvironment{Fig}[3]{%
+  \gdef\FigID{#1}\gdef\FigTitle{#2}\gdef\FigDesc{#3}%
+  \par\medskip\begin{center}}{%
+  \end{center}\nopagebreak\par\vspace{4pt}
+  \begin{center}\begin{minipage}{0.86\linewidth}\footnotesize
+  \hypertarget{\FigID}{\textbf{Figure~\FigID.}}\enspace{\scshape\FigTitle.}%
+  \ifx\FigDesc\empty\else\enspace\FigDesc\fi\par
+  \end{minipage}\end{center}\medskip}
+
+% ---------- Section (topic) heading: \LARGE bold; sets running head + TOC entry ----------
+\newsavebox{\subnumbox}
+\newcommand{\sub}[2]{\par\bigskip
+  \markright{#1\quad #2}%
+  \phantomsection\addcontentsline{toc}{section}{\protect\numberline{#1}#2}%
+  \sbox\subnumbox{\LARGE\bfseries #1\quad}%
+  {\LARGE\bfseries\noindent\hyphenpenalty=10000\exhyphenpenalty=10000
+   \rightskip=0pt plus 1fil\relax
+   \hangindent=\wd\subnumbox\hangafter=1
+   \hypertarget{#1}{#1}\quad #2\par}\nobreak\vspace{6pt}}
+
+% ---------- "Contents of this lecture" / scope block (all styling lives here) ----------
+\newenvironment{lecturecontents}[1]{%
+  \par\nobreak
+  {\noindent\normalfont\scshape\small #1}\par
+  \vspace{-0.4em}\noindent\rule{\linewidth}{0.4pt}\par\smallskip
+  \small\begin{itemize}[leftmargin=1.6em,itemsep=1.5pt,topsep=0pt,label={}]%
+}{%
+  \end{itemize}%
+  \vspace{-0.3em}\noindent\rule{\linewidth}{0.4pt}\par}
+
+% ---------- Aligned contents blocks for part openers ----------
+\newlength{\partcontentlabelwidth}
+\newenvironment{partcontents}[2][12em]{%
+  \par\nobreak
+  {\noindent\normalfont\scshape\small #2}\par
+  \vspace{-0.4em}\noindent\rule{\linewidth}{0.4pt}\par\smallskip
+  \small
+  \setlength{\partcontentlabelwidth}{#1}%
+  \begin{list}{}{%
+    \setlength{\leftmargin}{1.6em}%
+    \setlength{\labelwidth}{0pt}%
+    \setlength{\labelsep}{0pt}%
+    \setlength{\itemindent}{0pt}%
+    \setlength{\itemsep}{2pt}%
+    \setlength{\topsep}{0pt}%
+    \setlength{\parsep}{0pt}}%
+}{%
+  \end{list}%
+  \vspace{-0.3em}\noindent\rule{\linewidth}{0.4pt}\par}
+\newcommand{\partcontentitem}[3]{%
+  \item
+  \begingroup
+  \hangindent=\dimexpr\partcontentlabelwidth+1.2em\relax
+  \hangafter=1
+  \makebox[\partcontentlabelwidth][l]{\hyperlink{#1}{#2}}%
+  \hspace{1.2em}\hyperlink{#1}{#3}\par
+  \endgroup}
+
+% ---------- Per-lecture appendix heading (supplementary material) ----------
+\newcommand{\lectureappendix}{\clearpage
+  \markright{Appendix}%
+  \phantomsection\addcontentsline{toc}{section}{Appendix}%
+  {\LARGE\bfseries Appendix}\par\nobreak\vspace{2pt}%
+  {\small\itshape Supplementary material---additional proofs, context, and other treatments;
+   not part of the lecture proper.}\par\nobreak\vspace{6pt}}
+
+% ---------- Per-(sub)file Index of Objects (auto; two passes) ----------
+\makeatletter
+\newcommand*{\l@objentry}[2]{%
+  \par\nobreak\noindent
+  \parbox[t]{\dimexpr\linewidth-3em\relax}{\footnotesize\raggedright
+    \hangindent=3.5em\hangafter=1 #1}%
+  \nobreak\hfill{\footnotesize #2}\par\vspace{2pt}}
+\newcommand{\looentry}[2]{\makebox[3.5em][l]{\textbf{#1}}#2}% fixed-width id column
+\newcommand{\registerobj}[3]{\phantomsection
+  \addcontentsline{loo}{objentry}{\protect\looentry{#2}{#1: #3}}%
+  \index{#3|hyperpage}}
+\newcommand{\objindex}{\par\markboth{Index of Objects}{Index of Objects}%
+  \phantomsection\addcontentsline{toc}{chapter}{Index of Objects}%
+  {\LARGE\bfseries Index of Objects}\par\smallskip
+  \noindent\rule{\linewidth}{0.4pt}\par\smallskip\@starttoc{loo}}
+\newcommand{\printgeneralindex}{%
+  \cleardoublepage
+  \renewcommand{\indexname}{General Index}%
+  \markboth{General Index}{General Index}%
+  \phantomsection\addcontentsline{toc}{chapter}{General Index}%
+  \printindex}
+\makeatother
+
+% ---------- Running heads (twoside): page outer; lecture verso, section recto ----------
+\newcommand{\lecturehead}{}
+\pagestyle{fancy}\fancyhf{}
+\fancyhead[LE]{\footnotesize\scshape\thepage}
+\fancyhead[RE]{\footnotesize\scshape\lecturehead}
+\fancyhead[LO]{\footnotesize\scshape\rightmark}
+\fancyhead[RO]{\footnotesize\scshape\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% ---------- Major book divider: custom part page, not the default book-class \part ----------
+\newcounter{bookpart}
+\renewcommand{\thebookpart}{\Roman{bookpart}}
+\newcommand{\bookpart}[2]{%
+  \cleardoublepage
+  \stepcounter{bookpart}%
+  \renewcommand{\lecturehead}{#1}%
+  \markboth{#1}{#1}%
+  \thispagestyle{plain}%
+  \phantomsection\addcontentsline{toc}{part}{Part~\thebookpart\texorpdfstring{\quad}{ }#1}%
+  \vspace*{0.18\textheight}%
+  {\Large\bfseries PART~\thebookpart}\par\vspace{0.95em}%
+  {\huge\bfseries\raggedright\hyphenpenalty=10000\exhyphenpenalty=10000
+   \linespread{1.08}\selectfont #1\par}%
+  \vspace{1.05em}\noindent\rule{0.72\linewidth}{0.4pt}\par
+  \clearpage}
+
+% ---------- Lecture opener: title block, running head, master-TOC entry ----------
+% \beginunit{<running head>}{<TOP LABEL>}{<date>}{<title>}  -- general opener
+% (a lecture, a review session, etc.); title wraps naturally, no \\ needed.
+% Thin vertical-rule divider for the course/title metadata line.
+\newcommand{\midbar}{\hspace{0.6em}\rule[-0.18ex]{0.4pt}{1.75ex}\hspace{0.6em}}
+\newcommand{\beginunittoc}[5]{%
+  \clearpage
+  \renewcommand{\lecturehead}{#1}%
+  \markboth{#1}{}%
+  \thispagestyle{plain}%
+  \phantomsection\addcontentsline{toc}{chapter}{#5}%
+  {\Large\bfseries #2}\par\vspace{0.95em}
+  {\huge\bfseries\raggedright\hyphenpenalty=10000\exhyphenpenalty=10000\linespread{1.08}\selectfont #4\par}%
+  \vspace{1.05em}{\large STAT~S4204\midbar Statistical Inference}\par
+  \def\UnitSubtitle{#3}%
+  \ifx\UnitSubtitle\empty\else\vspace{0.5em}{\normalsize #3}\par\fi
+  \vspace{1.25em}}
+\newcommand{\beginunit}[4]{%
+  \beginunittoc{#1}{#2}{#3}{#4}{#2\texorpdfstring{\quad}{ }#4}}
+% \beginlecture{<number>}{<date>}{<title>}
+\newcommand{\beginlecture}[3]{\beginunit{Lecture #1~\textendash~#2}{LECTURE #1}{#2}{#3}}
+
+% ---------- Epigraph: a subject-relevant quotation under a unit opener ----------
+% \epigraph{<quotation>}{<attribution>}  -- place immediately after \beginlecture/\beginunit.
+% Every lecture opener carries one, chosen to fit that lecture's subject matter.
+\newcommand{\epigraph}[2]{%
+  \par\nopagebreak\vspace{0.55em}%
+  {\noindent\hfill\begin{minipage}{0.66\linewidth}%
+    \itshape\small #1\par\vspace{0.5em}%
+    {\normalfont\footnotesize\scshape\raggedleft #2\par}%
+  \end{minipage}}\par\vspace{1.5em}}
+
+\endinput

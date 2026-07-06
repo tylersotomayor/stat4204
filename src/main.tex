@@ -1,0 +1,164 @@
+% ============================================================
+%  Notes in Statistical Inference  (STAT S4204)
+%  Book master. Compile this file (two passes) to build the
+%  whole book; compile an individual lecture-XX.tex on its own
+%  while drafting (it inherits this preamble via subfiles).
+% ============================================================
+\documentclass[11pt,twoside]{book}
+\usepackage{inferencenotes}  % shared house style (all macros)
+\usepackage{subfiles}        % each lecture compiles standalone or as part of the book
+
+\newif\ifclassedition
+\ifnum\pdfstrcmp{\jobname}{main-class}=0
+  \classeditiontrue
+\else
+  \classeditionfalse
+\fi
+
+\providecommand{\LatestVersionURL}{}
+\IfFileExists{publication-config.tex}{\input{publication-config.tex}}{}
+
+\ifclassedition
+\hypersetup{
+  pdftitle={Notes in Statistical Inference (Class Edition)},
+  pdfauthor={Tyler Sotomayor (student); lectures by Daniel Rabinowitz},
+  pdfsubject={STAT S4204 -- Statistical Inference}
+}
+\else
+\hypersetup{
+  pdftitle={Notes in Statistical Inference},
+  pdfauthor={Tyler Sotomayor (student); lectures by Daniel Rabinowitz},
+  pdfsubject={STAT S4204 -- Statistical Inference}
+}
+\fi
+
+% ---- Let long chapter (lecture) TOC entries wrap ragged-right instead of overflowing ----
+% Standard book-class \l@chapter, with \@plus 2.5em added to \rightskip so a long title
+% breaks at a good space rather than justifying past the margin.
+\makeatletter
+\renewcommand*\l@chapter[2]{%
+  \ifnum \c@tocdepth >\m@ne
+    \addpenalty{-\@highpenalty}%
+    \vskip 1.0em \@plus\p@
+    \setlength\@tempdima{1.5em}%
+    \begingroup
+      \parindent \z@ \rightskip \@pnumwidth \@plus 2.5em
+      \parfillskip -\@pnumwidth
+      \leavevmode \bfseries
+      \advance\leftskip\@tempdima
+      \hskip -\leftskip
+      #1\nobreak\hfil \nobreak\hb@xt@\@pnumwidth{\hss #2}\par
+      \penalty\@highpenalty
+    \endgroup
+  \fi}
+\makeatother
+
+\begin{document}
+
+\frontmatter
+
+% ============================================================
+%  TITLE PAGE  (Columbia seal, cuBlue rules -- matches the
+%  house handbook style)
+% ============================================================
+\begin{titlepage}
+  \begingroup
+  \centering
+  \setlength{\parindent}{0pt}\setlength{\parskip}{0pt}
+
+  \vspace*{0.4cm}
+  \IfFileExists{figures/ColumbiaSeal.png}{%
+    \includegraphics[width=0.20\textwidth]{ColumbiaSeal.png}\par\vspace{0.5cm}}{}
+  {\LARGE\bfseries COLUMBIA UNIVERSITY}\par
+  \vspace{0.15cm}{\large Department of Statistics}\par
+
+  \vspace{1.5cm}
+  {\rule{0.7\textwidth}{0.5pt}}\par
+  \vspace{1.0cm}
+  {\normalfont\scshape\Huge Notes in Statistical Inference}\par
+  \vspace{0.55cm}
+  {\normalfont\itshape\large Based on the Lectures of Daniel Rabinowitz}\par
+  \vspace{1.0cm}
+  {\rule{0.7\textwidth}{0.5pt}}\par
+
+  \vspace{1.4cm}
+  {\normalfont\Large\bfseries STAT~S4204}\par
+  \vspace{0.22cm}{\normalfont\Large\bfseries Statistical Inference}\par
+  \vspace{0.35cm}{\normalfont\large Summer 2026 (Session B)}\par
+
+  \vspace{1.9cm}
+  \makebox[\textwidth][c]{%
+    \begin{minipage}[t]{0.46\textwidth}\centering
+      {\normalfont\footnotesize\scshape Student}\par\vspace{0.12cm}
+      {\large\bfseries Tyler Sotomayor}\par\vspace{0.1cm}
+      \href{mailto:tyler.sotomayor@columbia.edu}{\texttt{\small tyler.sotomayor@columbia.edu}}\par
+    \end{minipage}\hfill
+    \begin{minipage}[t]{0.46\textwidth}\centering
+      {\normalfont\footnotesize\scshape Instructor}\par\vspace{0.12cm}
+      {\large\bfseries Daniel Rabinowitz}\par\vspace{0.1cm}
+      \href{mailto:dr105@columbia.edu}{\texttt{\small dr105@columbia.edu}}\par
+    \end{minipage}}\par
+
+  \vfill
+  {\normalfont\small This version compiled \today
+  \if\relax\detokenize\expandafter{\LatestVersionURL}\relax\else
+    \footnote{For latest version: \href{\LatestVersionURL}{\texttt{\detokenize\expandafter{\LatestVersionURL}}}. Please report any errata to \href{mailto:tyler.sotomayor@columbia.edu}{\texttt{tyler.sotomayor@columbia.edu}}.}%
+  \fi
+  \par}
+  \endgroup
+\end{titlepage}
+
+\cleardoublepage
+% Long lecture titles wrap in the contents; forbid hyphenation there so words
+% (e.g. "Admissibility") break only at spaces.
+\begingroup
+\hyphenpenalty=10000\exhyphenpenalty=10000
+\tableofcontents
+\endgroup
+
+% ---- front-matter apparatus: the proof-tag legend ----
+\cleardoublepage
+\phantomsection\addcontentsline{toc}{chapter}{Modes of Argument}
+\markboth{Modes of Argument}{Modes of Argument}
+\thispagestyle{plain}
+{\LARGE\bfseries Modes of Argument}\par\smallskip
+\noindent\rule{\linewidth}{0.4pt}\par\medskip
+\noindent Each proof in these notes is tagged, in its caption, by its dominant \emph{mode of
+argument}---the kind of reasoning it turns on. The letter \emph{A} abbreviates \emph{argument};
+a proof that blends two is written, e.g., \textsf{[A2$+$A4]}. The tags are keyed below.\par\medskip
+\noindent\begin{tabular}{@{}l@{\hspace{0.9em}}p{0.78\linewidth}@{}}
+\textbf{A1}  & Iterated expectation, or conditioning: compute through $\E\{\E\{Y\mid X\}\}=\E\{Y\}$, or condition on the right variable.\\[3pt]
+\textbf{A2}  & Linearity and bilinearity: expand $\E$, $\Var$, $\Cov$ over linear combinations; collect and cancel.\\[3pt]
+\textbf{A3}  & The indicator trick: write a probability as an expectation, $P(A)=\E\,\one_A$.\\[3pt]
+\textbf{A4}  & Add-and-subtract a centering term: bias--variance and mean-squared-error decompositions.\\[3pt]
+\textbf{A5}  & Completing the square: quadratic minimisation, least squares, normal kernels.\\[3pt]
+\textbf{A6}  & Independence factorisation: joint distributions factor; expectations of products split.\\[3pt]
+\textbf{A7}  & Inequality bounding: Jensen, Cauchy--Schwarz, Markov--Chebyshev.\\[3pt]
+\textbf{A8}  & Transformation: change of variables, the CDF method, Jacobians.\\[3pt]
+\textbf{A9}  & Contradiction, or the contrapositive.\\[3pt]
+\textbf{A10} & First-order condition: differentiate, set to zero, and verify the minimum.\\[3pt]
+\textbf{A11} & Exchange of operations: swap expectation with sums, integrals, or derivatives.\\[3pt]
+\textbf{A12} & Cases, or reduction ``without loss of generality.''\\[3pt]
+\textbf{Constr} & Explicit construction of the required object (an estimator, a test, a counterexample).\\[3pt]
+\textbf{Direct} & A direct chain of implications, with no special device.\\
+\end{tabular}
+
+\mainmatter
+
+% ---- Part I: lecture notes ----
+\bookpart{Lecture Notes}{}
+
+% ---- lectures (one \subfile line per lecture, in order) ----
+\subfile{lecture-01}   % Monday, 6 July 2026
+
+% ---- master Index of Objects across the whole book ----
+\backmatter
+% ---- Part IV: back-matter reference apparatus ----
+\bookpart{Resources and References}{}
+
+\subfile{course-facts}
+\clearpage
+\objindex
+\printgeneralindex
+
+\end{document}

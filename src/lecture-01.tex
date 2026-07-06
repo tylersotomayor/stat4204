@@ -1,0 +1,671 @@
+%% ============================================================
+%%  Lecture 1 -- Monday, 6 July 2026
+%%  Subfile of main.tex: compiles standalone OR as part of the book.
+%%  Built from sources/2026-07-06/ (slide-transcript.md, outline.md).
+%% ============================================================
+\documentclass[main.tex]{subfiles}
+
+\begin{document}
+
+\beginlecture{1}{Monday, 6 July 2026}%
+  {From Data to Decisions: Statistical Models, Loss, and Risk}
+
+\epigraph{Far better an approximate answer to the right question, which is often vague, than an
+exact answer to the wrong question, which can always be made precise.}%
+{John W. Tukey, ``The Future of Data Analysis'' (1962)}
+
+\begin{lecturecontents}{Contents of this lecture}
+  \item \hyperlink{1.1}{1.1\quad Probability Review I: Randomness, Random Variables, Distributions, and Realizations}
+  \item \hyperlink{1.2}{1.2\quad The Applied-Statistics Pipeline}
+  \item \hyperlink{1.3}{1.3\quad The Statistical Model and the Analytic Goal}
+  \item \hyperlink{1.4}{1.4\quad Probability Review II: Expectation, Conditional Expectation, and Iterated Expectations}
+  \item \hyperlink{1.5}{1.5\quad Decision Theory: Actions, Loss, and Risk}
+  \item \hyperlink{1.6}{1.6\quad Bayesian Decision Theory}
+  \item \hyperlink{1.7}{1.7\quad The Cheat Sheet: Decision Theory in Eleven Items}
+  \item \hyperlink{1.8}{1.8\quad Estimation, Testing, and the Clinical Trial}
+\end{lecturecontents}
+
+\bigskip
+\noindent\textbf{Overview.} The course opens where applied statistics leaves off: a study has a
+goal, data, and software output---and none of those, by themselves, say anything about reality.
+This lecture builds the bridge. After a review of random variables, distributions, and
+realizations (and, later, of expectation up through iterated expectations), the data's unknown
+joint distribution is organized into a \emph{statistical model}, the study's purpose becomes an
+\emph{analytic goal} expressed in the model's parameters, and the choice of method becomes a
+decision problem: an action space, a loss function, and---as the figure of merit---the
+\emph{risk function}, the expected loss as a function of the parameter. Admissibility and the
+Bayes principle give the two classical answers to what ``good'' means, and both are put to work
+on a two-arm clinical trial in which two estimators of a cure-rate difference compete. The
+companion text is Hoel--Port--Stone, Chapter~1 (\HPS{1}).
+
+\clearpage
+% ============================================================
+\sub{1.1}{Probability Review I: Randomness, Random Variables, Distributions, and Realizations}
+
+\begin{ObjL}{Concept}{1.1.1}{The point of statistical theory}
+``The point of statistical theory is to inform the application of statistics.'' The lecture
+therefore begins with applied statistics---what a data analysis is \emph{for}---and works
+backward to the theory that disciplines it.
+\end{ObjL}
+
+\begin{ObjL}{Remark}{1.1.2}{Randomness---does it exist?}
+The review opens with a philosophical aside: whether randomness ``exists'' in the world or only
+describes our ignorance is left unresolved---and is beside the point. Probability is the
+\emph{model} we adopt for quantities whose values we cannot predict; everything in this course
+is a statement within that model.
+\end{ObjL}
+
+\begin{Obj}{Definition}{1.1.3}{Sample space}
+The \emph{sample space} $S$ is the set of all possible outcomes of the random phenomenon being
+modeled. Events are subsets of $S$, and probabilities are assigned to events in accordance with
+the axioms of probability.
+\end{Obj}
+
+\begin{Obj}{Definition}{1.1.4}{Random variable}
+In the real world, a \emph{random variable} is a numerical quantity whose value is determined
+by the outcome of a random phenomenon---a measurement not yet made. Mathematically, a random
+variable is a (measurable) function
+\[ X : S \to \mathbb{R}, \]
+assigning a number $X(s)$ to each outcome $s\in S$. The data of a study are random variables;
+so is anything computed from them.
+\end{Obj}
+
+\begin{Obj}{Definition}{1.1.5}{Distribution}
+The \emph{distribution} of a random variable $X$ is the assignment
+\[ A \;\longmapsto\; P(X\in A) \]
+of a probability to each (measurable) set $A\subseteq\mathbb{R}$: the complete description, in
+advance of observation, of how likely $X$ is to fall anywhere. It is determined by the
+cumulative distribution function $F(x)=P(X\le x)$, and, in the discrete and continuous cases,
+by a probability mass function or a density.
+\end{Obj}
+
+\begin{Obj}{Definition}{1.1.6}{Joint distribution, joint pmf, joint density}
+The \emph{joint distribution} of random variables $X_1,\dots,X_n$ assigns a probability
+$P\big((X_1,\dots,X_n)\in B\big)$ to each (measurable) $B\subseteq\mathbb{R}^n$; it carries
+every dependence among the variables, and it determines---but is not in general determined
+by---the marginal distribution of each $X_i$. In the discrete case it is given by the
+\emph{joint probability mass function}
+$p(x_1,\dots,x_n)=P(X_1=x_1,\dots,X_n=x_n)$; in the continuous case by a \emph{joint density}
+$f\ge0$ with
+\[ P\big((X_1,\dots,X_n)\in B\big)\;=\;\int_B f(x_1,\dots,x_n)\,dx_1\cdots dx_n . \]
+\end{Obj}
+
+\begin{Obj}{Definition}{1.1.7}{Realization}
+If the outcome of the experiment is $s\in S$, the \emph{realization} of the random variable $X$
+is the number $x=X(s)$: the value actually observed. Random variables are written with capital
+letters and their realizations in lower case. Your data set is a realization of the random
+variables the model describes.
+\end{Obj}
+
+\begin{ObjL}{Example}{1.1.8}{The same coin flipped twice}
+Flip the same coin twice, and let $X_1$ and $X_2$ be the head-indicators of the two flips. The
+deck poses three questions.
+\emph{Are the random variables the same?} No: $X_1$ and $X_2$ are different functions on the
+sample space $S=\{HH,HT,TH,TT\}$---the first reads off the first coordinate, the second the
+second.
+\emph{Are the distributions the same?} Yes: each is Bernoulli with the same head-probability,
+because it is the same coin.
+\emph{Are the realizations the same?} Not necessarily: the observed pair may be $(1,0)$.
+Distinct random variables can share one distribution and still realize differently---the three
+notions of \xref{1.1.4}, \xref{1.1.5}, and \xref{1.1.7} are genuinely different.
+\end{ObjL}
+
+% ============================================================
+\sub{1.2}{The Applied-Statistics Pipeline}
+
+\begin{ObjL}{Concept}{1.2.1}{The goal of the study versus the data}
+``If you are doing a statistical analysis, there should be something you are trying to
+learn\dots\ NOT something about your data, something about what your data says about
+reality.'' The goal of the study and the data are separate objects; no arrow connects them
+directly.
+\end{ObjL}
+
+\begin{ObjL}{Concept}{1.2.2}{Methods and output}
+Statistical methods are applied to the data---through a package (R, SAS, SPSS, Stata, \dots),
+through modules (SciPy, NumPy, Pandas, \dots), ``or \dots\ AI?''---and ``the application of
+methods produces output\dots''
+\end{ObjL}
+
+\begin{ObjL}{Concept}{1.2.3}{Interpretation}
+``These results do not directly speak to the goal!'' They must be \emph{interpreted}, and it is
+the interpretation of the results \emph{in light of where the data came from}---causality and
+representativeness---that allows conclusions about reality.
+\end{ObjL}
+
+\begin{Fig}{1.2.4}{The applied-statistics pipeline}{What you know and what you don't know about
+the phenomenon and the data collection feed the statistical model; the model and the goal of
+the study produce the analytic goal; model and analytic goal select the method; the method
+applied to the data produces results, which---interpreted in light of causality and
+representativeness---yield conclusions. The dashed arrow is the feedback from results back into
+the model. Recreated from the lecture deck (\xref{1.2.1}--\xref{1.2.3}; cf.\ \xref{1.3.1},
+\xref{1.3.5}).}
+\begin{tikzpicture}[x=1cm,y=1cm,
+  every node/.style={font=\small},
+  box/.style={draw, rounded corners=2pt, align=center, inner sep=4pt, minimum height=0.72cm,
+    execute at begin node={\hyphenpenalty=10000\exhyphenpenalty=10000}},
+  arr/.style={->, thick}]
+  % top row: inputs to the model
+  \node[box, draw=cuBlueDk, fill=cuBlueLt!35, text width=3.9cm] (know) at (0.1,6.3)
+    {\textbf{What you know}\\[-1pt]{\footnotesize about the phenomenon and data collection}};
+  \node[box, draw=figBad, fill=figBad!8, text width=3.9cm] (dont) at (4.5,6.3)
+    {\textbf{What you don't know}\\[-1pt]{\footnotesize about the phenomenon and data collection}};
+  \node[box, draw=cuBlueDk, fill=white, text width=3.3cm] (goal) at (8.6,6.3)
+    {\textbf{The Goal of the Study}};
+  % model row
+  \node[box, draw=figLim, fill=figLim!10, text width=3.0cm] (model) at (1.9,4.6)
+    {\textbf{Statistical Model}};
+  \node[box, draw=figTerm, fill=figTerm!8, text width=3.3cm] (agoal) at (8.6,4.6)
+    {\textbf{The Analytic Goal}};
+  % method row
+  \node[box, draw=figTerm, fill=figTerm!8, text width=2.2cm] (method) at (4.4,3.0)
+    {\textbf{Method}};
+  \node[box, draw=cuBlueDk, fill=cuBlueLt!45, text width=1.8cm] (data) at (8.3,3.0)
+    {\textbf{Data}};
+  % results row
+  \node[box, draw=black!65, fill=black!4, text width=2.2cm] (results) at (6.3,1.5)
+    {\textbf{Results}};
+  \node[box, draw=figBad!80, fill=figBad!6, text width=3.4cm] (causal) at (10.9,1.5)
+    {\textbf{Causality and Representativeness}};
+  % interpretation
+  \node[box, draw=figBad, fill=figBad!10, text width=2.6cm] (interp) at (8.6,0.0)
+    {\textbf{Interpretation}};
+  % arrows
+  \draw[arr, cuBlueDk] (know.south) -- ([xshift=-0.9cm]model.north);
+  \draw[arr, figBad!85!black] (dont.south) -- ([xshift=0.9cm]model.north);
+  \draw[arr, figLim] (model.east) -- (agoal.west|-model.east);
+  \draw[arr, cuBlueDk] (goal.south) -- (agoal.north);
+  \draw[arr, figLim] (model.south) |- ([yshift=3.4pt]method.west);
+  \draw[arr, figTerm] (agoal.south) .. controls (7.2,3.9) .. ([yshift=3.4pt]method.east);
+  \draw[arr, figTerm] (method.south) |- ([yshift=2.8pt]results.west);
+  \draw[arr, cuBlueDk] (data.south) |- ([yshift=2.8pt]results.east);
+  \draw[arr, black!65] (results.south) |- ([yshift=2.8pt]interp.west);
+  \draw[arr, figBad!80] (causal.south) |- ([yshift=2.8pt]interp.east);
+  % dashed feedback: results -> model, up the left margin
+  \draw[->, thick, dashed, figLim!80!black]
+    (results.west) -- ++(-6.6,0) |- ([yshift=-1.4pt]model.west);
+\end{tikzpicture}
+\end{Fig}
+
+% ============================================================
+\sub{1.3}{The Statistical Model and the Analytic Goal}
+
+\begin{Obj}{Definition}{1.3.1}{The statistical model}
+If your data are random, they have a joint distribution (\xref{1.1.6}). What can you learn from
+your data? ``The data! AND THE DISTRIBUTION OF THE DATA?! And that is all!'' If the study
+has a goal, there must be something you do not know about that distribution---so more than one
+distribution must be possible. \emph{The statistical model is the set of all possible
+distributions of the data.} \HPS{1}
+\end{Obj}
+
+\begin{Obj}{Definition}{1.3.2}{Parameterization}
+It is common to \emph{index} the family of distributions: a \emph{parameterization} assigns to
+each value $\theta$ of a \emph{parameter space} $\Theta$ a distribution in the model, so the
+model may be written
+\[ \{\, p^{\theta}\ \text{or}\ f^{\theta} \;:\; \theta\in\Theta \,\} \]
+with $p^{\theta}$ a pmf or $f^{\theta}$ a density for the data.
+\end{Obj}
+
+\begin{Obj}{Definition}{1.3.3}{The analytic goal}
+The \emph{analytic goal} is an expression of the purpose of the study in terms of the
+parameters of the model. The scientific question, which lives in the real world, is translated
+into a statement about $\theta$.
+\end{Obj}
+
+\begin{ObjL}{Example}{1.3.4}{A two-arm clinical trial (the questions)}
+A clinical trial compares a treatment arm with a placebo arm, measuring cure or failure for
+each patient; the goal is to determine whether the treatment is efficacious. What is the
+statistical model? What is the analytic goal? The formal answers are assembled in
+\xref{1.8.4}, once decision theory has supplied the vocabulary.
+\end{ObjL}
+
+\begin{ObjL}{Concept}{1.3.5}{Where does the statistical model come from?}
+From \emph{what you know} about the phenomenon and the data collection (which distributions are
+plausible) and \emph{what you don't know} (which is why the model contains more than one
+distribution)---the two inputs at the top of Figure~\xref{1.2.4}. The dashed feedback arrow
+records that results can send you back to revise the model.
+\end{ObjL}
+
+\begin{ObjL}{Remark}{1.3.6}{What this class is about}
+Mostly: how do we get from \emph{a model and an analytic goal} to \emph{a good method}---and
+first, what do we mean by ``good''? In the deck's own strongest emphasis, these are ``an
+answer, of sorts, to the question: what is it all about, extracting information from data?''
+\end{ObjL}
+
+% ============================================================
+\sub{1.4}{Probability Review II: Expectation, Conditional Expectation, and Iterated Expectations}
+
+The roadmap for the rest of the lecture: ``First, all the theory. Then a list of the essential
+points. Then an illustration (the clinical trial).'' But first, some more probability review.
+
+\begin{Obj}{Definition}{1.4.1}{Expectation}
+Expectations belong to \emph{distributions}: a random variable has an expectation through its
+distribution. For discrete $Y$ with pmf $p$ and for continuous $Y$ with density $f$,
+\[ \E\{Y\} \;=\; \sum_{y} y\,p(y) \qquad\text{or}\qquad \E\{Y\} \;=\; \int y\,f(y)\,dy , \]
+provided the sum or integral converges absolutely: the probability-weighted average of the
+values of $Y$.
+\end{Obj}
+
+\begin{Obj}{Theorem}{1.4.2}{The law of the unconscious statistician}
+Let $Y$ be discrete with pmf $p$, and let $g$ be a real function. Then
+\[ \E\{g(Y)\} \;=\; \sum_{y} g(y)\,p(y) \]
+(and $\E\{g(Y)\}=\int g(y)f(y)\,dy$ in the continuous case): the expectation of $g(Y)$ may be
+computed against the distribution of $Y$, without first finding the distribution of $g(Y)$.
+\end{Obj}
+\begin{Prf}{1.4.2}{Proof by Regrouping of the Unconscious-Statistician Formula (discrete case).}{[A11]}
+\item Let $Z=g(Y)$, a random variable with pmf $p_Z(z)=P(g(Y)=z)=\sum_{y:\,g(y)=z}p(y)$.
+\item By \xref{1.4.1},
+      \[ \E\{Z\} \;=\; \sum_z z\,p_Z(z) \;=\; \sum_z\, z \!\sum_{y:\,g(y)=z}\! p(y) . \]
+\item Each outcome $y$ appears in exactly one inner sum, contributing $g(y)\,p(y)$; regrouping
+      the double sum by $y$ (legitimate by absolute convergence) gives
+      $\E\{g(Y)\}=\sum_y g(y)\,p(y)$.
+\end{Prf}
+
+\begin{Obj}{Definition}{1.4.3}{Joint, marginal, and conditional distributions}
+For a pair $(X,Y)$ with joint pmf $p(x,y)$: the \emph{marginal} pmf of $X$ is
+$p_X(x)=\sum_y p(x,y)$, and for any $x$ with $p_X(x)>0$ the \emph{conditional} pmf of $Y$ given
+$X=x$ is
+\[ p_{Y\mid X}(y\mid x) \;=\; \frac{p(x,y)}{p_X(x)} . \]
+Densities work the same way, with integrals in place of sums.
+\end{Obj}
+
+\begin{ObjL}{Remark}{1.4.4}{Conditional distributions are probability distributions!}
+For each fixed $x$, the numbers $p_{Y\mid X}(y\mid x)$ are nonnegative and sum to $1$: a
+conditional distribution is a genuine probability distribution, so everything defined for
+distributions---expectations included---applies to it verbatim. That single observation powers
+the next two objects.
+\end{ObjL}
+
+\begin{Obj}{Definition}{1.4.5}{Conditional expectation}
+The \emph{conditional expectation} of $Y$ given $X=x$ is the expectation of the conditional
+distribution,
+\[ \E\{Y\mid X=x\} \;=\; \sum_y y\,p_{Y\mid X}(y\mid x), \]
+and $\E\{Y\mid X\}$ denotes the random variable obtained by evaluating this function of $x$ at
+$X$.
+\end{Obj}
+
+\begin{Obj}{Theorem}{1.4.6}{Iterated expectations}
+Whenever the expectations exist,
+\[ \E\{\E\{Y\mid X\}\} \;=\; \E\{Y\}. \]
+\end{Obj}
+\begin{Prf}{1.4.6}{Proof by Conditioning of the Iterated-Expectations Identity (discrete case).}{[A1$+$A11]}
+\item $\E\{Y\mid X\}$ is the function $x\mapsto\E\{Y\mid X=x\}$ evaluated at $X$, so by the law
+      of the unconscious statistician (\xref{1.4.2}),
+      \[ \E\{\E\{Y\mid X\}\} \;=\; \sum_x \E\{Y\mid X=x\}\,p_X(x) . \]
+\item Substituting \xref{1.4.5} and \xref{1.4.3},
+      \[ \sum_x \sum_y y\,p_{Y\mid X}(y\mid x)\,p_X(x) \;=\; \sum_x\sum_y y\,p(x,y) . \]
+\item Exchanging the order of summation (legitimate by the assumed absolute convergence) and
+      summing out $x$ gives
+      \[ \sum_y y \sum_x p(x,y) \;=\; \sum_y y\,p_Y(y) \;=\; \E\{Y\} . \]
+\end{Prf}
+
+% ============================================================
+\sub{1.5}{Decision Theory: Actions, Loss, and Risk}
+
+Decision theory begins from the statistical model of \xref{1.3.1}---a ``parameterized set of
+distributions on the sample space''---and adds three objects. \HPS{1}
+
+\begin{Obj}{Definition}{1.5.1}{Action space}
+The \emph{action space} $\mathcal{A}$ is the set of possible choices of the decision maker:
+the values an analysis is allowed to output.
+\end{Obj}
+
+\begin{Obj}{Definition}{1.5.2}{Loss function}
+The \emph{loss function} is a map
+\[ L : \mathcal{A}\times\Theta \;\to\; \mathbb{R}, \]
+where $L(a,\theta)$ tells you how much you lose by choosing action $a$ when the parameter is
+$\theta$.\note{The deck words the domain both ways---``the parameter space cross the action
+space'' on the definition slides, ``the action space cross the parameter space'' in the
+typeset cheat sheet---while always writing the arguments $L(a,\theta)$. These notes follow the
+cheat sheet.}
+\end{Obj}
+
+\begin{Obj}{Definition}{1.5.3}{Method (decision rule)}
+A \emph{method}, or \emph{decision rule}, is a function
+\[ \delta : S \;\to\; \mathcal{A} \]
+from the sample space to the action space: what you will do, specified in advance, for every
+data set you might observe.
+\end{Obj}
+
+\begin{Obj}{Definition}{1.5.4}{Risk function}
+The \emph{risk function} of a decision rule $\delta$ is the expected loss as a function of the
+parameter:
+\[ R_{\delta}(\theta) \;=\; \E^{\theta}\{L(\delta(Y),\theta)\}
+   \;=\; \int_{y\in S} f^{\theta}(y)\,L(\delta(y),\theta)\,dy
+   \quad\text{or}\quad \sum_{y\in S} p^{\theta}(y)\,L(\delta(y),\theta), \]
+where $\E^{\theta}$ denotes expectation when the data's distribution is the one indexed by
+$\theta$.
+\end{Obj}
+
+\begin{Obj}{Principle}{1.5.5}{The risk principle}
+``THIS IS A PRINCIPLE, NOT A RESULT: try to minimize the risk.'' And---``Remember, Risk is a
+function!'' One method's risk is an entire curve over $\Theta$, not a number, so two methods
+need not be comparable: each may be better somewhere. The principle disciplines the search for
+methods; it does not by itself select one.
+\end{Obj}
+
+\begin{Obj}{Definition}{1.5.6}{Admissibility}
+A method is \emph{admissible} if there is no other method that does at least as well for every
+parameter value \emph{and} better for some parameter value. A method that is so dominated is
+\emph{inadmissible}: whatever $\theta$ turns out to be, you would not regret abandoning it.
+\end{Obj}
+
+\begin{Fig}{1.5.7}{Three risk functions}{Risk curves for three decision rules, as sketched in
+lecture. The dashed rule $\delta_3$ lies strictly above $\delta_1$ everywhere, so $\delta_1$
+dominates it and $\delta_3$ is inadmissible; $\delta_1$ and $\delta_2$ cross, so neither
+dominates the other, and the deck's legend marks both admissible (\xref{1.5.6}).}
+\begin{tikzpicture}[x=1.15cm,y=1.9cm]
+  % axes
+  \draw[->] (-3.3,0) -- (4.55,0) node[right=2pt] {$\theta$};
+  \draw[->] (-3,-0.08) -- (-3,1.95) node[left=2pt] {$R(\theta)$};
+  \foreach \x in {-2,0,2,4} \draw (\x,0) -- (\x,-0.04) node[below,font=\footnotesize] {$\x$};
+  \foreach \y in {0.5,1.0} \draw (-3,\y) -- (-3.06,\y) node[left,font=\footnotesize] {\y};
+  % delta_1: blue solid
+  \draw[figTerm, thick] plot [smooth, tension=0.9]
+    coordinates {(-3,0.80) (-1.5,1.00) (0,0.80) (2,0.55) (3.9,0.75)};
+  \node[figTerm, font=\footnotesize, right] at (3.95,0.68) {$\delta_1$};
+  % delta_3: red dashed, strictly above delta_1
+  \draw[figBad, thick, dashed] plot [smooth, tension=0.9]
+    coordinates {(-3,0.89) (-1.5,1.09) (0,0.89) (2,0.64) (3.9,0.84)};
+  \node[figBad, font=\footnotesize, right] at (3.95,0.86) {$\delta_3$};
+  % delta_2: green solid, crosses the others
+  \draw[figLim, thick] plot [smooth, tension=0.9]
+    coordinates {(-3,0.50) (-1,0.85) (1.5,1.15) (3.9,0.90)};
+  \node[figLim, font=\footnotesize, right] at (3.95,1.06) {$\delta_2$};
+  % domination annotation (label above, leader into the delta_1-delta_3 gap, as in the deck)
+  \draw[black!70, densely dotted] (-0.5,1.42) -- (-0.5,0.98);
+  \node[black!70, font=\footnotesize, above] at (-0.5,1.42)
+    {$\delta_1$ dominates $\delta_3$ here};
+  % legend (kept clear of the curves, upper right)
+  \node[draw=black!40, fill=white, rounded corners=1.5pt, anchor=north east, align=left,
+        font=\footnotesize, inner sep=4pt] at (4.25,1.95)
+    {\textcolor{figTerm}{\rule[2pt]{14pt}{1.2pt}}\; $\delta_1$ --- admissible\\
+     \textcolor{figLim}{\rule[2pt]{14pt}{1.2pt}}\; $\delta_2$ --- admissible\\
+     \textcolor{figBad}{\rule[2pt]{4pt}{1.2pt}\,\rule[2pt]{4pt}{1.2pt}\,\rule[2pt]{4pt}{1.2pt}}\;
+       $\delta_3$ --- inadmissible};
+\end{tikzpicture}
+\end{Fig}
+
+\begin{ObjL}{Concept}{1.5.8}{Should we follow the normative prescription?}
+If you have a coherent ordering on decision rules---any consistent way of ranking them---then
+that ordering is consistent with the risk for \emph{some} loss function. ``And so why not use
+THE loss function?!'' Ranking methods at all commits you, implicitly, to behaving as if you
+were minimizing some risk; decision theory just makes the loss explicit.\note{Stated at the
+deck's informal level. A precise version---axioms of coherence and the accompanying
+complete-class theorems---is beyond this course.}
+\end{ObjL}
+
+% ============================================================
+\sub{1.6}{Bayesian Decision Theory}
+
+Bayesian decision theory keeps the statistical model, the action space, and the loss function
+of \S\,\xref{1.5}, and adds one object. \HPS{1}
+
+\begin{Obj}{Definition}{1.6.1}{Prior distribution}
+The \emph{prior distribution} $\pi$ is a probability distribution on the parameter space
+$\Theta$: the parameter is treated as random, with $\pi$ describing where it is likely to be
+before the data are seen.
+\end{Obj}
+
+\begin{Obj}{Definition}{1.6.2}{Bayes risk}
+The \emph{Bayes risk} of a decision rule $\delta$ under the prior $\pi$ is the expected
+risk---``treating the parameter as random'':
+\[ \E\{R_{\delta}(\theta)\} \;=\; \int_{\theta\in\Theta} \pi(\theta)\,R_{\delta}(\theta)\,d\theta \]
+(a sum, for a discrete prior).\note{The deck prints this integral without the trailing
+$d\theta$; it is restored here.} Where the risk was a function on $\Theta$, the Bayes risk is a
+single number: the prior averages the curve.
+\end{Obj}
+
+\begin{Obj}{Principle}{1.6.3}{The Bayes principle}
+The Bayes version of the principle: minimize the \emph{expected} risk. Among all decision
+rules, choose one whose Bayes risk is smallest---a \emph{Bayes rule} for the prior $\pi$.
+\end{Obj}
+
+\begin{ObjL}{Concept}{1.6.4}{Where does the prior distribution come from?}
+Maybe the parameter really is random and you know its distribution---or at least have some data
+to make a good guess about it. Or maybe you just make the prior up: ``it can be helpful!''
+\end{ObjL}
+
+\begin{ObjL}{Remark}{1.6.5}{Should we follow the Bayes prescription?}
+If we believe in the prior, then there really is only one distribution for the data, and if we
+believe the general prescription (minimize risk), we should minimize the corresponding
+risk---the Bayes risk. Also: ``(almost) every admissible rule is a Bayes rule and every Bayes
+rule is admissible\dots\ so even if we don't have a prior, the Bayes rule is
+sensible.''\note{As stated in lecture, with the instructor's ``(almost).'' The two directions
+require side conditions in general; the precise statements are the complete-class theorems,
+beyond this course.}
+\end{ObjL}
+
+% ============================================================
+\sub{1.7}{The Cheat Sheet: Decision Theory in Eleven Items}
+
+\begin{ObjL}{Concept}{1.7.1}{The essential points}
+The instructor's own typeset summary of \S\S\,\xref{1.3}--\xref{1.6}, reproduced with the
+notation of these notes:
+\begin{enumerate}[leftmargin=2.2em,itemsep=3pt,topsep=3pt]
+  \item Sample space $S$.
+  \item Action space $\mathcal{A}$: the possible actions available to the decision-maker.
+  \item Parameter space $\Theta$.
+  \item Data $Y$ taking values in $S$.
+  \item There is a statistical model: for each $\theta$, a distribution for $Y$, with
+        $f^{\theta}$ or $p^{\theta}$ the corresponding density or pmf.
+  \item Loss function $L:\mathcal{A}\times\Theta\to\mathbb{R}$: $L(a,\theta)$ is the loss
+        associated with making decision $a$ when the true distribution is the one with pmf or
+        density $p^{\theta}$ or $f^{\theta}$.
+  \item A decision rule $\delta$ maps the sample space to the action space.
+  \item The risk function of $\delta$, $R_{\delta}(\theta)$, maps each $\theta\in\Theta$ to the
+        expected loss when the decision rule is $\delta$ and the distribution of $Y$ is the one
+        corresponding to $\theta$:
+        \[ R_{\delta}(\theta)=\E^{\theta}\{L(\delta(Y),\theta)\}
+           =\int_{y\in S} f^{\theta}(y)\,L(\delta(y),\theta)\,dy
+           \ \ \text{or}\ \ \sum_{y\in S} p^{\theta}(y)\,L(\delta(y),\theta). \]
+  \item Normative principle of decision theory: use only admissible decision rules---there must
+        be no other rule at least as good for every $\theta$ and better for some $\theta$.
+  \item Prior distribution $\pi$ for a random $\theta$ taking values in $\Theta$; the Bayes
+        risk of $\delta$ under $\pi$ is
+        \[ \E\{R_{\delta}(\theta)\}=\int_{\theta\in\Theta}\pi(\theta)\,R_{\delta}(\theta)\,d\theta . \]
+  \item The Bayesian principle: choose $\delta$ to minimize the Bayes risk.
+\end{enumerate}
+\end{ObjL}
+
+% ============================================================
+\sub{1.8}{Estimation, Testing, and the Clinical Trial}
+
+Two special cases of the framework carry the whole course. \HPS{1}
+
+\begin{Obj}{Definition}{1.8.1}{Estimation}
+\emph{Estimation} is the special case in which the action space is the parameter space (or the
+set of values of the quantity being estimated\note{The deck says exactly ``the action space is
+the parameter space''; the parenthetical broadening is ours, and is needed as soon as one
+estimates a \emph{function} of the parameter---in the trial of \xref{1.8.4},
+$\mathcal{A}=[-1,1]$ while $\Theta=[0,1]^2$.}): the decision \emph{is} a guess at the
+parameter. The loss function reflects a distance between the parameter and the estimate; this
+course will stick to \emph{squared-error loss},
+\[ L(a,\theta) \;=\; (a-\theta)^2 . \]
+\end{Obj}
+
+\begin{Obj}{Definition}{1.8.2}{Testing}
+\emph{Testing} is the special case in which the action space has two choices: assert that the
+parameter is in one portion of the parameter space, or that it is in the rest. The loss
+function reflects whether you guessed right; this course will stick to \emph{zero--one loss},
+\[ L(a,\theta) \;=\; \one\{a \text{ is the wrong assertion about } \theta\} , \]
+which loses $1$ for a wrong call and $0$ for a right one.
+\end{Obj}
+
+\begin{ObjL}{Example}{1.8.3}{Two Bernoulli samples, and two estimators}
+The running example: two samples of independent Bernoulli outcomes with common expectations
+within each sample---$\theta_T$ in one arm, $\theta_P$ in the other. Estimate the difference
+$\theta_T-\theta_P$ between the two expectations, with squared-error loss. The Bayes version
+puts a Beta$(1,1)$ (uniform) prior on each parameter, the two assumed independent. Two
+estimators will be compared:
+\begin{enumerate}[leftmargin=2.2em,itemsep=2pt,topsep=2pt]
+  \item the difference between the two observed rates, $X_T/n_T - X_P/n_P$; and
+  \item the difference if, separately in each sample, one instead uses
+        \[ \frac{1+X}{2+n}, \]
+        where $X$ is the sum of the Bernoulli variables and $n$ is the sample size.
+\end{enumerate}
+Here the second estimator shades the observed rate toward $\tfrac12$; where it comes from, and
+when it wins, is the business of the appendix (\appref{1.A.3}, \appref{1.A.4}).
+\end{ObjL}
+
+\begin{ObjL}{Example}{1.8.4}{The clinical trial, formalized}
+For the two-arm trial of \xref{1.3.4}, with $n_T$ treatment patients and $n_P$ placebo
+patients and cure ($1$) or failure ($0$) recorded for each:
+\begin{itemize}[leftmargin=1.8em,itemsep=2pt,topsep=2pt]
+  \item \emph{Sample space:} $S=\{0,1\}^{n_T}\times\{0,1\}^{n_P}$, the possible cure/failure
+        records.
+  \item \emph{Statistical model and parameter space:} within each arm the outcomes are
+        independent Bernoulli variables with a common expectation; the parameter is
+        $\theta=(\theta_T,\theta_P)$ with $\Theta=[0,1]^2$, and
+        \[ p^{\theta}(y)=\theta_T^{\,x_T}(1-\theta_T)^{n_T-x_T}\,
+                       \theta_P^{\,x_P}(1-\theta_P)^{n_P-x_P}, \]
+        where $x_T,x_P$ are the arm totals of $y$.
+  \item \emph{Analytic goal:} learn the difference $\theta_T-\theta_P$ (is the treatment
+        efficacious?).
+  \item \emph{Action space:} the possible values of the difference, $\mathcal{A}=[-1,1]$.
+  \item \emph{Loss function:} squared error, $L(a,\theta)=\big(a-(\theta_T-\theta_P)\big)^2$.
+\end{itemize}
+The lecture closes by naming, for each of the two estimators of \xref{1.8.3}: the risk
+function, the prior, and the Bayes risk. The deck sets these up and leaves the computations to
+us; they are worked in the appendix (\appref{1.A.2}--\appref{1.A.4}).
+\end{ObjL}
+
+\begin{ObjL}{Remark}{1.8.5}{The probability theory we will need}
+The deck lists ``Bias--variance decomposition'' and ``Beta distributions,'' adding: ``Also,
+variances, covariance, rules for expectations and variances for linear combinations of random
+variables; And the role of independence\dots'' For the Beta$(\alpha,\beta)$ distribution
+($\alpha,\beta>0$) the deck displays the standard
+reference facts:\note{The deck shows the pdf/mean/variance rows of a standard reference table;
+they are typeset here directly.}
+\[ f(x)=\frac{x^{\alpha-1}(1-x)^{\beta-1}}{\mathrm{B}(\alpha,\beta)}
+   \quad\text{on } [0,1], \qquad
+   \E\{X\}=\frac{\alpha}{\alpha+\beta}, \qquad
+   \Var(X)=\frac{\alpha\beta}{(\alpha+\beta)^2(\alpha+\beta+1)} , \]
+where $\mathrm{B}(\alpha,\beta)=\Gamma(\alpha)\Gamma(\beta)/\Gamma(\alpha+\beta)$. Note that
+Beta$(1,1)$ is the uniform distribution on $[0,1]$.
+\end{ObjL}
+
+\begin{ObjL}{Remark}{1.8.6}{What about AI?}
+The instructor's advice: set up the calculations yourself---``that is practicing the conceptual
+issues, and that is the point''---while acknowledging that hand fluidity with such calculations
+``is already pretty much obsolete.'' Two questions are left open: do you need to do some by
+hand to understand the conceptual side? And do you need to learn, now, how to get AI to do them
+for you?
+\end{ObjL}
+
+% ============================================================
+\lectureappendix
+
+The deck names the bias--variance decomposition, the risk functions of the two estimators, and
+their Bayes risks (Slides 40--41 and the closing checklist), but works none of them. They are
+worked here, beyond the deck, in the deck's own notation. Throughout, $X\sim$
+Binomial$(n,\theta)$ denotes an arm total, so $\E\{X\}=n\theta$ and
+$\Var(X)=n\theta(1-\theta)$.
+
+\begin{ObjL}{Supplement}{1.A.1}{The bias--variance decomposition}
+Let $\delta=\delta(Y)$ estimate a target $g(\theta)$ under squared-error loss, with
+$\E^{\theta}\{\delta^2\}<\infty$, and write
+$m(\theta)=\E^{\theta}\{\delta\}$ and $b(\theta)=m(\theta)-g(\theta)$ (the \emph{bias}). Then
+\[ R_{\delta}(\theta) \;=\; \E^{\theta}\{(\delta-g(\theta))^2\}
+   \;=\; \Var^{\theta}(\delta) \;+\; b(\theta)^2 . \]
+\end{ObjL}
+\begin{Prf}{1.A.1}{Proof of the Bias--Variance Decomposition by Adding and Subtracting the Mean.}{[A4$+$A2]}
+\item Add and subtract $m(\theta)$ inside the square:
+      $(\delta-g)^2=(\delta-m)^2+2(\delta-m)(m-g)+(m-g)^2$.
+\item Take $\E^{\theta}$ term by term (linearity). The middle term is
+      $2(m-g)\,\E^{\theta}\{\delta-m\}=0$, since $m-g$ is a constant and
+      $\E^{\theta}\{\delta\}=m$.
+\item What remains is $\E^{\theta}\{(\delta-m)^2\}+(m-g)^2=\Var^{\theta}(\delta)+b(\theta)^2$.
+\end{Prf}
+
+\begin{ObjL}{Supplement}{1.A.2}{Risk of the difference of observed rates}
+For $\hat\delta = X_T/n_T - X_P/n_P$ in the model of \xref{1.8.4}:
+\[ R_{\hat\delta}(\theta)
+   \;=\; \frac{\theta_T(1-\theta_T)}{n_T} + \frac{\theta_P(1-\theta_P)}{n_P} . \]
+\end{ObjL}
+\begin{Prf}{1.A.2}{Proof of the Rate-Difference Risk via Unbiasedness and Independence.}{[A2$+$A6]\quad uses \xref{1.A.1}.}
+\item Each arm's rate is unbiased: $\E^{\theta}\{X_T/n_T\}=n_T\theta_T/n_T=\theta_T$
+      (linearity), and likewise for the placebo arm; so
+      $b(\theta)=\E^{\theta}\{\hat\delta\}-(\theta_T-\theta_P)=0$.
+\item A single Bernoulli variable $Y$ has $\E\{Y^2\}=\E\{Y\}=\theta$, so
+      $\Var(Y)=\theta-\theta^2=\theta(1-\theta)$; summing $n$ independent copies and scaling,
+      $\Var(X/n)=\theta(1-\theta)/n$ for each arm.
+\item The arms are independent, so the variances of the difference add:
+      $\Var^{\theta}(\hat\delta)=\theta_T(1-\theta_T)/n_T+\theta_P(1-\theta_P)/n_P$.
+\item By the bias--variance decomposition (\xref{1.A.1}) with zero bias, the risk is the
+      variance.
+\end{Prf}
+
+\begin{ObjL}{Supplement}{1.A.3}{Risk of the shaded estimator}
+Write $T=\dfrac{1+X}{2+n}$ for one arm with $X\sim$ Binomial$(n,\theta)$. Then
+\[ \E^{\theta}\{T\}=\frac{1+n\theta}{n+2},\qquad
+   b(\theta)=\frac{1-2\theta}{n+2},\qquad
+   \Var^{\theta}(T)=\frac{n\theta(1-\theta)}{(n+2)^2}, \]
+so the one-arm risk is
+\[ \mathrm{MSE}_n(\theta) \;=\; \frac{n\theta(1-\theta)+(1-2\theta)^2}{(n+2)^2} , \]
+and for $\tilde\delta = T_T - T_P$ (the difference of the shaded rates, arms independent),
+\[ R_{\tilde\delta}(\theta) \;=\;
+   \frac{n_T\theta_T(1-\theta_T)}{(n_T+2)^2}+\frac{n_P\theta_P(1-\theta_P)}{(n_P+2)^2}
+   +\left(\frac{1-2\theta_T}{n_T+2}-\frac{1-2\theta_P}{n_P+2}\right)^{\!2}. \]
+At $\theta=\tfrac12$ the one-arm risk is $\tfrac{n}{4(n+2)^2}<\tfrac{1}{4n}$: shading toward
+$\tfrac12$ beats the raw rate in the middle of the parameter space, at the price of bias near
+the edges---neither estimator dominates the other.
+\end{ObjL}
+\begin{Prf}{1.A.3}{Proof of the Shaded Estimator's Risk by Linear-Combination Rules.}{[A2$+$A4]\quad uses \xref{1.A.1}, \xref{1.A.2}.}
+\item By linearity, $\E^{\theta}\{T\}=(1+\E^{\theta}\{X\})/(n+2)=(1+n\theta)/(n+2)$, so
+      \[ b(\theta)=\frac{1+n\theta}{n+2}-\theta=\frac{1+n\theta-(n+2)\theta}{n+2}
+      =\frac{1-2\theta}{n+2} . \]
+\item Adding constants does not change variance, and scaling squares:
+      $\Var^{\theta}(T)=\Var(X)/(n+2)^2=n\theta(1-\theta)/(n+2)^2$ (step (2) of \xref{1.A.2}).
+\item The one-arm risk is variance plus squared bias (\xref{1.A.1}).
+\item For the difference, the arms are independent, so variances add, while the bias of a
+      difference is the difference of the biases; \xref{1.A.1} assembles the displayed risk.
+\item At $\theta=\tfrac12$: bias $=0$ and the risk is $\tfrac{n/4}{(n+2)^2}$, smaller than the
+      raw rate's $\tfrac{1}{4n}$ since $n^2<(n+2)^2$.
+\end{Prf}
+
+\begin{ObjL}{Supplement}{1.A.4}{Bayes risks under the uniform prior, and where $(1+X)/(2+n)$ comes from}
+Under the Beta$(1,1)$ (uniform) prior on each arm's parameter, independently:
+\begin{enumerate}[leftmargin=2.2em,itemsep=2pt,topsep=2pt]
+  \item the one-arm Bayes risk of the observed rate $X/n$ is
+        \[ \int_0^1 \frac{\theta(1-\theta)}{n}\,d\theta=\frac{1}{6n} \,; \]
+  \item the one-arm Bayes risk of $T=(1+X)/(2+n)$ is $1/\big(6(n+2)\big)$ --- strictly
+        smaller;
+  \item for the difference, the Bayes risks add across arms:
+        \[ \frac{1}{6n_T}+\frac{1}{6n_P} \ \text{ for the rates,}\quad\text{versus}\quad
+           \frac{1}{6(n_T+2)}+\frac{1}{6(n_P+2)} \ \text{ for the shaded estimators;} \]
+  \item and $T$ is no accident: under the uniform prior, the posterior distribution of
+        $\theta$ given $X=x$ is Beta$(1+x,\,1+n-x)$, whose mean is exactly $(1+x)/(n+2)$ ---
+        the shaded estimator is the \emph{Bayes rule} for squared-error loss. (And since the
+        arms' posteriors are independent, $T_T-T_P$ is the Bayes rule for the difference.)
+\end{enumerate}
+\end{ObjL}
+\begin{Prf}{1.A.4}{Proof of the Bayes Risks by Integration, and of the Bayes Rule by Identifying the Posterior.}{[A1$+$A11]\quad uses \xref{1.A.2}, \xref{1.A.3}, \xref{1.8.5}.}
+\item $\int_0^1\theta(1-\theta)\,d\theta=\tfrac12-\tfrac13=\tfrac16$, so the rate's risk
+      $\theta(1-\theta)/n$ integrates to $1/(6n)$.
+\item For $T$: $\int_0^1(1-2\theta)^2\,d\theta=\int_0^1(1-4\theta+4\theta^2)\,d\theta
+      =1-2+\tfrac43=\tfrac13$, so
+      \[ \int_0^1 \mathrm{MSE}_n(\theta)\,d\theta
+      =\frac{n\cdot\frac16+\frac13}{(n+2)^2}
+      =\frac{n+2}{6(n+2)^2}=\frac{1}{6(n+2)} . \]
+\item For the difference, expand the risk of \xref{1.A.3} and integrate under the independent
+      uniform priors. The cross term of the squared bias is
+      \[ -2\int_0^1\!\!\int_0^1 \frac{(1-2\theta_T)(1-2\theta_P)}{(n_T+2)(n_P+2)}
+      \,d\theta_T\,d\theta_P=0, \]
+      because $\int_0^1(1-2\theta)\,d\theta=0$; what survives is the
+      sum of the two one-arm Bayes risks (for the rates, the biases are identically zero).
+\item For the posterior: with prior density $1$ on $[0,1]$ and $P(X=x\mid\theta)
+      =\binom{n}{x}\theta^x(1-\theta)^{n-x}$, the posterior density is proportional to
+      $\theta^{x}(1-\theta)^{n-x}=\theta^{(1+x)-1}(1-\theta)^{(1+n-x)-1}$ --- the
+      Beta$(1+x,1+n-x)$ kernel. Its mean, by the Beta facts of \xref{1.8.5}, is
+      $(1+x)/(n+2)$.
+\item Finally, the action $a$ minimizing the posterior expected loss
+      $\E\{(\theta-a)^2\mid X=x\}=\Var(\theta\mid X=x)+(\E\{\theta\mid X=x\}-a)^2$
+      (by \xref{1.A.1} applied to the posterior) is the posterior mean; and since the Bayes
+      risk is the expectation over $X$ of the posterior expected loss (iterated expectations,
+      \xref{1.4.6}), minimizing the latter for each $x$ minimizes the former, so $T$ is the
+      Bayes rule.
+\end{Prf}
+
+\ifSubfilesClassLoaded{\clearpage\objindex}{}
+
+\end{document}
