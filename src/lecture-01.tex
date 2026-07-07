@@ -383,14 +383,28 @@ Whenever the expectations exist,
 \item As before, $\E\{Y\mid X\}$ is a function of $X$, so by the law of the unconscious
       statistician (\xref{1.4.3}), now in its integral form,
       \[ \E\{\E\{Y\mid X\}\} \;=\; \int \E\{Y\mid X=x\}\,f_X(x)\,dx . \]
-\item Substituting \xref{1.4.8} and \xref{1.4.6}, the conditional density's denominator
-      cancels against the marginal wherever $f_X(x)>0$---and the set where $f_X(x)=0$
-      contributes nothing to the outer integral:
-      \[ \int\!\left(\int y\,f_{Y\mid X}(y\mid x)\,dy\right) f_X(x)\,dx
-         \;=\; \int\!\!\int y\,f(x,y)\,dy\,dx . \]
-\item Exchanging the order of integration (legitimate, by Fubini's theorem, under the assumed
-      absolute convergence) and integrating out $x$ gives
-      \[ \int y \int f(x,y)\,dx\,dy \;=\; \int y\,f_Y(y)\,dy \;=\; \E\{Y\} . \]
+\item Substitute the conditional expectation (\xref{1.4.8}),
+      $\E\{Y\mid X=x\}=\int y\,f_{Y\mid X}(y\mid x)\,dy$:
+      \[ \E\{\E\{Y\mid X\}\}
+         \;=\; \int\!\left(\int y\,f_{Y\mid X}(y\mid x)\,dy\right) f_X(x)\,dx . \]
+\item The outer integrand carries the factor $f_X(x)$, so the set where $f_X(x)=0$
+      contributes zero to the outer integral; on the set where $f_X(x)>0$, substitute the
+      conditional density (\xref{1.4.6}), $f_{Y\mid X}(y\mid x)=f(x,y)/f_X(x)$:
+      \[ \E\{\E\{Y\mid X\}\}
+         \;=\; \int\!\left(\int y\,\frac{f(x,y)}{f_X(x)}\,dy\right) f_X(x)\,dx . \]
+\item The factor $f_X(x)$ does not involve $y$, so it passes inside the inner integral, where
+      it cancels the denominator pointwise,
+      \[ y\,\frac{f(x,y)}{f_X(x)}\cdot f_X(x) \;=\; y\,f(x,y) ,
+         \qquad\text{leaving}\qquad
+         \E\{\E\{Y\mid X\}\} \;=\; \int\!\!\int y\,f(x,y)\,dy\,dx . \]
+\item Exchange the order of integration (legitimate, by Fubini's theorem, under the assumed
+      absolute convergence), and pull $y$---constant in $x$---out of the inner integral:
+      \[ \int\!\!\int y\,f(x,y)\,dy\,dx \;=\; \int\!\!\int y\,f(x,y)\,dx\,dy
+         \;=\; \int y\!\left(\int f(x,y)\,dx\right) dy . \]
+\item The inner integral is the marginal density of $Y$ (\xref{1.4.5}, with the roles of $X$
+      and $Y$ exchanged): $\int f(x,y)\,dx=f_Y(y)$. Hence, by the definition of expectation
+      (\xref{1.4.1}),
+      \[ \E\{\E\{Y\mid X\}\} \;=\; \int y\,f_Y(y)\,dy \;=\; \E\{Y\} . \]
 \end{Prf}
 
 % ============================================================
