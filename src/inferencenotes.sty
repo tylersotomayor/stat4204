@@ -160,6 +160,8 @@
   \par\vspace{2pt}{\normalfont\footnotesize\scshape\raggedleft
   ---\ in lecture\ifx\SpokenLoc\empty\else,\ \SpokenLoc\fi\par}%
   \end{spokenbody}\end{adjustwidth}}
+% Timestamp tag for transcript paragraphs (transcript-NN.tex): \tstamp{41:30} at the head.
+\newcommand{\tstamp}[1]{{\footnotesize\color{black!55}\bfseries #1}\enspace\ignorespaces}
 
 % ---------- Exercises Part: problem heading (bold "Problem id" + italic source); TOC + hypertarget ----------
 % \prob{id}{source/tag}  ...problem text...  then \begin{Solution}/\begin{Reflection}.
@@ -167,18 +169,6 @@
   \markright{#1\quad #2}%
   \noindent{\large\bfseries Problem~\hypertarget{prob:#1}{#1}}%
   \gdef\ProbSrc{#2}\ifx\ProbSrc\empty\else\enspace{\normalsize\itshape #2}\fi\par\nobreak\smallskip}
-% Cite an item of the course "List of Facts".
-% Stable key: fact:<key>. Display number: auto-generated F01, F02, ...
-\newcounter{coursefact}
-\renewcommand{\thecoursefact}{F\ifnum\value{coursefact}<10 0\fi\arabic{coursefact}}
-\newcommand{\coursefact}[3]{%
-  \item \refstepcounter{coursefact}\hypertarget{fact:#1}{}\label{factnum:#1}%
-  {\emergencystretch=2em\relax
-   \textbf{\thecoursefact.}\enspace #2\unskip\hfill(#3)\par}%
-}
-\newcommand{\factidref}[1]{\hyperlink{fact:#1}{\ref*{factnum:#1}}}
-\newcommand{\factref}[2]{\hyperlink{fact:#1}{#2}}
-\newcommand{\factanchor}[1]{\hypertarget{fact:#1}{}}
 % ---------- Placeholder solution (for problems deferred beyond the current notes) ----------
 \newcommand{\deferredsoln}{\par\smallskip\begin{adjustwidth}{1.6em}{0pt}%
   \noindent{\small\scshape Solution.}\par\nobreak\smallskip

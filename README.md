@@ -10,7 +10,7 @@ Sotomayor.
 
 - `lecture-NN.pdf` — standalone lecture notes, one per lecture.
 - `notes-in-statistical-inference.pdf` — the complete class edition (all lectures,
-  problem sets, the course list of facts, and the index of objects), once assignments
+  problem sets, and the index of objects), once assignments
   in it are past due.
 - `assignment-N.pdf` — problem-set write-ups with worked solutions and reflections,
   published only **after** each assignment's due date.

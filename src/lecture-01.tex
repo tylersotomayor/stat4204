@@ -251,7 +251,7 @@ Let $Y$ be discrete with pmf $p$, and let $g$ be a real function. Then
 (and $\E\{g(Y)\}=\int g(y)f(y)\,dy$ in the continuous case): the expectation of $g(Y)$ may be
 computed against the distribution of $Y$, without first finding the distribution of $g(Y)$.
 \end{Obj}
-\begin{Prf}{1.4.2}{Proof by Regrouping of the Unconscious-Statistician Formula (discrete case).}{[A11]}
+\begin{Prf}{1.4.2}{Proof by Regrouping of the Unconscious-Statistician Formula (discrete case).}{}
 \item Let $Z=g(Y)$, a random variable with pmf $p_Z(z)=P(g(Y)=z)=\sum_{y:\,g(y)=z}p(y)$.
 \item By \xref{1.4.1},
       \[ \E\{Z\} \;=\; \sum_z z\,p_Z(z) \;=\; \sum_z\, z \!\sum_{y:\,g(y)=z}\! p(y) . \]
@@ -287,7 +287,7 @@ $X$.
 Whenever the expectations exist,
 \[ \E\{\E\{Y\mid X\}\} \;=\; \E\{Y\}. \]
 \end{Obj}
-\begin{Prf}{1.4.6}{Proof by Conditioning of the Iterated-Expectations Identity (discrete case).}{[A1$+$A11]}
+\begin{Prf}{1.4.6}{Proof by Conditioning of the Iterated-Expectations Identity (discrete case).}{}
 \item $\E\{Y\mid X\}$ is the function $x\mapsto\E\{Y\mid X=x\}$ evaluated at $X$, so by the law
       of the unconscious statistician (\xref{1.4.2}),
       \[ \E\{\E\{Y\mid X\}\} \;=\; \sum_x \E\{Y\mid X=x\}\,p_X(x) . \]
@@ -568,7 +568,7 @@ $m(\theta)=\E^{\theta}\{\delta\}$ and $b(\theta)=m(\theta)-g(\theta)$ (the \emph
 \[ R_{\delta}(\theta) \;=\; \E^{\theta}\{(\delta-g(\theta))^2\}
    \;=\; \Var^{\theta}(\delta) \;+\; b(\theta)^2 . \]
 \end{ObjL}
-\begin{Prf}{1.A.1}{Proof of the Bias--Variance Decomposition by Adding and Subtracting the Mean.}{[A4$+$A2]}
+\begin{Prf}{1.A.1}{Proof of the Bias--Variance Decomposition by Adding and Subtracting the Mean.}{}
 \item Add and subtract $m(\theta)$ inside the square:
       $(\delta-g)^2=(\delta-m)^2+2(\delta-m)(m-g)+(m-g)^2$.
 \item Take $\E^{\theta}$ term by term (linearity). The middle term is
@@ -582,7 +582,7 @@ For $\hat\delta = X_T/n_T - X_P/n_P$ in the model of \xref{1.8.4}:
 \[ R_{\hat\delta}(\theta)
    \;=\; \frac{\theta_T(1-\theta_T)}{n_T} + \frac{\theta_P(1-\theta_P)}{n_P} . \]
 \end{ObjL}
-\begin{Prf}{1.A.2}{Proof of the Rate-Difference Risk via Unbiasedness and Independence.}{[A2$+$A6]\quad uses \xref{1.A.1}.}
+\begin{Prf}{1.A.2}{Proof of the Rate-Difference Risk via Unbiasedness and Independence.}{Uses \xref{1.A.1}.}
 \item Each arm's rate is unbiased: $\E^{\theta}\{X_T/n_T\}=n_T\theta_T/n_T=\theta_T$
       (linearity), and likewise for the placebo arm; so
       $b(\theta)=\E^{\theta}\{\hat\delta\}-(\theta_T-\theta_P)=0$.
@@ -610,7 +610,7 @@ At $\theta=\tfrac12$ the one-arm risk is $\tfrac{n}{4(n+2)^2}<\tfrac{1}{4n}$: sh
 $\tfrac12$ beats the raw rate in the middle of the parameter space, at the price of bias near
 the edges---neither estimator dominates the other.
 \end{ObjL}
-\begin{Prf}{1.A.3}{Proof of the Shaded Estimator's Risk by Linear-Combination Rules.}{[A2$+$A4]\quad uses \xref{1.A.1}, \xref{1.A.2}.}
+\begin{Prf}{1.A.3}{Proof of the Shaded Estimator's Risk by Linear-Combination Rules.}{Uses \xref{1.A.1}, \xref{1.A.2}.}
 \item By linearity, $\E^{\theta}\{T\}=(1+\E^{\theta}\{X\})/(n+2)=(1+n\theta)/(n+2)$, so
       \[ b(\theta)=\frac{1+n\theta}{n+2}-\theta=\frac{1+n\theta-(n+2)\theta}{n+2}
       =\frac{1-2\theta}{n+2} . \]
@@ -639,7 +639,7 @@ Under the Beta$(1,1)$ (uniform) prior on each arm's parameter, independently:
         arms' posteriors are independent, $T_T-T_P$ is the Bayes rule for the difference.)
 \end{enumerate}
 \end{ObjL}
-\begin{Prf}{1.A.4}{Proof of the Bayes Risks by Integration, and of the Bayes Rule by Identifying the Posterior.}{[A1$+$A11]\quad uses \xref{1.A.2}, \xref{1.A.3}, \xref{1.8.5}.}
+\begin{Prf}{1.A.4}{Proof of the Bayes Risks by Integration, and of the Bayes Rule by Identifying the Posterior.}{Uses \xref{1.A.2}, \xref{1.A.3}, \xref{1.8.5}.}
 \item $\int_0^1\theta(1-\theta)\,d\theta=\tfrac12-\tfrac13=\tfrac16$, so the rate's risk
       $\theta(1-\theta)/n$ integrates to $1/(6n)$.
 \item For $T$: $\int_0^1(1-2\theta)^2\,d\theta=\int_0^1(1-4\theta+4\theta^2)\,d\theta

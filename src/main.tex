@@ -116,33 +116,6 @@
 \tableofcontents
 \endgroup
 
-% ---- front-matter apparatus: the proof-tag legend ----
-\cleardoublepage
-\phantomsection\addcontentsline{toc}{chapter}{Modes of Argument}
-\markboth{Modes of Argument}{Modes of Argument}
-\thispagestyle{plain}
-{\LARGE\bfseries Modes of Argument}\par\smallskip
-\noindent\rule{\linewidth}{0.4pt}\par\medskip
-\noindent Each proof in these notes is tagged, in its caption, by its dominant \emph{mode of
-argument}---the kind of reasoning it turns on. The letter \emph{A} abbreviates \emph{argument};
-a proof that blends two is written, e.g., \textsf{[A2$+$A4]}. The tags are keyed below.\par\medskip
-\noindent\begin{tabular}{@{}l@{\hspace{0.9em}}p{0.78\linewidth}@{}}
-\textbf{A1}  & Iterated expectation, or conditioning: compute through $\E\{\E\{Y\mid X\}\}=\E\{Y\}$, or condition on the right variable.\\[3pt]
-\textbf{A2}  & Linearity and bilinearity: expand $\E$, $\Var$, $\Cov$ over linear combinations; collect and cancel.\\[3pt]
-\textbf{A3}  & The indicator trick: write a probability as an expectation, $P(A)=\E\,\one_A$.\\[3pt]
-\textbf{A4}  & Add-and-subtract a centering term: bias--variance and mean-squared-error decompositions.\\[3pt]
-\textbf{A5}  & Completing the square: quadratic minimisation, least squares, normal kernels.\\[3pt]
-\textbf{A6}  & Independence factorisation: joint distributions factor; expectations of products split.\\[3pt]
-\textbf{A7}  & Inequality bounding: Jensen, Cauchy--Schwarz, Markov--Chebyshev.\\[3pt]
-\textbf{A8}  & Transformation: change of variables, the CDF method, Jacobians.\\[3pt]
-\textbf{A9}  & Contradiction, or the contrapositive.\\[3pt]
-\textbf{A10} & First-order condition: differentiate, set to zero, and verify the minimum.\\[3pt]
-\textbf{A11} & Exchange of operations: swap expectation with sums, integrals, or derivatives.\\[3pt]
-\textbf{A12} & Cases, or reduction ``without loss of generality.''\\[3pt]
-\textbf{Constr} & Explicit construction of the required object (an estimator, a test, a counterexample).\\[3pt]
-\textbf{Direct} & A direct chain of implications, with no special device.\\
-\end{tabular}
-
 \mainmatter
 
 % ---- Part I: lecture notes ----
@@ -156,8 +129,6 @@ a proof that blends two is written, e.g., \textsf{[A2$+$A4]}. The tags are keyed
 % ---- Part IV: back-matter reference apparatus ----
 \bookpart{Resources and References}{}
 
-\subfile{course-facts}
-\clearpage
 \objindex
 \printgeneralindex
 
