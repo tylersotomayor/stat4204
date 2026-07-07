@@ -85,7 +85,16 @@ $P\big((X_1,\dots,X_n)\in B\big)$ to each (measurable) $B\subseteq\mathbb{R}^n$;
 every dependence among the variables, and it determines---but is not in general determined
 by---the marginal distribution of each $X_i$. In the discrete case it is given by the
 \emph{joint probability mass function}
-$p(x_1,\dots,x_n)=P(X_1=x_1,\dots,X_n=x_n)$; in the continuous case by a \emph{joint density}
+$p(x_1,\dots,x_n)=P(X_1=x_1,\dots,X_n=x_n)$; in the continuous case by a \emph{joint
+density}\note{What a density \emph{is}: not a probability but a probability
+\emph{rate}---probability per unit length (per unit area or volume, for joint densities).
+Probabilities come only from integrating it over regions, so for small $dx$,
+$f(x)\,dx \approx P(x\le X\le x+dx)$. Two consequences that trip people up: a density can
+exceed $1$ (the uniform distribution on $[0,\tfrac12]$ has $f\equiv 2$ there), and every
+single point carries probability zero ($\int_x^x f=0$), so for a continuous random variable
+$f(x)$ is emphatically \emph{not} $P(X=x)$. The pmf, by contrast, \emph{is} a probability at
+each point; the twin formulas---sums against $p$, integrals against $f$---conceal that
+difference in kind.}
 $f\ge0$ with
 \[ P\big((X_1,\dots,X_n)\in B\big)\;=\;\int_B f(x_1,\dots,x_n)\,dx_1\cdots dx_n . \]
 \end{Obj}
