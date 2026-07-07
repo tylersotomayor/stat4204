@@ -260,7 +260,7 @@ bookkeeping. Take $Y$ with $P\big(Y=(-1)^{k+1}2^k/k\big)=2^{-k}$ for $k=1,2,\dot
 the natural order, $\sum_k(-1)^{k+1}/k=\ln 2$, yet $\E\{|Y|\}=\sum_k 1/k=\infty$, and
 rearranging the terms changes the answer---so such a $Y$ is assigned \emph{no} expectation.
 Second, absolute convergence is precisely the license for the regrouping and
-exchange-of-order steps in the proofs of \xref{1.4.4} and \xref{1.4.11} (for integrals, via
+exchange-of-order steps in the proofs of \xref{1.4.4} and \xref{1.4.14} (for integrals, via
 Fubini's theorem).}: the probability-weighted average of the
 values of $Y$.\note{Four conflated words, disentangled. \emph{Expectation} is the number
 defined here---a property of the distribution, fixed before any data are seen. \emph{Mean} is
@@ -322,7 +322,7 @@ distribution you already hold, by weighting $g(y)$, rather than $y$, by $p(y)$. 
 the profession's joke at its own expense---the formula is what everyone writes down
 instinctively, without noticing that, by the definition, there was something to prove; the
 theorem is why the instinct is correct. And it earns its keep at once: the risk function of
-\xref{1.5.4} \emph{is} this formula with $g$ the loss, a variance is this formula with
+\xref{1.5.8} \emph{is} this formula with $g$ the loss, a variance is this formula with
 $g(y)=(y-\mu)^2$, and its bivariate form,
 $\E\{g(X,Y)\}=\sum_x\sum_y g(x,y)\,p(x,y)$, is behind every covariance.
 \end{ObjL}
@@ -361,60 +361,73 @@ is all the proof of \xref{1.4.4} does in general.
 \begin{Obj}{Definition}{1.4.6}{The joint distribution of a pair}
 For a pair of random variables $(X,Y)$, the joint distribution of \xref{1.1.6} specializes to
 a joint pmf $p(x,y)=P(X=x,\,Y=y)$ in the discrete case, or a joint density $f(x,y)$ in the
-continuous case. This is the complete description of the pair: it carries not only how each
-variable behaves alone but every trace of the dependence between them. For discrete variables
-it is usefully pictured as a two-way table---one row per value $x$, one column per value $y$,
-the cell holding $p(x,y)$---with all the cells summing to $1$.
+continuous case.
 \end{Obj}
 
-\begin{Obj}{Definition}{1.4.7}{Marginal distribution}
+\begin{ObjL}{Remark}{1.4.7}{Reading the joint: the two-way table}
+The joint is the complete description of the pair: it carries not only how each variable
+behaves alone but every trace of the dependence between them. For discrete variables it is
+usefully pictured as a two-way table---one row per value $x$, one column per value $y$, the
+cell holding $p(x,y)$---with all the cells summing to $1$. The next two definitions are the
+table's row totals and its rescaled rows.
+\end{ObjL}
+
+\begin{Obj}{Definition}{1.4.8}{Marginal distribution}
 The \emph{marginal} pmf of $X$ recovers the distribution of $X$ alone by summing the joint
 over everything that can happen to $Y$:
 \[ p_X(x) \;=\; \sum_y p(x,y) \]
-(and $f_X(x)=\int f(x,y)\,dy$ in the continuous case). In the two-way table these are the row
-totals, classically written in the table's \emph{margin}---hence the name. Marginalizing is a
-one-way street: the joint determines both marginals, but the marginals do not determine the
-joint, because everything about the dependence has been summed away (\xref{1.1.6}).
+(and $f_X(x)=\int f(x,y)\,dy$ in the continuous case).
 \end{Obj}
 
-\begin{Obj}{Definition}{1.4.8}{Conditional distribution}
+\begin{ObjL}{Remark}{1.4.9}{Why ``marginal,'' and what marginalizing forgets}
+In the two-way table the marginal's values are the row totals, classically written in the
+table's \emph{margin}---hence the name. And marginalizing is a one-way street: the joint
+determines both marginals, but the marginals do not determine the joint, because everything
+about the dependence has been summed away (\xref{1.1.6}).
+\end{ObjL}
+
+\begin{Obj}{Definition}{1.4.10}{Conditional distribution}
 For any $x$ with $p_X(x)>0$, the \emph{conditional} pmf of $Y$ given $X=x$ is
 \[ p_{Y\mid X}(y\mid x) \;=\; \frac{p(x,y)}{p_X(x)} \]
-(and $f_{Y\mid X}(y\mid x)=f(x,y)/f_X(x)$ for densities, when $f_X(x)>0$). The recipe: fix
-$X=x$, take that row of the table---the $x$-slice of the joint---and rescale it by its total
-so it sums to $1$. The result is the distribution of $Y$ for someone who has learned that
-$X=x$: conditioning is how a distribution absorbs information.
+(and $f_{Y\mid X}(y\mid x)=f(x,y)/f_X(x)$ for densities, when $f_X(x)>0$).
 \end{Obj}
 
-\begin{ObjL}{Remark}{1.4.9}{Conditional distributions are probability distributions!}
+\begin{ObjL}{Remark}{1.4.11}{Conditioning as reweighting a slice}
+The recipe behind the formula: fix $X=x$, take that row of the table---the $x$-slice of the
+joint---and rescale it by its total so it sums to $1$. The result is the distribution of $Y$
+for someone who has learned that $X=x$: conditioning is how a distribution absorbs
+information.
+\end{ObjL}
+
+\begin{ObjL}{Remark}{1.4.12}{Conditional distributions are probability distributions!}
 For each fixed $x$, the numbers $p_{Y\mid X}(y\mid x)$ are nonnegative and sum to $1$: a
 conditional distribution is a genuine probability distribution, so everything defined for
 distributions---expectations included---applies to it verbatim. That single observation powers
 the next two objects.
 \end{ObjL}
 
-\begin{Obj}{Definition}{1.4.10}{Conditional expectation}
+\begin{Obj}{Definition}{1.4.13}{Conditional expectation}
 The \emph{conditional expectation} of $Y$ given $X=x$ is the expectation of the conditional
-distribution (\xref{1.4.8}),
+distribution (\xref{1.4.10}),
 \[ \E\{Y\mid X=x\} \;=\; \sum_y y\,p_{Y\mid X}(y\mid x), \]
 and $\E\{Y\mid X\}$ denotes the random variable obtained by evaluating this function of $x$ at
 $X$.
 \end{Obj}
 
-\begin{Obj}{Theorem}{1.4.11}{Iterated expectations}
+\begin{Obj}{Theorem}{1.4.14}{Iterated expectations}
 Whenever the expectations exist,
 \[ \E\{\E\{Y\mid X\}\} \;=\; \E\{Y\}. \]
 \end{Obj}
-\begin{Prf}{1.4.11.a}{Proof by Conditioning of the Iterated-Expectations Identity (discrete case).}{}
+\begin{Prf}{1.4.14.a}{Proof by Conditioning of the Iterated-Expectations Identity (discrete case).}{}
 \item $\E\{Y\mid X\}$ is the function $x\mapsto\E\{Y\mid X=x\}$ evaluated at $X$, so by the law
       of the unconscious statistician (\xref{1.4.4}),
       \[ \E\{\E\{Y\mid X\}\} \;=\; \sum_x \E\{Y\mid X=x\}\,p_X(x) . \]
-\item Substitute the conditional expectation (\xref{1.4.10}),
+\item Substitute the conditional expectation (\xref{1.4.13}),
       $\E\{Y\mid X=x\}=\sum_y y\,p_{Y\mid X}(y\mid x)$:
       \[ \E\{\E\{Y\mid X\}\}
          \;=\; \sum_x\Big(\sum_y y\,p_{Y\mid X}(y\mid x)\Big)\,p_X(x) . \]
 \item Each outer term carries the factor $p_X(x)$, so the terms with $p_X(x)=0$ vanish; in the
-      terms with $p_X(x)>0$, substitute the conditional pmf (\xref{1.4.8}),
+      terms with $p_X(x)>0$, substitute the conditional pmf (\xref{1.4.10}),
       $p_{Y\mid X}(y\mid x)=p(x,y)/p_X(x)$:
       \[ \E\{\E\{Y\mid X\}\}
          \;=\; \sum_x\Big(\sum_y y\,\frac{p(x,y)}{p_X(x)}\Big)\,p_X(x) . \]
@@ -426,22 +439,22 @@ Whenever the expectations exist,
 \item Exchange the order of summation (legitimate by the assumed absolute convergence), and
       pull $y$---constant in $x$---out of the inner sum:
       \[ \sum_x\sum_y y\,p(x,y) \;=\; \sum_y\sum_x y\,p(x,y) \;=\; \sum_y y\sum_x p(x,y) . \]
-\item The inner sum is the marginal pmf of $Y$ (\xref{1.4.7}, with the roles of $X$ and $Y$
+\item The inner sum is the marginal pmf of $Y$ (\xref{1.4.8}, with the roles of $X$ and $Y$
       exchanged): $\sum_x p(x,y)=p_Y(y)$. Hence, by the definition of expectation
       (\xref{1.4.1}),
       \[ \E\{\E\{Y\mid X\}\} \;=\; \sum_y y\,p_Y(y) \;=\; \E\{Y\} . \]
 \end{Prf}
-\begin{Prf}{1.4.11.b}{Proof by Conditioning of the Iterated-Expectations Identity (continuous case).}{}
+\begin{Prf}{1.4.14.b}{Proof by Conditioning of the Iterated-Expectations Identity (continuous case).}{}
 \item As before, $\E\{Y\mid X\}$ is a function of $X$, so by the law of the unconscious
       statistician (\xref{1.4.4}), now in its integral form,
       \[ \E\{\E\{Y\mid X\}\} \;=\; \int \E\{Y\mid X=x\}\,f_X(x)\,dx . \]
-\item Substitute the conditional expectation (\xref{1.4.10}),
+\item Substitute the conditional expectation (\xref{1.4.13}),
       $\E\{Y\mid X=x\}=\int y\,f_{Y\mid X}(y\mid x)\,dy$:
       \[ \E\{\E\{Y\mid X\}\}
          \;=\; \int\!\left(\int y\,f_{Y\mid X}(y\mid x)\,dy\right) f_X(x)\,dx . \]
 \item The outer integrand carries the factor $f_X(x)$, so the set where $f_X(x)=0$
       contributes zero to the outer integral; on the set where $f_X(x)>0$, substitute the
-      conditional density (\xref{1.4.8}), $f_{Y\mid X}(y\mid x)=f(x,y)/f_X(x)$:
+      conditional density (\xref{1.4.10}), $f_{Y\mid X}(y\mid x)=f(x,y)/f_X(x)$:
       \[ \E\{\E\{Y\mid X\}\}
          \;=\; \int\!\left(\int y\,\frac{f(x,y)}{f_X(x)}\,dy\right) f_X(x)\,dx . \]
 \item The factor $f_X(x)$ does not involve $y$, so it passes inside the inner integral, where
@@ -453,7 +466,7 @@ Whenever the expectations exist,
       absolute convergence), and pull $y$---constant in $x$---out of the inner integral:
       \[ \int\!\!\int y\,f(x,y)\,dy\,dx \;=\; \int\!\!\int y\,f(x,y)\,dx\,dy
          \;=\; \int y\!\left(\int f(x,y)\,dx\right) dy . \]
-\item The inner integral is the marginal density of $Y$ (\xref{1.4.7}, with the roles of $X$
+\item The inner integral is the marginal density of $Y$ (\xref{1.4.8}, with the roles of $X$
       and $Y$ exchanged): $\int f(x,y)\,dx=f_Y(y)$. Hence, by the definition of expectation
       (\xref{1.4.1}),
       \[ \E\{\E\{Y\mid X\}\} \;=\; \int y\,f_Y(y)\,dy \;=\; \E\{Y\} . \]
@@ -497,82 +510,102 @@ space''---and adds three objects. \HPS{1}
 
 \begin{Obj}{Definition}{1.5.1}{Action space}
 The \emph{action space} $\mathcal{A}$ is the set of possible choices of the decision maker:
-the values an analysis is allowed to output. It is fixed by the \emph{question}, not by the
-data. The same trial supports estimation---report a plausible value of the cure-rate
-difference, $\mathcal{A}=[-1,1]$, every value a difference of two proportions could
-take---or testing---assert ``efficacious'' or ``not,'' an action space with exactly two
-elements; changing $\mathcal{A}$ changes the problem (\S\,\xref{1.8} makes both versions
-precise). And note what $\mathcal{A}$ is not: it is not the sample space---data live in $S$,
-conclusions live in $\mathcal{A}$, and the method of \xref{1.5.3} will be the bridge---and its
-elements carry no probabilities, because actions are \emph{chosen}, not drawn.
+the values an analysis is allowed to output.
 \end{Obj}
 
-\begin{Obj}{Definition}{1.5.2}{Loss function}
+\begin{ObjL}{Remark}{1.5.2}{Choosing the action space}
+The action space is fixed by the \emph{question}, not by the data. The same trial supports
+estimation---report a plausible value of the cure-rate difference, $\mathcal{A}=[-1,1]$, every
+value a difference of two proportions could take---or testing---assert ``efficacious'' or
+``not,'' an action space with exactly two elements; changing $\mathcal{A}$ changes the problem
+(\S\,\xref{1.8} makes both versions precise). And note what $\mathcal{A}$ is not: it is not
+the sample space---data live in $S$, conclusions live in $\mathcal{A}$, and the method of
+\xref{1.5.5} will be the bridge---and its elements carry no probabilities, because actions are
+\emph{chosen}, not drawn.
+\end{ObjL}
+
+\begin{Obj}{Definition}{1.5.3}{Loss function}
 The \emph{loss function} is a map
 \[ L : \mathcal{A}\times\Theta \;\to\; \mathbb{R}, \]
 where $L(a,\theta)$ tells you how much you lose by choosing action $a$ when the parameter is
 $\theta$.\note{The deck words the domain both ways---``the parameter space cross the action
 space'' on the definition slides, ``the action space cross the parameter space'' in the
 typeset cheat sheet---while always writing the arguments $L(a,\theta)$. These notes follow the
-cheat sheet.} The loss is a \emph{modeling choice}, as much a part of the problem's
-specification as the statistical model itself: it declares, in advance and in numbers, how bad
-each mistake would be---zero (or least) for the best action available at $\theta$, growing as
-the action worsens, in whatever units of regret the analyst adopts. The course will stick to
-two standards (\S\,\xref{1.8}): \emph{squared-error loss}, $L(a,\theta)=(a-\theta)^2$, for
+cheat sheet.}
+\end{Obj}
+
+\begin{ObjL}{Remark}{1.5.4}{Reading the loss function}
+The loss is a \emph{modeling choice}, as much a part of the problem's specification as the
+statistical model itself: it declares, in advance and in numbers, how bad each mistake would
+be---zero (or least) for the best action available at $\theta$, growing as the action worsens,
+in whatever units of regret the analyst adopts. The course will stick to two standards
+(\S\,\xref{1.8}): \emph{squared-error loss}, $L(a,\theta)=(a-\theta)^2$, for
 estimation---near-misses almost free, large misses punished disproportionately (double the
 miss, quadruple the loss)---and \emph{zero--one loss} for testing, which charges $1$ for a
 wrong assertion and $0$ for a right one. Nothing in the definition demands symmetry---in the
 trial, shelving a working therapy may well cost more than approving a useless one, and a loss
 function can say so---but the two standards keep the theory clean. For the trial, with the
 difference as the target: $L(a,\theta)=\big(a-(\theta_T-\theta_P)\big)^2$.
-\end{Obj}
+\end{ObjL}
 
-\begin{Obj}{Definition}{1.5.3}{Method (decision rule)}
+\begin{Obj}{Definition}{1.5.5}{Method (decision rule)}
 A \emph{method}, or \emph{decision rule}, is a function
 \[ \delta : S \;\to\; \mathcal{A} \]
 from the sample space to the action space: what you will do, specified in advance, for every
-data set you might observe. The force of the definition is in its timing. A method is chosen
-\emph{before} the data arrive, and it commits you on every data set you might see---a complete
-contingency plan, not an answer. That is exactly what makes methods judgeable: a single answer
-cannot be evaluated until the truth is known, but a plan can be averaged over everything the
-model says the data may do. For the trial, each of the following is a method from
-$S=\{0,1\}^{n_T}\times\{0,1\}^{n_P}$ to $\mathcal{A}=[-1,1]$:
+data set you might observe.
+\end{Obj}
+
+\begin{ObjL}{Remark}{1.5.6}{A plan, not an answer}
+The force of the definition is in its timing. A method is chosen \emph{before} the data
+arrive, and it commits you on every data set you might see---a complete contingency plan, not
+an answer. That is exactly what makes methods judgeable: a single answer cannot be evaluated
+until the truth is known, but a plan can be averaged over everything the model says the data
+may do. And since the data are modeled as random, $\delta(Y)$ is a random variable---so it has
+an expected loss, and that is where the risk comes from.
+\end{ObjL}
+
+\begin{ObjL}{Example}{1.5.7}{Three methods for the trial}
+Each of the following is a method from $S=\{0,1\}^{n_T}\times\{0,1\}^{n_P}$ to
+$\mathcal{A}=[-1,1]$:
 \[ \delta_1(y)=\frac{x_T}{n_T}-\frac{x_P}{n_P}, \qquad
    \delta_2(y)=\frac{1+x_T}{2+n_T}-\frac{1+x_P}{2+n_P}, \qquad
    \delta_3(y)\equiv 0 , \]
 the difference of observed rates, the shaded version of \xref{1.8.3}, and a rule that ignores
 the data entirely. Nothing in the definition requires a method to be sensible---that is the
-point: ``method'' is the arena, and the rest of the section builds the referee. Finally, since
-the data are modeled as random, $\delta(Y)$ is a random variable---so it has an expected loss,
-and that is where the risk comes from.
-\end{Obj}
+point: ``method'' is the arena, and the rest of the section builds the referee.
+\end{ObjL}
 
-\begin{Obj}{Definition}{1.5.4}{Risk function}
+\begin{Obj}{Definition}{1.5.8}{Risk function}
 The \emph{risk function} of a decision rule $\delta$ is the expected loss as a function of the
 parameter:
 \[ R_{\delta}(\theta) \;=\; \E^{\theta}\{L(\delta(Y),\theta)\}
    \;=\; \int_{y\in S} f^{\theta}(y)\,L(\delta(y),\theta)\,dy
    \quad\text{or}\quad \sum_{y\in S} p^{\theta}(y)\,L(\delta(y),\theta), \]
 where $\E^{\theta}$ denotes expectation when the data's distribution is the one indexed by
-$\theta$. Read the construction from the inside out: fix a candidate truth $\theta$; the model
-hands the data their distribution; the method turns the random data into a random action
-$\delta(Y)$; the loss turns the random action into a random number $L(\delta(Y),\theta)$; and
-the expectation---the display is LOTUS (\xref{1.4.4}) with $g(y)=L(\delta(y),\theta)$---collapses
-the randomness to a single number: the method's average penalty \emph{if $\theta$ were the
-truth}. Sweeping $\theta$ across $\Theta$ traces the risk curve (Figure~\xref{1.5.5} shows the
-machine; Figure~\xref{1.5.8} shows the curves). Two instances carry the course: under
-zero--one loss the risk \emph{is} the probability of a wrong assertion,
-$R_{\delta}(\theta)=P^{\theta}(\delta\ \text{errs})$; under squared-error loss it is the mean
-squared error, which splits as variance plus squared bias (\xref{1.A.1}). The trial's two
-estimators have their risks computed in closed form in \xref{1.A.2} and \xref{1.A.3}.
+$\theta$.
 \end{Obj}
 
-\begin{Fig}{1.5.5}{The anatomy of a decision problem}{How the four objects compose, at one
+\begin{ObjL}{Remark}{1.5.9}{Reading the risk function}
+Read the construction from the inside out: fix a candidate truth $\theta$; the model hands the
+data their distribution; the method turns the random data into a random action $\delta(Y)$;
+the loss turns the random action into a random number $L(\delta(Y),\theta)$; and the
+expectation---the display in \xref{1.5.8} is LOTUS (\xref{1.4.4}) with
+$g(y)=L(\delta(y),\theta)$---collapses the randomness to a single number: the method's average
+penalty \emph{if $\theta$ were the truth}. Sweeping $\theta$ across $\Theta$ traces the risk
+curve (Figure~\xref{1.5.10} shows the machine; Figure~\xref{1.5.13} shows the curves). Two
+instances carry the course: under zero--one loss the risk \emph{is} the probability of a wrong
+assertion, $R_{\delta}(\theta)=P^{\theta}(\delta\ \text{errs})$; under squared-error loss it
+is the mean squared error, which splits as variance plus squared bias (\xref{1.A.1}). The
+trial's two estimators have their risks computed in closed form in \xref{1.A.2} and
+\xref{1.A.3}.
+\end{ObjL}
+
+\begin{Fig}{1.5.10}{The anatomy of a decision problem}{How the four objects compose, at one
 fixed candidate truth $\theta$: the model hands the data their distribution, the method maps
 data to an action, the loss prices that action against $\theta$, and the expectation over the
 data collapses the randomness to the single number $R_{\delta}(\theta)$. Sweeping $\theta$
-over $\Theta$ traces the risk curves of Figure~\xref{1.5.8}
-(\xref{1.5.1}--\xref{1.5.4}).}
+over $\Theta$ traces the risk curves of Figure~\xref{1.5.13}
+(\xref{1.5.1}, \xref{1.5.3}, \xref{1.5.5}, \xref{1.5.8}).}
 \begin{tikzpicture}[x=1cm,y=1cm,
   every node/.style={font=\small},
   box/.style={draw, rounded corners=2pt, align=center, inner sep=5pt, minimum height=0.78cm,
@@ -598,23 +631,23 @@ over $\Theta$ traces the risk curves of Figure~\xref{1.5.8}
 \end{tikzpicture}
 \end{Fig}
 
-\begin{Obj}{Principle}{1.5.6}{The risk principle}
+\begin{Obj}{Principle}{1.5.11}{The risk principle}
 ``THIS IS A PRINCIPLE, NOT A RESULT: try to minimize the risk.'' And---``Remember, Risk is a
 function!'' One method's risk is an entire curve over $\Theta$, not a number, so two methods
 need not be comparable: each may be better somewhere. The principle disciplines the search for
 methods; it does not by itself select one.
 \end{Obj}
 
-\begin{Obj}{Definition}{1.5.7}{Admissibility}
+\begin{Obj}{Definition}{1.5.12}{Admissibility}
 A method is \emph{admissible} if there is no other method that does at least as well for every
 parameter value \emph{and} better for some parameter value. A method that is so dominated is
 \emph{inadmissible}: whatever $\theta$ turns out to be, you would not regret abandoning it.
 \end{Obj}
 
-\begin{Fig}{1.5.8}{Three risk functions}{Risk curves for three decision rules, as sketched in
+\begin{Fig}{1.5.13}{Three risk functions}{Risk curves for three decision rules, as sketched in
 lecture. The dashed rule $\delta_3$ lies strictly above $\delta_1$ everywhere, so $\delta_1$
 dominates it and $\delta_3$ is inadmissible; $\delta_1$ and $\delta_2$ cross, so neither
-dominates the other, and the deck's legend marks both admissible (\xref{1.5.7}).}
+dominates the other, and the deck's legend marks both admissible (\xref{1.5.12}).}
 \begin{tikzpicture}[x=1.15cm,y=1.9cm]
   % axes
   \draw[->] (-3.3,0) -- (4.55,0) node[right=2pt] {$\theta$};
@@ -647,7 +680,7 @@ dominates the other, and the deck's legend marks both admissible (\xref{1.5.7}).
 \end{tikzpicture}
 \end{Fig}
 
-\begin{ObjL}{Concept}{1.5.9}{Should we follow the normative prescription?}
+\begin{ObjL}{Concept}{1.5.14}{Should we follow the normative prescription?}
 If you have a coherent ordering on decision rules---any consistent way of ranking them---then
 that ordering is consistent with the risk for \emph{some} loss function. ``And so why not use
 THE loss function?!'' Ranking methods at all commits you, implicitly, to behaving as if you
@@ -924,7 +957,7 @@ Under the Beta$(1,1)$ (uniform) prior on each arm's parameter, independently:
       $\E\{(\theta-a)^2\mid X=x\}=\Var(\theta\mid X=x)+(\E\{\theta\mid X=x\}-a)^2$
       (by \xref{1.A.1} applied to the posterior) is the posterior mean; and since the Bayes
       risk is the expectation over $X$ of the posterior expected loss (iterated expectations,
-      \xref{1.4.11}), minimizing the latter for each $x$ minimizes the former, so $T$ is the
+      \xref{1.4.14}), minimizing the latter for each $x$ minimizes the former, so $T$ is the
       Bayes rule.
 \end{Prf}
 
