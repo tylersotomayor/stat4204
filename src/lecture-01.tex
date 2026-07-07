@@ -242,7 +242,16 @@ Expectations belong to \emph{distributions}: a random variable has an expectatio
 distribution. For discrete $Y$ with pmf $p$ and for continuous $Y$ with density $f$,
 \[ \E\{Y\} \;=\; \sum_{y} y\,p(y) \qquad\text{or}\qquad \E\{Y\} \;=\; \int y\,f(y)\,dy , \]
 provided the sum or integral converges absolutely: the probability-weighted average of the
-values of $Y$.
+values of $Y$.\note{Four conflated words, disentangled. \emph{Expectation} is the number
+defined here---a property of the distribution, fixed before any data are seen. \emph{Mean} is
+its synonym when speaking of a distribution (a ``population mean''), but a \emph{sample mean}
+is something else: it is an \emph{average}---the arithmetic operation $\frac1n\sum_i y_i$ on a
+finite list of numbers, defined with no probability in sight. Averaging realized data produces
+a random quantity that \emph{estimates} the expectation; only when every possible value is
+equally likely does the expectation reduce to the plain average of those values. Finally,
+``\emph{balancing point}'' is the physical reading of the same number: place the probability
+as mass along the line, and $\E\{Y\}$ is its center of mass---the unique $c$ with
+$\E\{Y-c\}=0$. It need not be a possible value: a fair die balances at $3.5$.}
 \end{Obj}
 
 \begin{Obj}{Theorem}{1.4.2}{The law of the unconscious statistician}
