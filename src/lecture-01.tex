@@ -263,13 +263,46 @@ as mass along the line, and $\E\{Y\}$ is its center of mass---the unique $c$ wit
 $\E\{Y-c\}=0$. It need not be a possible value: a fair die balances at $3.5$.}
 \end{Obj}
 
-\begin{Obj}{Theorem}{1.4.2}{The law of the unconscious statistician}
+\begin{Fig}{1.4.2}{The expectation as a balancing point}{Left: the fair die puts mass
+$\tfrac16$ at each of $1,\dots,6$; the beam balances at $\E\{Y\}=3.5$, a value the die never
+shows. Right: for a skewed density, probability is area, and the long right tail carries
+enough of it to drag the balance point past the peak. In both cases $\E\{Y\}$ is the center
+of mass of the distribution---the unique $c$ with $\E\{Y-c\}=0$ (\xref{1.4.1}).}
+\begin{tikzpicture}[x=0.85cm,y=1.55cm]
+  % ---- left panel: the fair die's pmf as point masses on a beam ----
+  \draw[cuBlueDk] (0.4,0) -- (6.6,0);
+  \foreach \x in {1,...,6}{
+    \draw[figTerm, thick] (\x,0) -- (\x,0.42);
+    \fill[figTerm] (\x,0.42) circle (2.6pt);
+    \node[cuBlueDk, below, font=\footnotesize] at (\x,-0.02) {$\x$};
+  }
+  \node[figTerm, font=\footnotesize, left] at (0.9,0.42) {$p(y)=\tfrac16$};
+  \draw[figLim, densely dashed] (3.5,0) -- (3.5,0.58);
+  \fill[figLim] (3.5,-0.03) -- (3.3,-0.30) -- (3.7,-0.30) -- cycle;
+  \node[figLim!80!black, font=\footnotesize, below] at (3.5,-0.34) {$\E\{Y\}=3.5$};
+  % ---- right panel: a skewed density balancing past its peak ----
+  \begin{scope}[shift={(8.6,0)}]
+    \fill[figTerm!10] plot [smooth, tension=0.8] coordinates
+      {(0.2,0) (0.7,0.30) (1.2,0.62) (1.7,0.72) (2.2,0.60) (3.2,0.36) (4.2,0.18) (5.2,0.08) (6.2,0.02)}
+      -- (6.2,0) -- (0.2,0) -- cycle;
+    \draw[figTerm, thick] plot [smooth, tension=0.8] coordinates
+      {(0.2,0) (0.7,0.30) (1.2,0.62) (1.7,0.72) (2.2,0.60) (3.2,0.36) (4.2,0.18) (5.2,0.08) (6.2,0.02)};
+    \draw[cuBlueDk] (0,0) -- (6.6,0);
+    \draw[figLim, densely dashed] (2.55,0) -- (2.55,0.52);
+    \fill[figLim] (2.55,-0.03) -- (2.35,-0.30) -- (2.75,-0.30) -- cycle;
+    \node[figLim!80!black, font=\footnotesize, below] at (2.55,-0.34) {$\E\{Y\}$};
+    \node[figTerm, font=\footnotesize] at (5.0,0.5) {area $=$ probability};
+  \end{scope}
+\end{tikzpicture}
+\end{Fig}
+
+\begin{Obj}{Theorem}{1.4.3}{The law of the unconscious statistician}
 Let $Y$ be discrete with pmf $p$, and let $g$ be a real function. Then
 \[ \E\{g(Y)\} \;=\; \sum_{y} g(y)\,p(y) \]
 (and $\E\{g(Y)\}=\int g(y)f(y)\,dy$ in the continuous case): the expectation of $g(Y)$ may be
 computed against the distribution of $Y$, without first finding the distribution of $g(Y)$.
 \end{Obj}
-\begin{Prf}{1.4.2}{Proof by Regrouping of the Unconscious-Statistician Formula (discrete case).}{}
+\begin{Prf}{1.4.3}{Proof by Regrouping of the Unconscious-Statistician Formula (discrete case).}{}
 \item Let $Z=g(Y)$, a random variable with pmf $p_Z(z)=P(g(Y)=z)=\sum_{y:\,g(y)=z}p(y)$.
 \item By \xref{1.4.1},
       \[ \E\{Z\} \;=\; \sum_z z\,p_Z(z) \;=\; \sum_z\, z \!\sum_{y:\,g(y)=z}\! p(y) . \]
@@ -278,38 +311,58 @@ computed against the distribution of $Y$, without first finding the distribution
       $\E\{g(Y)\}=\sum_y g(y)\,p(y)$.
 \end{Prf}
 
-\begin{Obj}{Definition}{1.4.3}{Joint, marginal, and conditional distributions}
-For a pair $(X,Y)$ with joint pmf $p(x,y)$: the \emph{marginal} pmf of $X$ is
-$p_X(x)=\sum_y p(x,y)$, and for any $x$ with $p_X(x)>0$ the \emph{conditional} pmf of $Y$ given
-$X=x$ is
-\[ p_{Y\mid X}(y\mid x) \;=\; \frac{p(x,y)}{p_X(x)} . \]
-Densities work the same way, with integrals in place of sums.
+\begin{Obj}{Definition}{1.4.4}{The joint distribution of a pair}
+For a pair of random variables $(X,Y)$, the joint distribution of \xref{1.1.6} specializes to
+a joint pmf $p(x,y)=P(X=x,\,Y=y)$ in the discrete case, or a joint density $f(x,y)$ in the
+continuous case. This is the complete description of the pair: it carries not only how each
+variable behaves alone but every trace of the dependence between them. For discrete variables
+it is usefully pictured as a two-way table---one row per value $x$, one column per value $y$,
+the cell holding $p(x,y)$---with all the cells summing to $1$.
 \end{Obj}
 
-\begin{ObjL}{Remark}{1.4.4}{Conditional distributions are probability distributions!}
+\begin{Obj}{Definition}{1.4.5}{Marginal distribution}
+The \emph{marginal} pmf of $X$ recovers the distribution of $X$ alone by summing the joint
+over everything that can happen to $Y$:
+\[ p_X(x) \;=\; \sum_y p(x,y) \]
+(and $f_X(x)=\int f(x,y)\,dy$ in the continuous case). In the two-way table these are the row
+totals, classically written in the table's \emph{margin}---hence the name. Marginalizing is a
+one-way street: the joint determines both marginals, but the marginals do not determine the
+joint, because everything about the dependence has been summed away (\xref{1.1.6}).
+\end{Obj}
+
+\begin{Obj}{Definition}{1.4.6}{Conditional distribution}
+For any $x$ with $p_X(x)>0$, the \emph{conditional} pmf of $Y$ given $X=x$ is
+\[ p_{Y\mid X}(y\mid x) \;=\; \frac{p(x,y)}{p_X(x)} \]
+(and $f_{Y\mid X}(y\mid x)=f(x,y)/f_X(x)$ for densities, when $f_X(x)>0$). The recipe: fix
+$X=x$, take that row of the table---the $x$-slice of the joint---and rescale it by its total
+so it sums to $1$. The result is the distribution of $Y$ for someone who has learned that
+$X=x$: conditioning is how a distribution absorbs information.
+\end{Obj}
+
+\begin{ObjL}{Remark}{1.4.7}{Conditional distributions are probability distributions!}
 For each fixed $x$, the numbers $p_{Y\mid X}(y\mid x)$ are nonnegative and sum to $1$: a
 conditional distribution is a genuine probability distribution, so everything defined for
 distributions---expectations included---applies to it verbatim. That single observation powers
 the next two objects.
 \end{ObjL}
 
-\begin{Obj}{Definition}{1.4.5}{Conditional expectation}
+\begin{Obj}{Definition}{1.4.8}{Conditional expectation}
 The \emph{conditional expectation} of $Y$ given $X=x$ is the expectation of the conditional
-distribution,
+distribution (\xref{1.4.6}),
 \[ \E\{Y\mid X=x\} \;=\; \sum_y y\,p_{Y\mid X}(y\mid x), \]
 and $\E\{Y\mid X\}$ denotes the random variable obtained by evaluating this function of $x$ at
 $X$.
 \end{Obj}
 
-\begin{Obj}{Theorem}{1.4.6}{Iterated expectations}
+\begin{Obj}{Theorem}{1.4.9}{Iterated expectations}
 Whenever the expectations exist,
 \[ \E\{\E\{Y\mid X\}\} \;=\; \E\{Y\}. \]
 \end{Obj}
-\begin{Prf}{1.4.6}{Proof by Conditioning of the Iterated-Expectations Identity (discrete case).}{}
+\begin{Prf}{1.4.9}{Proof by Conditioning of the Iterated-Expectations Identity (discrete case).}{}
 \item $\E\{Y\mid X\}$ is the function $x\mapsto\E\{Y\mid X=x\}$ evaluated at $X$, so by the law
-      of the unconscious statistician (\xref{1.4.2}),
+      of the unconscious statistician (\xref{1.4.3}),
       \[ \E\{\E\{Y\mid X\}\} \;=\; \sum_x \E\{Y\mid X=x\}\,p_X(x) . \]
-\item Substituting \xref{1.4.5} and \xref{1.4.3},
+\item Substituting \xref{1.4.8} and \xref{1.4.6},
       \[ \sum_x \sum_y y\,p_{Y\mid X}(y\mid x)\,p_X(x) \;=\; \sum_x\sum_y y\,p(x,y) . \]
 \item Exchanging the order of summation (legitimate by the assumed absolute convergence) and
       summing out $x$ gives
@@ -680,7 +733,7 @@ Under the Beta$(1,1)$ (uniform) prior on each arm's parameter, independently:
       $\E\{(\theta-a)^2\mid X=x\}=\Var(\theta\mid X=x)+(\E\{\theta\mid X=x\}-a)^2$
       (by \xref{1.A.1} applied to the posterior) is the posterior mean; and since the Bayes
       risk is the expectation over $X$ of the posterior expected loss (iterated expectations,
-      \xref{1.4.6}), minimizing the latter for each $x$ minimizes the former, so $T$ is the
+      \xref{1.4.9}), minimizing the latter for each $x$ minimizes the former, so $T$ is the
       Bayes rule.
 \end{Prf}
 
