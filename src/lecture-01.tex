@@ -250,7 +250,18 @@ points. Then an illustration (the clinical trial).'' But first, some more probab
 Expectations belong to \emph{distributions}: a random variable has an expectation through its
 distribution. For discrete $Y$ with pmf $p$ and for continuous $Y$ with density $f$,
 \[ \E\{Y\} \;=\; \sum_{y} y\,p(y) \qquad\text{or}\qquad \E\{Y\} \;=\; \int y\,f(y)\,dy , \]
-provided the sum or integral converges absolutely: the probability-weighted average of the
+provided the sum or integral converges absolutely\note{\emph{Absolute} convergence means the
+sum or integral of $|y|$ is finite---$\sum_y |y|\,p(y)<\infty$ or $\int|y|\,f(y)\,dy<\infty$,
+i.e.\ $\E\{|Y|\}<\infty$---not merely that the signed sum happens to settle. The assumption
+earns its keep twice. First, a distribution's values come in no privileged order, and by
+Riemann's rearrangement theorem a conditionally convergent series can be reordered to reach
+\emph{any} value---so without absolute convergence, ``the'' expectation would depend on
+bookkeeping. Take $Y$ with $P\big(Y=(-1)^{k+1}2^k/k\big)=2^{-k}$ for $k=1,2,\dots$: summed in
+the natural order, $\sum_k(-1)^{k+1}/k=\ln 2$, yet $\E\{|Y|\}=\sum_k 1/k=\infty$, and
+rearranging the terms changes the answer---so such a $Y$ is assigned \emph{no} expectation.
+Second, absolute convergence is precisely the license for the regrouping and
+exchange-of-order steps in the proofs of \xref{1.4.3} and \xref{1.4.9} (for integrals, via
+Fubini's theorem).}: the probability-weighted average of the
 values of $Y$.\note{Four conflated words, disentangled. \emph{Expectation} is the number
 defined here---a property of the distribution, fixed before any data are seen. \emph{Mean} is
 its synonym when speaking of a distribution (a ``population mean''), but a \emph{sample mean}
