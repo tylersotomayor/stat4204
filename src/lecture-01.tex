@@ -696,14 +696,30 @@ complete-class theorems---is beyond this course.}
 % ============================================================
 \sub{1.6}{Bayesian Decision Theory}
 
-Bayesian decision theory keeps the statistical model, the action space, and the loss function
-of \S\,\xref{1.5}, and adds one object. \HPS{1}
+Section \xref{1.5} ended with a deliberately incomplete verdict system. Admissibility only
+\emph{prunes}: it discards the dominated methods and then falls silent, leaving a family of
+survivors whose risk curves cross---one better here, another better there
+(Figure~\xref{1.5.13}). To pick a single method, something must say which regions of $\Theta$
+matter most---how heavily the middle of the parameter space should weigh against its edges.
+Bayesian decision theory makes that weighting explicit, and makes it honest, by insisting it
+take the one lawful form a weighting of possibilities can take: a probability distribution on
+the parameter space. Everything else---the statistical model, the action space, the
+loss---stays exactly as \S\,\xref{1.5} built it; one object is added. \HPS{1}
 
 \begin{Obj}{Definition}{1.6.1}{Prior distribution}
 The \emph{prior distribution} $\pi$ is a probability distribution on the parameter space
 $\Theta$: the parameter is treated as random, with $\pi$ describing where it is likely to be
 before the data are seen.
 \end{Obj}
+
+\medskip
+Treating $\theta$ as random changes what the risk \emph{is}. In \S\,\xref{1.5} the risk
+$R_{\delta}(\theta)$ was a curve---one number per candidate truth. With $\theta$ drawn from
+$\pi$, the curve's height becomes a random quantity, and a random quantity has an expectation:
+the collapse that turned random losses into the risk (\xref{1.5.9}) can be run once more, one
+level up, averaging the curve itself. For the trial, the deck's choice is Beta$(1,1)$---the
+uniform distribution---on each arm's cure probability, the two priors independent
+(\xref{1.8.3}).
 
 \begin{Obj}{Definition}{1.6.2}{Bayes risk}
 The \emph{Bayes risk} of a decision rule $\delta$ under the prior $\pi$ is the expected
@@ -714,15 +730,32 @@ $d\theta$; it is restored here.} Where the risk was a function on $\Theta$, the 
 single number: the prior averages the curve.
 \end{Obj}
 
+\medskip
+A number, unlike a curve, orders the candidates completely: any two Bayes risks can be
+compared, and ``best'' finally means something. The prescription writes itself---and for the
+trial the arithmetic is carried out in \xref{1.A.4}, where, under the uniform priors, the
+shaded estimator of \xref{1.8.3} turns out not merely to be good but to \emph{be} the Bayes
+rule.
+
 \begin{Obj}{Principle}{1.6.3}{The Bayes principle}
 The Bayes version of the principle: minimize the \emph{expected} risk. Among all decision
 rules, choose one whose Bayes risk is smallest---a \emph{Bayes rule} for the prior $\pi$.
 \end{Obj}
 
+\medskip
+The principle is only as defensible as the distribution it consumes. Everything now turns on a
+question the mathematics cannot settle by itself: where does a prior come from?
+
 \begin{ObjL}{Concept}{1.6.4}{Where does the prior distribution come from?}
 Maybe the parameter really is random and you know its distribution---or at least have some data
 to make a good guess about it. Or maybe you just make the prior up: ``it can be helpful!''
 \end{ObjL}
+
+\medskip
+Three provenances, running from the empirical down to the frankly invented---which raises the
+natural worry: does a prescription fed by an invented $\pi$ deserve obedience? The deck closes
+the section with two defenses, one internal to the framework and one structural, tying the
+Bayes rules back to admissibility.
 
 \begin{ObjL}{Remark}{1.6.5}{Should we follow the Bayes prescription?}
 If we believe in the prior, then there really is only one distribution for the data, and if we
