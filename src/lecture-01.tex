@@ -358,7 +358,7 @@ $X$.
 Whenever the expectations exist,
 \[ \E\{\E\{Y\mid X\}\} \;=\; \E\{Y\}. \]
 \end{Obj}
-\begin{Prf}{1.4.9}{Proof by Conditioning of the Iterated-Expectations Identity (discrete case).}{}
+\begin{Prf}{1.4.9.a}{Proof by Conditioning of the Iterated-Expectations Identity (discrete case).}{}
 \item $\E\{Y\mid X\}$ is the function $x\mapsto\E\{Y\mid X=x\}$ evaluated at $X$, so by the law
       of the unconscious statistician (\xref{1.4.3}),
       \[ \E\{\E\{Y\mid X\}\} \;=\; \sum_x \E\{Y\mid X=x\}\,p_X(x) . \]
@@ -367,6 +367,19 @@ Whenever the expectations exist,
 \item Exchanging the order of summation (legitimate by the assumed absolute convergence) and
       summing out $x$ gives
       \[ \sum_y y \sum_x p(x,y) \;=\; \sum_y y\,p_Y(y) \;=\; \E\{Y\} . \]
+\end{Prf}
+\begin{Prf}{1.4.9.b}{Proof by Conditioning of the Iterated-Expectations Identity (continuous case).}{}
+\item As before, $\E\{Y\mid X\}$ is a function of $X$, so by the law of the unconscious
+      statistician (\xref{1.4.3}), now in its integral form,
+      \[ \E\{\E\{Y\mid X\}\} \;=\; \int \E\{Y\mid X=x\}\,f_X(x)\,dx . \]
+\item Substituting \xref{1.4.8} and \xref{1.4.6}, the conditional density's denominator
+      cancels against the marginal wherever $f_X(x)>0$---and the set where $f_X(x)=0$
+      contributes nothing to the outer integral:
+      \[ \int\!\left(\int y\,f_{Y\mid X}(y\mid x)\,dy\right) f_X(x)\,dx
+         \;=\; \int\!\!\int y\,f(x,y)\,dy\,dx . \]
+\item Exchanging the order of integration (legitimate, by Fubini's theorem, under the assumed
+      absolute convergence) and integrating out $x$ gives
+      \[ \int y \int f(x,y)\,dx\,dy \;=\; \int y\,f_Y(y)\,dy \;=\; \E\{Y\} . \]
 \end{Prf}
 
 % ============================================================
