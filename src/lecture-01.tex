@@ -260,7 +260,7 @@ bookkeeping. Take $Y$ with $P\big(Y=(-1)^{k+1}2^k/k\big)=2^{-k}$ for $k=1,2,\dot
 the natural order, $\sum_k(-1)^{k+1}/k=\ln 2$, yet $\E\{|Y|\}=\sum_k 1/k=\infty$, and
 rearranging the terms changes the answer---so such a $Y$ is assigned \emph{no} expectation.
 Second, absolute convergence is precisely the license for the regrouping and
-exchange-of-order steps in the proofs of \xref{1.4.3} and \xref{1.4.9} (for integrals, via
+exchange-of-order steps in the proofs of \xref{1.4.4} and \xref{1.4.11} (for integrals, via
 Fubini's theorem).}: the probability-weighted average of the
 values of $Y$.\note{Four conflated words, disentangled. \emph{Expectation} is the number
 defined here---a property of the distribution, fixed before any data are seen. \emph{Mean} is
@@ -307,13 +307,36 @@ of mass of the distribution---the unique $c$ with $\E\{Y-c\}=0$ (\xref{1.4.1}).}
 \end{tikzpicture}
 \end{Fig}
 
-\begin{Obj}{Theorem}{1.4.3}{The law of the unconscious statistician}
+\begin{ObjL}{Concept}{1.4.3}{The problem the next theorem solves}
+You know the distribution of $Y$, and you need the expectation not of $Y$ itself but of some
+transformed quantity $g(Y)$: $Y^2$ on the way to a variance, a loss $L(\delta(Y),\theta)$ on
+the way to a risk, an estimator $(1+X)/(2+n)$ built from a count. Now $g(Y)$ is a random
+variable in its own right, and \xref{1.4.1} is unambiguous about what its expectation means:
+weight each value $z$ that $g(Y)$ can take by the probability that it takes it---compute
+against the distribution \emph{of $g(Y)$}. Taken literally, that instruction opens a
+preliminary project: derive that distribution. List the values $g$ can produce; for each one,
+find all the outcomes $y$ that $g$ sends there and merge their probabilities; only then
+average. The project is real work, and it would have to be redone for every new $g$. The next
+theorem says the project is unnecessary: the same number can be read directly off the
+distribution you already hold, by weighting $g(y)$, rather than $y$, by $p(y)$. The name is
+the profession's joke at its own expense---the formula is what everyone writes down
+instinctively, without noticing that, by the definition, there was something to prove; the
+theorem is why the instinct is correct. And it earns its keep at once: the risk function of
+\xref{1.5.4} \emph{is} this formula with $g$ the loss, a variance is this formula with
+$g(y)=(y-\mu)^2$, and its bivariate form,
+$\E\{g(X,Y)\}=\sum_x\sum_y g(x,y)\,p(x,y)$, is behind every covariance.
+\end{ObjL}
+
+\begin{Obj}{Theorem}{1.4.4}{The law of the unconscious statistician}
 Let $Y$ be discrete with pmf $p$, and let $g$ be a real function. Then
 \[ \E\{g(Y)\} \;=\; \sum_{y} g(y)\,p(y) \]
 (and $\E\{g(Y)\}=\int g(y)f(y)\,dy$ in the continuous case): the expectation of $g(Y)$ may be
 computed against the distribution of $Y$, without first finding the distribution of $g(Y)$.
+Equivalently: grouping the average by outcome (each $y$ weighted by $p(y)$) and grouping it by
+value (each $z$ weighted by $P(g(Y)=z)$) must agree. The theorem is a regrouping identity, and
+its proof is exactly that regrouping.
 \end{Obj}
-\begin{Prf}{1.4.3}{Proof by Regrouping of the Unconscious-Statistician Formula (discrete case).}{}
+\begin{Prf}{1.4.4}{Proof by Regrouping of the Unconscious-Statistician Formula (discrete case).}{}
 \item Let $Z=g(Y)$, a random variable with pmf $p_Z(z)=P(g(Y)=z)=\sum_{y:\,g(y)=z}p(y)$.
 \item By \xref{1.4.1},
       \[ \E\{Z\} \;=\; \sum_z z\,p_Z(z) \;=\; \sum_z\, z \!\sum_{y:\,g(y)=z}\! p(y) . \]
@@ -322,7 +345,20 @@ computed against the distribution of $Y$, without first finding the distribution
       $\E\{g(Y)\}=\sum_y g(y)\,p(y)$.
 \end{Prf}
 
-\begin{Obj}{Definition}{1.4.4}{The joint distribution of a pair}
+\begin{ObjL}{Example}{1.4.5}{LOTUS on a many-to-one map}
+Let $Y$ be uniform on $\{-1,0,1\}$ and $g(y)=y^2$. The definition-first route derives the
+distribution of $Z=g(Y)$: the two outcomes $-1$ and $1$ both land on the value $1$, so their
+probabilities merge, $P(Z=1)=\tfrac23$, while $P(Z=0)=\tfrac13$; then
+$\E\{Z\}=0\cdot\tfrac13+1\cdot\tfrac23=\tfrac23$. The theorem's route never mentions $Z$'s
+distribution:
+\[ \E\{g(Y)\} \;=\; (-1)^2\cdot\tfrac13+0^2\cdot\tfrac13+1^2\cdot\tfrac13 \;=\; \tfrac23 . \]
+Same number, different bookkeeping---and the difference is the whole content of the theorem:
+the first route's single term $1\cdot\tfrac23$ is the second route's two terms
+$(-1)^2\cdot\tfrac13+1^2\cdot\tfrac13$, regrouped. That merging of outcomes that share a value
+is all the proof of \xref{1.4.4} does in general.
+\end{ObjL}
+
+\begin{Obj}{Definition}{1.4.6}{The joint distribution of a pair}
 For a pair of random variables $(X,Y)$, the joint distribution of \xref{1.1.6} specializes to
 a joint pmf $p(x,y)=P(X=x,\,Y=y)$ in the discrete case, or a joint density $f(x,y)$ in the
 continuous case. This is the complete description of the pair: it carries not only how each
@@ -331,7 +367,7 @@ it is usefully pictured as a two-way table---one row per value $x$, one column p
 the cell holding $p(x,y)$---with all the cells summing to $1$.
 \end{Obj}
 
-\begin{Obj}{Definition}{1.4.5}{Marginal distribution}
+\begin{Obj}{Definition}{1.4.7}{Marginal distribution}
 The \emph{marginal} pmf of $X$ recovers the distribution of $X$ alone by summing the joint
 over everything that can happen to $Y$:
 \[ p_X(x) \;=\; \sum_y p(x,y) \]
@@ -341,7 +377,7 @@ one-way street: the joint determines both marginals, but the marginals do not de
 joint, because everything about the dependence has been summed away (\xref{1.1.6}).
 \end{Obj}
 
-\begin{Obj}{Definition}{1.4.6}{Conditional distribution}
+\begin{Obj}{Definition}{1.4.8}{Conditional distribution}
 For any $x$ with $p_X(x)>0$, the \emph{conditional} pmf of $Y$ given $X=x$ is
 \[ p_{Y\mid X}(y\mid x) \;=\; \frac{p(x,y)}{p_X(x)} \]
 (and $f_{Y\mid X}(y\mid x)=f(x,y)/f_X(x)$ for densities, when $f_X(x)>0$). The recipe: fix
@@ -350,46 +386,62 @@ so it sums to $1$. The result is the distribution of $Y$ for someone who has lea
 $X=x$: conditioning is how a distribution absorbs information.
 \end{Obj}
 
-\begin{ObjL}{Remark}{1.4.7}{Conditional distributions are probability distributions!}
+\begin{ObjL}{Remark}{1.4.9}{Conditional distributions are probability distributions!}
 For each fixed $x$, the numbers $p_{Y\mid X}(y\mid x)$ are nonnegative and sum to $1$: a
 conditional distribution is a genuine probability distribution, so everything defined for
 distributions---expectations included---applies to it verbatim. That single observation powers
 the next two objects.
 \end{ObjL}
 
-\begin{Obj}{Definition}{1.4.8}{Conditional expectation}
+\begin{Obj}{Definition}{1.4.10}{Conditional expectation}
 The \emph{conditional expectation} of $Y$ given $X=x$ is the expectation of the conditional
-distribution (\xref{1.4.6}),
+distribution (\xref{1.4.8}),
 \[ \E\{Y\mid X=x\} \;=\; \sum_y y\,p_{Y\mid X}(y\mid x), \]
 and $\E\{Y\mid X\}$ denotes the random variable obtained by evaluating this function of $x$ at
 $X$.
 \end{Obj}
 
-\begin{Obj}{Theorem}{1.4.9}{Iterated expectations}
+\begin{Obj}{Theorem}{1.4.11}{Iterated expectations}
 Whenever the expectations exist,
 \[ \E\{\E\{Y\mid X\}\} \;=\; \E\{Y\}. \]
 \end{Obj}
-\begin{Prf}{1.4.9.a}{Proof by Conditioning of the Iterated-Expectations Identity (discrete case).}{}
+\begin{Prf}{1.4.11.a}{Proof by Conditioning of the Iterated-Expectations Identity (discrete case).}{}
 \item $\E\{Y\mid X\}$ is the function $x\mapsto\E\{Y\mid X=x\}$ evaluated at $X$, so by the law
-      of the unconscious statistician (\xref{1.4.3}),
+      of the unconscious statistician (\xref{1.4.4}),
       \[ \E\{\E\{Y\mid X\}\} \;=\; \sum_x \E\{Y\mid X=x\}\,p_X(x) . \]
-\item Substituting \xref{1.4.8} and \xref{1.4.6},
-      \[ \sum_x \sum_y y\,p_{Y\mid X}(y\mid x)\,p_X(x) \;=\; \sum_x\sum_y y\,p(x,y) . \]
-\item Exchanging the order of summation (legitimate by the assumed absolute convergence) and
-      summing out $x$ gives
-      \[ \sum_y y \sum_x p(x,y) \;=\; \sum_y y\,p_Y(y) \;=\; \E\{Y\} . \]
+\item Substitute the conditional expectation (\xref{1.4.10}),
+      $\E\{Y\mid X=x\}=\sum_y y\,p_{Y\mid X}(y\mid x)$:
+      \[ \E\{\E\{Y\mid X\}\}
+         \;=\; \sum_x\Big(\sum_y y\,p_{Y\mid X}(y\mid x)\Big)\,p_X(x) . \]
+\item Each outer term carries the factor $p_X(x)$, so the terms with $p_X(x)=0$ vanish; in the
+      terms with $p_X(x)>0$, substitute the conditional pmf (\xref{1.4.8}),
+      $p_{Y\mid X}(y\mid x)=p(x,y)/p_X(x)$:
+      \[ \E\{\E\{Y\mid X\}\}
+         \;=\; \sum_x\Big(\sum_y y\,\frac{p(x,y)}{p_X(x)}\Big)\,p_X(x) . \]
+\item The factor $p_X(x)$ does not involve $y$, so it passes inside the inner sum, where it
+      cancels the denominator term by term,
+      \[ y\,\frac{p(x,y)}{p_X(x)}\cdot p_X(x) \;=\; y\,p(x,y) ,
+         \qquad\text{leaving}\qquad
+         \E\{\E\{Y\mid X\}\} \;=\; \sum_x\sum_y y\,p(x,y) . \]
+\item Exchange the order of summation (legitimate by the assumed absolute convergence), and
+      pull $y$---constant in $x$---out of the inner sum:
+      \[ \sum_x\sum_y y\,p(x,y) \;=\; \sum_y\sum_x y\,p(x,y) \;=\; \sum_y y\sum_x p(x,y) . \]
+\item The inner sum is the marginal pmf of $Y$ (\xref{1.4.7}, with the roles of $X$ and $Y$
+      exchanged): $\sum_x p(x,y)=p_Y(y)$. Hence, by the definition of expectation
+      (\xref{1.4.1}),
+      \[ \E\{\E\{Y\mid X\}\} \;=\; \sum_y y\,p_Y(y) \;=\; \E\{Y\} . \]
 \end{Prf}
-\begin{Prf}{1.4.9.b}{Proof by Conditioning of the Iterated-Expectations Identity (continuous case).}{}
+\begin{Prf}{1.4.11.b}{Proof by Conditioning of the Iterated-Expectations Identity (continuous case).}{}
 \item As before, $\E\{Y\mid X\}$ is a function of $X$, so by the law of the unconscious
-      statistician (\xref{1.4.3}), now in its integral form,
+      statistician (\xref{1.4.4}), now in its integral form,
       \[ \E\{\E\{Y\mid X\}\} \;=\; \int \E\{Y\mid X=x\}\,f_X(x)\,dx . \]
-\item Substitute the conditional expectation (\xref{1.4.8}),
+\item Substitute the conditional expectation (\xref{1.4.10}),
       $\E\{Y\mid X=x\}=\int y\,f_{Y\mid X}(y\mid x)\,dy$:
       \[ \E\{\E\{Y\mid X\}\}
          \;=\; \int\!\left(\int y\,f_{Y\mid X}(y\mid x)\,dy\right) f_X(x)\,dx . \]
 \item The outer integrand carries the factor $f_X(x)$, so the set where $f_X(x)=0$
       contributes zero to the outer integral; on the set where $f_X(x)>0$, substitute the
-      conditional density (\xref{1.4.6}), $f_{Y\mid X}(y\mid x)=f(x,y)/f_X(x)$:
+      conditional density (\xref{1.4.8}), $f_{Y\mid X}(y\mid x)=f(x,y)/f_X(x)$:
       \[ \E\{\E\{Y\mid X\}\}
          \;=\; \int\!\left(\int y\,\frac{f(x,y)}{f_X(x)}\,dy\right) f_X(x)\,dx . \]
 \item The factor $f_X(x)$ does not involve $y$, so it passes inside the inner integral, where
@@ -401,7 +453,7 @@ Whenever the expectations exist,
       absolute convergence), and pull $y$---constant in $x$---out of the inner integral:
       \[ \int\!\!\int y\,f(x,y)\,dy\,dx \;=\; \int\!\!\int y\,f(x,y)\,dx\,dy
          \;=\; \int y\!\left(\int f(x,y)\,dx\right) dy . \]
-\item The inner integral is the marginal density of $Y$ (\xref{1.4.5}, with the roles of $X$
+\item The inner integral is the marginal density of $Y$ (\xref{1.4.7}, with the roles of $X$
       and $Y$ exchanged): $\int f(x,y)\,dx=f_Y(y)$. Hence, by the definition of expectation
       (\xref{1.4.1}),
       \[ \E\{\E\{Y\mid X\}\} \;=\; \int y\,f_Y(y)\,dy \;=\; \E\{Y\} . \]
@@ -410,8 +462,38 @@ Whenever the expectations exist,
 % ============================================================
 \sub{1.5}{Decision Theory: Actions, Loss, and Risk}
 
-Decision theory begins from the statistical model of \xref{1.3.1}---a ``parameterized set of
-distributions on the sample space''---and adds three objects. \HPS{1}
+Section \xref{1.3} left the clinical trial in a precise but incomplete state: a model (two
+independent Bernoulli samples, $\theta=(\theta_T,\theta_P)\in[0,1]^2$) and an analytic goal
+(learn the difference $\theta_T-\theta_P$). What it did not supply is a \emph{method}---and
+candidate methods are cheap. Report the difference of the observed rates; report the shaded
+difference of \xref{1.8.3}; ignore the data and always report $0$; average the first two. Every
+one of them produces an answer on every data set, so producing answers cannot be what
+``working'' means. The deck's question---``But first, what do we mean `good?'\,''---is not
+rhetorical: until \emph{good} is defined, \emph{best} is meaningless.
+
+Decision theory is the discipline of making ``good'' explicit, and its move is to look past
+the answer to its \emph{consequences}. Choosing is acting: report a number, declare efficacy,
+approve or shelve. Actions have consequences that depend on the unknown state of
+reality---report a difference of $0.30$ when the truth is $0.05$ and patients are steered to a
+nearly useless treatment; declare ``no effect'' when there is one and a working therapy is
+shelved. So attach to every (action, truth) pair a price: the \emph{loss}. Judging a
+\emph{method}---a rule, fixed before the data arrive, committing you to an action for every
+data set you might see---then means asking what it can be \emph{expected} to lose. Because the
+data are random, that expected loss is computable from the model; because the truth is
+unknown, it must be computed at every candidate $\theta$. The result is not a number but a
+curve over the parameter space: the \emph{risk}.
+
+A curve is an honest but awkward report card. Risk curves cross---the rule ``always report
+$0$'' is unbeatable when $\theta_T=\theta_P$ and dreadful elsewhere---so ``minimize the risk''
+cannot be a theorem-backed instruction (a principle, the deck insists, not a result). What
+survives is a discipline: discard any method whose curve another beats everywhere
+(admissibility), and, when a single number is wanted, average the curve against a prior (the
+Bayes risk of \S\,\xref{1.6}). This framing of statistics---estimation and testing as one
+decision problem with different action spaces and losses (\S\,\xref{1.8})---is Abraham Wald's,
+worked out in the 1940s, and the course adopts it from the outset. The definitions below fix
+the vocabulary; each is already visible in the trial. Decision theory begins from the
+statistical model of \xref{1.3.1}---a ``parameterized set of distributions on the sample
+space''---and adds three objects. \HPS{1}
 
 \begin{Obj}{Definition}{1.5.1}{Action space}
 The \emph{action space} $\mathcal{A}$ is the set of possible choices of the decision maker:
@@ -771,7 +853,7 @@ Under the Beta$(1,1)$ (uniform) prior on each arm's parameter, independently:
       $\E\{(\theta-a)^2\mid X=x\}=\Var(\theta\mid X=x)+(\E\{\theta\mid X=x\}-a)^2$
       (by \xref{1.A.1} applied to the posterior) is the posterior mean; and since the Bayes
       risk is the expectation over $X$ of the posterior expected loss (iterated expectations,
-      \xref{1.4.9}), minimizing the latter for each $x$ minimizes the former, so $T$ is the
+      \xref{1.4.11}), minimizing the latter for each $x$ minimizes the former, so $T$ is the
       Bayes rule.
 \end{Prf}
 
