@@ -497,7 +497,14 @@ space''---and adds three objects. \HPS{1}
 
 \begin{Obj}{Definition}{1.5.1}{Action space}
 The \emph{action space} $\mathcal{A}$ is the set of possible choices of the decision maker:
-the values an analysis is allowed to output.
+the values an analysis is allowed to output. It is fixed by the \emph{question}, not by the
+data. The same trial supports estimation---report a plausible value of the cure-rate
+difference, $\mathcal{A}=[-1,1]$, every value a difference of two proportions could
+take---or testing---assert ``efficacious'' or ``not,'' an action space with exactly two
+elements; changing $\mathcal{A}$ changes the problem (\S\,\xref{1.8} makes both versions
+precise). And note what $\mathcal{A}$ is not: it is not the sample space---data live in $S$,
+conclusions live in $\mathcal{A}$, and the method of \xref{1.5.3} will be the bridge---and its
+elements carry no probabilities, because actions are \emph{chosen}, not drawn.
 \end{Obj}
 
 \begin{Obj}{Definition}{1.5.2}{Loss function}
@@ -507,14 +514,37 @@ where $L(a,\theta)$ tells you how much you lose by choosing action $a$ when the 
 $\theta$.\note{The deck words the domain both ways---``the parameter space cross the action
 space'' on the definition slides, ``the action space cross the parameter space'' in the
 typeset cheat sheet---while always writing the arguments $L(a,\theta)$. These notes follow the
-cheat sheet.}
+cheat sheet.} The loss is a \emph{modeling choice}, as much a part of the problem's
+specification as the statistical model itself: it declares, in advance and in numbers, how bad
+each mistake would be---zero (or least) for the best action available at $\theta$, growing as
+the action worsens, in whatever units of regret the analyst adopts. The course will stick to
+two standards (\S\,\xref{1.8}): \emph{squared-error loss}, $L(a,\theta)=(a-\theta)^2$, for
+estimation---near-misses almost free, large misses punished disproportionately (double the
+miss, quadruple the loss)---and \emph{zero--one loss} for testing, which charges $1$ for a
+wrong assertion and $0$ for a right one. Nothing in the definition demands symmetry---in the
+trial, shelving a working therapy may well cost more than approving a useless one, and a loss
+function can say so---but the two standards keep the theory clean. For the trial, with the
+difference as the target: $L(a,\theta)=\big(a-(\theta_T-\theta_P)\big)^2$.
 \end{Obj}
 
 \begin{Obj}{Definition}{1.5.3}{Method (decision rule)}
 A \emph{method}, or \emph{decision rule}, is a function
 \[ \delta : S \;\to\; \mathcal{A} \]
 from the sample space to the action space: what you will do, specified in advance, for every
-data set you might observe.
+data set you might observe. The force of the definition is in its timing. A method is chosen
+\emph{before} the data arrive, and it commits you on every data set you might see---a complete
+contingency plan, not an answer. That is exactly what makes methods judgeable: a single answer
+cannot be evaluated until the truth is known, but a plan can be averaged over everything the
+model says the data may do. For the trial, each of the following is a method from
+$S=\{0,1\}^{n_T}\times\{0,1\}^{n_P}$ to $\mathcal{A}=[-1,1]$:
+\[ \delta_1(y)=\frac{x_T}{n_T}-\frac{x_P}{n_P}, \qquad
+   \delta_2(y)=\frac{1+x_T}{2+n_T}-\frac{1+x_P}{2+n_P}, \qquad
+   \delta_3(y)\equiv 0 , \]
+the difference of observed rates, the shaded version of \xref{1.8.3}, and a rule that ignores
+the data entirely. Nothing in the definition requires a method to be sensible---that is the
+point: ``method'' is the arena, and the rest of the section builds the referee. Finally, since
+the data are modeled as random, $\delta(Y)$ is a random variable---so it has an expected loss,
+and that is where the risk comes from.
 \end{Obj}
 
 \begin{Obj}{Definition}{1.5.4}{Risk function}
@@ -524,26 +554,67 @@ parameter:
    \;=\; \int_{y\in S} f^{\theta}(y)\,L(\delta(y),\theta)\,dy
    \quad\text{or}\quad \sum_{y\in S} p^{\theta}(y)\,L(\delta(y),\theta), \]
 where $\E^{\theta}$ denotes expectation when the data's distribution is the one indexed by
-$\theta$.
+$\theta$. Read the construction from the inside out: fix a candidate truth $\theta$; the model
+hands the data their distribution; the method turns the random data into a random action
+$\delta(Y)$; the loss turns the random action into a random number $L(\delta(Y),\theta)$; and
+the expectation---the display is LOTUS (\xref{1.4.4}) with $g(y)=L(\delta(y),\theta)$---collapses
+the randomness to a single number: the method's average penalty \emph{if $\theta$ were the
+truth}. Sweeping $\theta$ across $\Theta$ traces the risk curve (Figure~\xref{1.5.5} shows the
+machine; Figure~\xref{1.5.8} shows the curves). Two instances carry the course: under
+zero--one loss the risk \emph{is} the probability of a wrong assertion,
+$R_{\delta}(\theta)=P^{\theta}(\delta\ \text{errs})$; under squared-error loss it is the mean
+squared error, which splits as variance plus squared bias (\xref{1.A.1}). The trial's two
+estimators have their risks computed in closed form in \xref{1.A.2} and \xref{1.A.3}.
 \end{Obj}
 
-\begin{Obj}{Principle}{1.5.5}{The risk principle}
+\begin{Fig}{1.5.5}{The anatomy of a decision problem}{How the four objects compose, at one
+fixed candidate truth $\theta$: the model hands the data their distribution, the method maps
+data to an action, the loss prices that action against $\theta$, and the expectation over the
+data collapses the randomness to the single number $R_{\delta}(\theta)$. Sweeping $\theta$
+over $\Theta$ traces the risk curves of Figure~\xref{1.5.8}
+(\xref{1.5.1}--\xref{1.5.4}).}
+\begin{tikzpicture}[x=1cm,y=1cm,
+  every node/.style={font=\small},
+  box/.style={draw, rounded corners=2pt, align=center, inner sep=5pt, minimum height=0.78cm,
+    execute at begin node={\hyphenpenalty=10000\exhyphenpenalty=10000}},
+  arr/.style={->, thick}]
+  \node[box, draw=figLim, fill=figLim!10] (truth) at (0,1.7)
+    {\textbf{truth} $\theta\in\Theta$};
+  \node[box, draw=cuBlueDk, fill=cuBlueLt!45] (data) at (4.6,1.7)
+    {\textbf{data} $Y\in S$};
+  \node[box, draw=figTerm, fill=figTerm!8] (act) at (9.2,1.7)
+    {\textbf{action} $\delta(Y)\in\mathcal{A}$};
+  \node[box, draw=figBad, fill=figBad!8] (loss) at (9.2,0)
+    {\textbf{loss} $L(\delta(Y),\theta)$};
+  \node[box, draw=figLim, fill=figLim!10] (risk) at (4.6,0)
+    {\textbf{risk} $R_{\delta}(\theta)$};
+  \draw[arr, figLim!80!black] (truth) -- node[above, font=\footnotesize]{the model $p^{\theta}$} (data);
+  \draw[arr, figTerm] (data) -- node[above, font=\footnotesize]{the method $\delta$} (act);
+  \draw[arr, figTerm] (act) -- node[right, font=\footnotesize]{priced by $L$} (loss);
+  \draw[arr, figLim!80!black] (truth.south) -- (0,-1.15)
+    -- node[below, font=\footnotesize]{$\theta$ enters the ledger too} (9.2,-1.15)
+    -- (loss.south);
+  \draw[arr, figBad!85!black] (loss) -- node[above, font=\footnotesize]{$\E^{\theta}$} (risk);
+\end{tikzpicture}
+\end{Fig}
+
+\begin{Obj}{Principle}{1.5.6}{The risk principle}
 ``THIS IS A PRINCIPLE, NOT A RESULT: try to minimize the risk.'' And---``Remember, Risk is a
 function!'' One method's risk is an entire curve over $\Theta$, not a number, so two methods
 need not be comparable: each may be better somewhere. The principle disciplines the search for
 methods; it does not by itself select one.
 \end{Obj}
 
-\begin{Obj}{Definition}{1.5.6}{Admissibility}
+\begin{Obj}{Definition}{1.5.7}{Admissibility}
 A method is \emph{admissible} if there is no other method that does at least as well for every
 parameter value \emph{and} better for some parameter value. A method that is so dominated is
 \emph{inadmissible}: whatever $\theta$ turns out to be, you would not regret abandoning it.
 \end{Obj}
 
-\begin{Fig}{1.5.7}{Three risk functions}{Risk curves for three decision rules, as sketched in
+\begin{Fig}{1.5.8}{Three risk functions}{Risk curves for three decision rules, as sketched in
 lecture. The dashed rule $\delta_3$ lies strictly above $\delta_1$ everywhere, so $\delta_1$
 dominates it and $\delta_3$ is inadmissible; $\delta_1$ and $\delta_2$ cross, so neither
-dominates the other, and the deck's legend marks both admissible (\xref{1.5.6}).}
+dominates the other, and the deck's legend marks both admissible (\xref{1.5.7}).}
 \begin{tikzpicture}[x=1.15cm,y=1.9cm]
   % axes
   \draw[->] (-3.3,0) -- (4.55,0) node[right=2pt] {$\theta$};
@@ -576,7 +647,7 @@ dominates the other, and the deck's legend marks both admissible (\xref{1.5.6}).
 \end{tikzpicture}
 \end{Fig}
 
-\begin{ObjL}{Concept}{1.5.8}{Should we follow the normative prescription?}
+\begin{ObjL}{Concept}{1.5.9}{Should we follow the normative prescription?}
 If you have a coherent ordering on decision rules---any consistent way of ranking them---then
 that ordering is consistent with the risk for \emph{some} loss function. ``And so why not use
 THE loss function?!'' Ranking methods at all commits you, implicitly, to behaving as if you
