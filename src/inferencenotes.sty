@@ -29,7 +29,14 @@
 
 \graphicspath{{figures/}}
 \onehalfspacing
-\setlength{\parindent}{0pt}
+% Textbook paragraphing: a first-line indent marks a paragraph (no inter-paragraph
+% skip); headings and object openers set their following paragraph flush; the boxed
+% working environments (Solutions, Reflections, Spoken, transcripts) instead use a
+% small skip with no indent. Widows and orphans are kept off page breaks.
+\setlength{\parindent}{1.5em}
+\clubpenalty=10000
+\widowpenalty=10000
+\displaywidowpenalty=10000
 
 % Columbia palette (shared with the handbook projects)
 \definecolor{cuBlue}{HTML}{1F4E79}
@@ -80,12 +87,12 @@
 \newenvironment{Obj}[3]{%
   \registerobj{#1}{#2}{#3}%
   \par\medskip\noindent{\small\bfseries #1~\hypertarget{#2}{#2}}\\[1pt]{\Large #3}\nopagebreak%
-  \begin{adjustwidth}{1.6em}{0pt}\ignorespaces}{\par\end{adjustwidth}}
+  \begin{adjustwidth}{1.6em}{0pt}\noindent\ignorespaces}{\par\end{adjustwidth}}
 
 % ---------- Object (SECONDARY/light): \large italic title, smaller body. Example/Remark/Concept ----------
 \newenvironment{ObjL}[3]{%
   \par\medskip\noindent{\small\bfseries #1~\hypertarget{#2}{#2}}\\[1pt]{\large\itshape #3}\nopagebreak%
-  \begin{adjustwidth}{1.6em}{0pt}\small\ignorespaces}{\par\end{adjustwidth}}
+  \begin{adjustwidth}{1.6em}{0pt}\small\noindent\ignorespaces}{\par\end{adjustwidth}}
 
 % ---------- Proof: numbered steps, ruled body, filled square, caption-size notes ----------
 \newenvironment{Prf}[3]{%
@@ -96,7 +103,7 @@
   \begin{enumerate}[leftmargin=1.9em,labelsep=0.55em,itemsep=5pt,topsep=1pt,
      parsep=1pt,label=\textnormal{(\arabic*)}]}{%
   \end{enumerate}\nobreak\par\noindent\hfill$\blacksquare$\end{pfbody}%
-  \ifx\PfNotes\empty\else\par{\footnotesize\PfNotes}\fi
+  \ifx\PfNotes\empty\else\par\noindent{\footnotesize\PfNotes}\fi
   \end{adjustwidth}\end{adjustwidth}}
 
 % ---------- Deferred / cited proof: label + italic title + pointer ----------
@@ -113,24 +120,24 @@
 \newenvironment{Exercise}[2]{%
   \par\medskip\noindent{\small\bfseries Exercise~\hypertarget{#1}{#1}}%
   \gdef\ExTag{#2}\ifx\ExTag\empty\else\enspace{\footnotesize[\,#2\,]}\fi\\[1pt]\nopagebreak%
-  \begin{adjustwidth}{1.6em}{0pt}\ignorespaces}{\par\end{adjustwidth}}
+  \begin{adjustwidth}{1.6em}{0pt}\noindent\ignorespaces}{\par\end{adjustwidth}}
 % \begin{Solution} ... \end{Solution}   LEFT GREEN rule (homework green), auto-square.
 \newenvironment{Solution}{%
   \par\smallskip\begin{adjustwidth}{1.6em}{0pt}%
   \noindent{\small\scshape Solution.}\par\nobreak\smallskip
-  \begin{solbody}\setlength{\parskip}{0.5em}\ignorespaces}{%
+  \begin{solbody}\setlength{\parskip}{0.5em}\setlength{\parindent}{0pt}\ignorespaces}{%
   \nobreak\par\noindent\hfill$\blacksquare$\end{solbody}\end{adjustwidth}}
 % \begin{SolutionBlue} ... \end{SolutionBlue}   LEFT BLUE rule for unassigned problems.
 \newenvironment{SolutionBlue}{%
   \par\smallskip\begin{adjustwidth}{1.6em}{0pt}%
   \noindent{\small\scshape Solution.}\par\nobreak\smallskip
-  \begin{solbodyblue}\setlength{\parskip}{0.5em}\ignorespaces}{%
+  \begin{solbodyblue}\setlength{\parskip}{0.5em}\setlength{\parindent}{0pt}\ignorespaces}{%
   \nobreak\par\noindent\hfill$\blacksquare$\end{solbodyblue}\end{adjustwidth}}
 % \begin{SolutionExam} ... \end{SolutionExam}   LEFT COLUMBIA LIGHT BLUE rule for exam problems.
 \newenvironment{SolutionExam}{%
   \par\smallskip\begin{adjustwidth}{1.6em}{0pt}%
   \noindent{\small\scshape Solution.}\par\nobreak\smallskip
-  \begin{solbodyexam}\setlength{\parskip}{0.5em}\ignorespaces}{%
+  \begin{solbodyexam}\setlength{\parskip}{0.5em}\setlength{\parindent}{0pt}\ignorespaces}{%
   \nobreak\par\noindent\hfill$\blacksquare$\end{solbodyexam}\end{adjustwidth}}
 
 % ---------- Reflection body: a LEFT GRAY rule (the homework's gray identity), no box ----------
@@ -140,7 +147,7 @@
 \newenvironment{Reflection}{%
   \par\smallskip\begin{adjustwidth}{1.6em}{0pt}%
   \noindent{\small\scshape Reflections.}\par\nobreak\smallskip
-  \begin{refbody}\setlength{\parskip}{0.6em}\ignorespaces}{%
+  \begin{refbody}\setlength{\parskip}{0.6em}\setlength{\parindent}{0pt}\ignorespaces}{%
   \par\end{refbody}\end{adjustwidth}}
 % Reflection run-in mini-header (Goal., Idea., What's needed., Takeaway., ...).
 \newcommand{\rh}[1]{\par\smallskip\noindent\textbf{#1}\enspace\ignorespaces}
@@ -156,7 +163,7 @@
 \newenvironment{Spoken}[1]{%
   \gdef\SpokenLoc{#1}%
   \par\smallskip\begin{adjustwidth}{1.6em}{0pt}\begin{spokenbody}%
-  \small\itshape\ignorespaces}{%
+  \setlength{\parindent}{0pt}\small\itshape\ignorespaces}{%
   \par\vspace{2pt}{\normalfont\footnotesize\scshape\raggedleft
   ---\ in lecture\ifx\SpokenLoc\empty\else,\ \SpokenLoc\fi\par}%
   \end{spokenbody}\end{adjustwidth}}
@@ -165,19 +172,21 @@
 
 % ---------- Exercises Part: problem heading (bold "Problem id" + italic source); TOC + hypertarget ----------
 % \prob{id}{source/tag}  ...problem text...  then \begin{Solution}/\begin{Reflection}.
+\makeatletter
 \newcommand{\prob}[2]{\par\bigskip\phantomsection
   \markright{#1\quad #2}%
   \noindent{\large\bfseries Problem~\hypertarget{prob:#1}{#1}}%
-  \gdef\ProbSrc{#2}\ifx\ProbSrc\empty\else\enspace{\normalsize\itshape #2}\fi\par\nobreak\smallskip}
+  \gdef\ProbSrc{#2}\ifx\ProbSrc\empty\else\enspace{\normalsize\itshape #2}\fi\par\nobreak\smallskip\@afterindentfalse\@afterheading}
+\makeatother
 % ---------- Placeholder solution (for problems deferred beyond the current notes) ----------
 \newcommand{\deferredsoln}{\par\smallskip\begin{adjustwidth}{1.6em}{0pt}%
   \noindent{\small\scshape Solution.}\par\nobreak\smallskip
-  \begin{solbody}\itshape Deferred. This problem depends on material not yet covered in the
+  \begin{solbody}\noindent\itshape Deferred. This problem depends on material not yet covered in the
   lectures; a full solution and reflection will follow once that material is in
   place.\end{solbody}\end{adjustwidth}}
 \newcommand{\deferredsolnblue}{\par\smallskip\begin{adjustwidth}{1.6em}{0pt}%
   \noindent{\small\scshape Solution.}\par\nobreak\smallskip
-  \begin{solbodyblue}\itshape Deferred. This problem depends on material not yet covered in the
+  \begin{solbodyblue}\noindent\itshape Deferred. This problem depends on material not yet covered in the
   lectures; a full solution and reflection will follow once that material is in
   place.\end{solbodyblue}\end{adjustwidth}}
 
@@ -186,13 +195,14 @@
   \gdef\FigID{#1}\gdef\FigTitle{#2}\gdef\FigDesc{#3}%
   \par\medskip\begin{center}}{%
   \end{center}\nopagebreak\par\vspace{4pt}
-  \begin{center}\begin{minipage}{0.86\linewidth}\footnotesize
+  \begin{center}\begin{minipage}{0.86\linewidth}\footnotesize\noindent
   \hypertarget{\FigID}{\textbf{Figure~\FigID.}}\enspace{\scshape\FigTitle.}%
   \ifx\FigDesc\empty\else\enspace\FigDesc\fi\par
   \end{minipage}\end{center}\medskip}
 
 % ---------- Section (topic) heading: \LARGE bold; sets running head + TOC entry ----------
 \newsavebox{\subnumbox}
+\makeatletter
 \newcommand{\sub}[2]{\par\bigskip
   \markright{#1\quad #2}%
   \phantomsection\addcontentsline{toc}{section}{\protect\numberline{#1}#2}%
@@ -200,7 +210,8 @@
   {\LARGE\bfseries\noindent\hyphenpenalty=10000\exhyphenpenalty=10000
    \rightskip=0pt plus 1fil\relax
    \hangindent=\wd\subnumbox\hangafter=1
-   \hypertarget{#1}{#1}\quad #2\par}\nobreak\vspace{6pt}}
+   \hypertarget{#1}{#1}\quad #2\par}\nobreak\vspace{6pt}\@afterindentfalse\@afterheading}
+\makeatother
 
 % ---------- "Contents of this lecture" / scope block (all styling lives here) ----------
 \newenvironment{lecturecontents}[1]{%
@@ -241,12 +252,14 @@
   \endgroup}
 
 % ---------- Per-lecture appendix heading (supplementary material) ----------
+\makeatletter
 \newcommand{\lectureappendix}{\clearpage
   \markright{Appendix}%
   \phantomsection\addcontentsline{toc}{section}{Appendix}%
   {\LARGE\bfseries Appendix}\par\nobreak\vspace{2pt}%
   {\small\itshape Supplementary material---additional proofs, context, and other treatments;
-   not part of the lecture proper.}\par\nobreak\vspace{6pt}}
+   not part of the lecture proper.}\par\nobreak\vspace{6pt}\@afterindentfalse\@afterheading}
+\makeatother
 
 % ---------- Per-(sub)file Index of Objects (auto; two passes) ----------
 \makeatletter
@@ -302,6 +315,7 @@
 % (a lecture, a review session, etc.); title wraps naturally, no \\ needed.
 % Thin vertical-rule divider for the course/title metadata line.
 \newcommand{\midbar}{\hspace{0.6em}\rule[-0.18ex]{0.4pt}{1.75ex}\hspace{0.6em}}
+\makeatletter
 \newcommand{\beginunittoc}[5]{%
   \clearpage
   \renewcommand{\lecturehead}{#1}%
@@ -313,7 +327,8 @@
   \vspace{1.05em}{\large STAT~S4204\midbar Statistical Inference}\par
   \def\UnitSubtitle{#3}%
   \ifx\UnitSubtitle\empty\else\vspace{0.5em}{\normalsize #3}\par\fi
-  \vspace{1.25em}}
+  \vspace{1.25em}\@afterindentfalse\@afterheading}
+\makeatother
 \newcommand{\beginunit}[4]{%
   \beginunittoc{#1}{#2}{#3}{#4}{#2\texorpdfstring{\quad}{ }#4}}
 % \beginlecture{<number>}{<date>}{<title>}
