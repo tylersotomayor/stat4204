@@ -260,7 +260,7 @@ bookkeeping. Take $Y$ with $P\big(Y=(-1)^{k+1}2^k/k\big)=2^{-k}$ for $k=1,2,\dot
 the natural order, $\sum_k(-1)^{k+1}/k=\ln 2$, yet $\E\{|Y|\}=\sum_k 1/k=\infty$, and
 rearranging the terms changes the answer---so such a $Y$ is assigned \emph{no} expectation.
 Second, absolute convergence is precisely the license for the regrouping and
-exchange-of-order steps in the proofs of \xref{1.4.4} and \xref{1.4.14} (for integrals, via
+exchange-of-order steps in the proofs of \xref{1.4.4} and \xref{1.4.16} (for integrals, via
 Fubini's theorem).}: the probability-weighted average of the
 values of $Y$.\note{Four conflated words, disentangled. \emph{Expectation} is the number
 defined here---a property of the distribution, fixed before any data are seen. \emph{Mean} is
@@ -396,17 +396,118 @@ For any $x$ with $p_X(x)>0$, the \emph{conditional} pmf of $Y$ given $X=x$ is
 The recipe behind the formula: fix $X=x$, take that row of the table---the $x$-slice of the
 joint---and rescale it by its total so it sums to $1$. The result is the distribution of $Y$
 for someone who has learned that $X=x$: conditioning is how a distribution absorbs
-information.
+information. And the formula is an old friend in new clothes: since $\{Y=y\}\cap\{X=x\}$ has
+probability $p(x,y)$, the display is the elementary $P(A\mid B)=P(A\cap B)/P(B)$ with
+$B=\{X=x\}$---applied to every event $\{Y=y\}$ at once, which is what upgrades a single
+conditional probability into an entire conditional distribution.
 \end{ObjL}
 
-\begin{ObjL}{Remark}{1.4.12}{Conditional distributions are probability distributions!}
+\begin{ObjL}{Example}{1.4.12}{A worked table: joint to marginal to conditional}
+Let $X\in\{0,1\}$ and $Y\in\{1,2,3\}$ have the joint pmf
+\begin{center}
+\begin{tabular}{@{}c|ccc|c@{}}
+$p(x,y)$ & $y=1$ & $y=2$ & $y=3$ & $p_X(x)$\\ \hline
+$x=0$ & $0.20$ & $0.20$ & $0.10$ & $0.50$\\
+$x=1$ & $0.10$ & $0.15$ & $0.25$ & $0.50$\\ \hline
+$p_Y(y)$ & $0.30$ & $0.35$ & $0.35$ & $1$\\
+\end{tabular}
+\end{center}
+The margins are computed, not given: the $x=1$ row sums to the marginal
+$p_X(1)=0.10+0.15+0.25=0.50$ (\xref{1.4.8}), and the column sums give
+$p_Y=(0.30,0.35,0.35)$. Conditioning on $X=1$ rescales that row by its total (\xref{1.4.10}):
+\[ p_{Y\mid X}(\,\cdot\mid 1) \;=\; \frac{(0.10,\;0.15,\;0.25)}{0.50}
+   \;=\; (0.20,\;0.30,\;0.50), \]
+which sums to $1$, as a distribution must. Two things to read off. First, the conditional
+differs from the marginal $p_Y$---learning $X=1$ tilts $Y$ upward---so $X$ carries information
+about $Y$: the variables are dependent. Second, the numbers quietly preview \xref{1.4.16}:
+here $\E\{Y\mid X=0\}=1.8$ and $\E\{Y\mid X=1\}=2.3$, and their $p_X$-weighted average
+$0.5(1.8)+0.5(2.3)=2.05$ is exactly $\E\{Y\}=1(0.30)+2(0.35)+3(0.35)=2.05$.
+\end{ObjL}
+
+\begin{Fig}{1.4.13}{Slicing a joint distribution into a conditional}{The worked example's
+joint pmf as a tinted grid (darker cells carry more probability), with its marginals in the
+margins; the outlined $x=1$ row is pulled out and rescaled by its total, $p_X(1)=0.50$, into
+the conditional distribution, which sums to $1$. The slice-and-renormalize recipe of
+\xref{1.4.11} in one picture (\xref{1.4.6}, \xref{1.4.8}, \xref{1.4.10}).}
+\begin{tikzpicture}[x=1cm,y=1cm, every node/.style={font=\small}]
+  % ---- left: the joint as a grid with margins ----
+  \node at (1.575,2.95) {$y=1$};
+  \node at (2.925,2.95) {$y=2$};
+  \node at (4.275,2.95) {$y=3$};
+  \node at (5.75,2.95) {$p_X(x)$};
+  \node at (0.4,2.175) {$x=0$};
+  \node at (0.4,1.425) {$x=1$};
+  \node at (0.4,0.475) {$p_Y(y)$};
+  % joint cells, tint proportional to probability
+  \fill[figTerm!40] (0.9,1.8) rectangle (2.25,2.55);
+  \fill[figTerm!40] (2.25,1.8) rectangle (3.6,2.55);
+  \fill[figTerm!20] (3.6,1.8) rectangle (4.95,2.55);
+  \fill[figTerm!20] (0.9,1.05) rectangle (2.25,1.8);
+  \fill[figTerm!30] (2.25,1.05) rectangle (3.6,1.8);
+  \fill[figTerm!50] (3.6,1.05) rectangle (4.95,1.8);
+  \draw[black!45] (0.9,1.05) grid[xstep=1.35,ystep=0.75] (4.95,2.55);
+  \node at (1.575,2.175) {$0.20$};
+  \node at (2.925,2.175) {$0.20$};
+  \node at (4.275,2.175) {$0.10$};
+  \node at (1.575,1.425) {$0.10$};
+  \node at (2.925,1.425) {$0.15$};
+  \node at (4.275,1.425) {$0.25$};
+  % marginal column (p_X) and row (p_Y)
+  \fill[figLim!15] (5.15,1.8) rectangle (6.35,2.55);
+  \fill[figLim!15] (5.15,1.05) rectangle (6.35,1.8);
+  \draw[black!45] (5.15,1.05) rectangle (6.35,2.55);
+  \draw[black!45] (5.15,1.8) -- (6.35,1.8);
+  \node at (5.75,2.175) {$0.50$};
+  \node at (5.75,1.425) {$0.50$};
+  \fill[figLim!15] (0.9,0.1) rectangle (2.25,0.85);
+  \fill[figLim!15] (2.25,0.1) rectangle (3.6,0.85);
+  \fill[figLim!15] (3.6,0.1) rectangle (4.95,0.85);
+  \draw[black!45] (0.9,0.1) grid[xstep=1.35,ystep=0.75] (4.95,0.85);
+  \node at (1.575,0.475) {$0.30$};
+  \node at (2.925,0.475) {$0.35$};
+  \node at (4.275,0.475) {$0.35$};
+  % highlight the x=1 slice
+  \draw[figBad, very thick] (0.9,1.05) rectangle (4.95,1.8);
+  % ---- right: slice, then renormalize ----
+  \begin{scope}[shift={(7.9,0)}]
+    \node[align=center] at (0.75,2.95) {the $x=1$ slice};
+    \draw[black!60] (-0.1,0.3) -- (1.6,0.3);
+    \fill[figTerm!60] (0.0,0.3) rectangle (0.4,0.62);
+    \fill[figTerm!60] (0.55,0.3) rectangle (0.95,0.78);
+    \fill[figTerm!60] (1.1,0.3) rectangle (1.5,1.10);
+    \node[font=\footnotesize] at (0.2,0.14) {$1$};
+    \node[font=\footnotesize] at (0.75,0.14) {$2$};
+    \node[font=\footnotesize] at (1.3,0.14) {$3$};
+    \node[font=\footnotesize, above] at (0.2,0.62) {$.10$};
+    \node[font=\footnotesize, above] at (0.75,0.78) {$.15$};
+    \node[font=\footnotesize, above] at (1.3,1.10) {$.25$};
+    \node[font=\footnotesize, black!60] at (0.75,-0.18) {sums to $0.50$};
+    \draw[->, thick, figBad!85!black] (1.95,1.0) -- (2.75,1.0)
+      node[midway, above, font=\footnotesize] {$\div\,0.50$};
+    \node[align=center] at (3.95,2.95) {the conditional\\[-2pt]$p_{Y\mid X}(\,\cdot\mid 1)$};
+    \draw[black!60] (3.1,0.3) -- (4.8,0.3);
+    \fill[figLim!55] (3.2,0.3) rectangle (3.6,0.94);
+    \fill[figLim!55] (3.75,0.3) rectangle (4.15,1.26);
+    \fill[figLim!55] (4.3,0.3) rectangle (4.7,1.90);
+    \node[font=\footnotesize] at (3.4,0.14) {$1$};
+    \node[font=\footnotesize] at (3.95,0.14) {$2$};
+    \node[font=\footnotesize] at (4.5,0.14) {$3$};
+    \node[font=\footnotesize, above] at (3.4,0.94) {$.20$};
+    \node[font=\footnotesize, above] at (3.95,1.26) {$.30$};
+    \node[font=\footnotesize, above] at (4.5,1.90) {$.50$};
+    \node[font=\footnotesize, black!60] at (3.95,-0.18) {sums to $1$};
+  \end{scope}
+\end{tikzpicture}
+\end{Fig}
+
+\begin{ObjL}{Remark}{1.4.14}{Conditional distributions are probability distributions!}
 For each fixed $x$, the numbers $p_{Y\mid X}(y\mid x)$ are nonnegative and sum to $1$: a
 conditional distribution is a genuine probability distribution, so everything defined for
 distributions---expectations included---applies to it verbatim. That single observation powers
 the next two objects.
 \end{ObjL}
 
-\begin{Obj}{Definition}{1.4.13}{Conditional expectation}
+\begin{Obj}{Definition}{1.4.15}{Conditional expectation}
 The \emph{conditional expectation} of $Y$ given $X=x$ is the expectation of the conditional
 distribution (\xref{1.4.10}),
 \[ \E\{Y\mid X=x\} \;=\; \sum_y y\,p_{Y\mid X}(y\mid x), \]
@@ -414,15 +515,15 @@ and $\E\{Y\mid X\}$ denotes the random variable obtained by evaluating this func
 $X$.
 \end{Obj}
 
-\begin{Obj}{Theorem}{1.4.14}{Iterated expectations}
+\begin{Obj}{Theorem}{1.4.16}{Iterated expectations}
 Whenever the expectations exist,
 \[ \E\{\E\{Y\mid X\}\} \;=\; \E\{Y\}. \]
 \end{Obj}
-\begin{Prf}{1.4.14.a}{Proof by Conditioning of the Iterated-Expectations Identity (discrete case).}{}
+\begin{Prf}{1.4.16.a}{Proof by Conditioning of the Iterated-Expectations Identity (discrete case).}{}
 \item $\E\{Y\mid X\}$ is the function $x\mapsto\E\{Y\mid X=x\}$ evaluated at $X$, so by the law
       of the unconscious statistician (\xref{1.4.4}),
       \[ \E\{\E\{Y\mid X\}\} \;=\; \sum_x \E\{Y\mid X=x\}\,p_X(x) . \]
-\item Substitute the conditional expectation (\xref{1.4.13}),
+\item Substitute the conditional expectation (\xref{1.4.15}),
       $\E\{Y\mid X=x\}=\sum_y y\,p_{Y\mid X}(y\mid x)$:
       \[ \E\{\E\{Y\mid X\}\}
          \;=\; \sum_x\Big(\sum_y y\,p_{Y\mid X}(y\mid x)\Big)\,p_X(x) . \]
@@ -444,11 +545,11 @@ Whenever the expectations exist,
       (\xref{1.4.1}),
       \[ \E\{\E\{Y\mid X\}\} \;=\; \sum_y y\,p_Y(y) \;=\; \E\{Y\} . \]
 \end{Prf}
-\begin{Prf}{1.4.14.b}{Proof by Conditioning of the Iterated-Expectations Identity (continuous case).}{}
+\begin{Prf}{1.4.16.b}{Proof by Conditioning of the Iterated-Expectations Identity (continuous case).}{}
 \item As before, $\E\{Y\mid X\}$ is a function of $X$, so by the law of the unconscious
       statistician (\xref{1.4.4}), now in its integral form,
       \[ \E\{\E\{Y\mid X\}\} \;=\; \int \E\{Y\mid X=x\}\,f_X(x)\,dx . \]
-\item Substitute the conditional expectation (\xref{1.4.13}),
+\item Substitute the conditional expectation (\xref{1.4.15}),
       $\E\{Y\mid X=x\}=\int y\,f_{Y\mid X}(y\mid x)\,dy$:
       \[ \E\{\E\{Y\mid X\}\}
          \;=\; \int\!\left(\int y\,f_{Y\mid X}(y\mid x)\,dy\right) f_X(x)\,dx . \]
@@ -1037,7 +1138,7 @@ Under the Beta$(1,1)$ (uniform) prior on each arm's parameter, independently:
       $\E\{(\theta-a)^2\mid X=x\}=\Var(\theta\mid X=x)+(\E\{\theta\mid X=x\}-a)^2$
       (by \xref{1.A.1} applied to the posterior) is the posterior mean; and since the Bayes
       risk is the expectation over $X$ of the posterior expected loss (iterated expectations,
-      \xref{1.4.14}), minimizing the latter for each $x$ minimizes the former, so $T$ is the
+      \xref{1.4.16}), minimizing the latter for each $x$ minimizes the former, so $T$ is the
       Bayes rule.
 \end{Prf}
 
