@@ -755,8 +755,8 @@ curve (Figure~\xref{1.5.11} shows the machine; Figure~\xref{1.5.14} shows the cu
 instances carry the course: under zero--one loss the risk \emph{is} the probability of a wrong
 assertion, $R_{\delta}(\theta)=P^{\theta}(\delta\ \text{errs})$; under squared-error loss it
 is the mean squared error, which splits as variance plus squared bias (\xref{1.A.1}). The
-trial's two estimators have their risks computed in closed form in \xref{1.A.2} and
-\xref{1.A.3}.
+trial's two estimators have their risks computed in closed form in \xref{1.A.3} and
+\xref{1.A.4}.
 \end{ObjL}
 
 \begin{Fig}{1.5.11}{The anatomy of a decision problem}{How the four objects compose, at one
@@ -892,7 +892,7 @@ single number: the prior averages the curve.
 \medskip
 A number, unlike a curve, orders the candidates completely: any two Bayes risks can be
 compared, and ``best'' finally means something. The prescription writes itself---and for the
-trial the arithmetic is carried out in \xref{1.A.4}, where, under the uniform priors, the
+trial the arithmetic is carried out in \xref{1.A.5}, where, under the uniform priors, the
 shaded estimator of \xref{1.8.3} turns out not merely to be good but to \emph{be} the Bayes
 rule.
 
@@ -995,7 +995,7 @@ estimators will be compared:
         where $X$ is the sum of the Bernoulli variables and $n$ is the sample size.
 \end{enumerate}
 Here the second estimator shades the observed rate toward $\tfrac12$; where it comes from, and
-when it wins, is the business of the appendix (\appref{1.A.3}, \appref{1.A.4}).
+when it wins, is the business of the appendix (\appref{1.A.4}, \appref{1.A.5}).
 \end{ObjL}
 
 \begin{ObjL}{Example}{1.8.4}{The clinical trial, formalized}
@@ -1017,7 +1017,7 @@ patients and cure ($1$) or failure ($0$) recorded for each:
 \end{itemize}
 The lecture closes by naming, for each of the two estimators of \xref{1.8.3}: the risk
 function, the prior, and the Bayes risk. The deck sets these up and leaves the computations to
-us; they are worked in the appendix (\appref{1.A.2}--\appref{1.A.4}).
+us; they are worked in the appendix (\appref{1.A.3}--\appref{1.A.5}).
 \end{ObjL}
 
 \begin{ObjL}{Remark}{1.8.5}{The probability theory we will need}
@@ -1052,6 +1052,19 @@ worked here, beyond the deck, in the deck's own notation. Throughout, $X\sim$
 Binomial$(n,\theta)$ denotes an arm total, so $\E\{X\}=n\theta$ and
 $\Var(X)=n\theta(1-\theta)$.
 
+\medskip
+Before the first statement, its cast. The estimator $\delta=\delta(Y)$ is \emph{random}---it
+inherits the data's randomness, so at each fixed candidate truth $\theta$ it has a whole
+sampling distribution of values it might take. The target $g(\theta)$ is, at that same fixed
+$\theta$, just a \emph{number} (in the trial, the difference $\theta_T-\theta_P$). Between the
+random estimator and the fixed target stand two more numbers, both functions of $\theta$:
+$m(\theta)=\E^{\theta}\{\delta\}$, the estimator's own long-run average---where its sampling
+distribution centers---and $b(\theta)=m(\theta)-g(\theta)$, the \emph{bias}: how far that
+center sits from the target. An estimator can therefore fail in exactly two ways: by
+scattering widely around wherever it centers (variance), and by centering in the wrong place
+(bias). The decomposition says that under squared-error loss, the risk is precisely these two
+failures added---no more, no less, and no interaction between them.
+
 \begin{ObjL}{Supplement}{1.A.1}{The bias--variance decomposition}
 Let $\delta=\delta(Y)$ estimate a target $g(\theta)$ under squared-error loss, with
 $\E^{\theta}\{\delta^2\}<\infty$, and write
@@ -1060,20 +1073,72 @@ $m(\theta)=\E^{\theta}\{\delta\}$ and $b(\theta)=m(\theta)-g(\theta)$ (the \emph
    \;=\; \Var^{\theta}(\delta) \;+\; b(\theta)^2 . \]
 \end{ObjL}
 \begin{Prf}{1.A.1}{Proof of the Bias--Variance Decomposition by Adding and Subtracting the Mean.}{}
-\item Add and subtract $m(\theta)$ inside the square:
-      $(\delta-g)^2=(\delta-m)^2+2(\delta-m)(m-g)+(m-g)^2$.
-\item Take $\E^{\theta}$ term by term (linearity). The middle term is
-      $2(m-g)\,\E^{\theta}\{\delta-m\}=0$, since $m-g$ is a constant and
-      $\E^{\theta}\{\delta\}=m$.
-\item What remains is $\E^{\theta}\{(\delta-m)^2\}+(m-g)^2=\Var^{\theta}(\delta)+b(\theta)^2$.
+\item Route the miss through the estimator's own center: since
+      $\delta-g=(\delta-m)+(m-g)$, every miss is a random scatter about the center plus the
+      fixed offset of the center from the target.
+\item Square the two-term sum:
+      \[ (\delta-g)^2 \;=\; (\delta-m)^2 \;+\; 2(\delta-m)(m-g) \;+\; (m-g)^2 . \]
+\item Take $\E^{\theta}$ term by term (linearity). The middle term vanishes:
+      $m-g$ is a constant, so
+      $\E^{\theta}\{2(\delta-m)(m-g)\}=2(m-g)\,\E^{\theta}\{\delta-m\}=0$, because deviations
+      about one's own mean average to zero.
+\item What remains is
+      $\E^{\theta}\{(\delta-m)^2\}+(m-g)^2=\Var^{\theta}(\delta)+b(\theta)^2$: the scatter
+      term is the variance by definition, and the offset term is the squared bias.
 \end{Prf}
 
-\begin{ObjL}{Supplement}{1.A.2}{Risk of the difference of observed rates}
+\begin{Fig}{1.A.2}{The two ways an estimator can miss}{Two sampling distributions of an
+estimator $\delta$ against the same target $g(\theta)$ (dashed green). Left: centered on the
+target ($b(\theta)=0$) but widely scattered---all its risk is variance. Right: tightly
+concentrated but systematically offset---its risk is a small variance plus the squared bias
+$b(\theta)^2$. Squared-error risk charges both sins at once, $R=\Var+b^2$
+(\xref{1.A.1}); neither picture dominates in general, and for the trial's two estimators which
+one wins depends on $\theta$ itself (\xref{1.A.3}, \xref{1.A.4}; cf.\ the crossing curves of
+Figure~\xref{1.5.14}).}
+\begin{tikzpicture}[x=1cm,y=1cm, every node/.style={font=\small}]
+  % ---- left: unbiased, imprecise ----
+  \node[align=center] at (2.2,2.35) {unbiased, imprecise};
+  \draw[black!60] (-0.1,0) -- (4.6,0);
+  \draw[figTerm, thick] plot [smooth, tension=0.8] coordinates
+    {(0.0,0.02) (0.8,0.16) (1.5,0.46) (2.2,0.62) (2.9,0.46) (3.6,0.16) (4.4,0.02)};
+  \draw[figLim, densely dashed, thick] (2.2,0) -- (2.2,1.05);
+  \node[figLim!80!black, font=\footnotesize, below] at (2.2,-0.02) {$g(\theta)=m(\theta)$};
+  \draw[<->, black!65] (1.2,0.24) -- (3.2,0.24);
+  \node[black!65, font=\footnotesize, above] at (2.2,1.10) {$b(\theta)=0$};
+  % ---- right: biased, precise ----
+  \begin{scope}[shift={(7.1,0)}]
+    \node[align=center] at (2.6,2.35) {biased, precise};
+    \draw[black!60] (-0.1,0) -- (4.9,0);
+    \draw[figTerm, thick] plot [smooth, tension=0.8] coordinates
+      {(1.7,0.02) (2.4,0.25) (2.8,0.80) (3.1,1.05) (3.4,0.80) (3.8,0.25) (4.5,0.02)};
+    \draw[figLim, densely dashed, thick] (2.2,0) -- (2.2,1.55);
+    \node[figLim!80!black, font=\footnotesize, below] at (2.05,-0.02) {$g(\theta)$};
+    \draw[figTerm, thick] (3.1,0) -- (3.1,1.30);
+    \node[figTerm, font=\footnotesize, below] at (3.35,-0.02) {$m(\theta)$};
+    \draw[<->, figBad!85!black, thick] (2.2,1.44) -- (3.1,1.44);
+    \node[figBad!85!black, font=\footnotesize, above] at (2.65,1.46) {$b(\theta)$};
+    \draw[<->, black!65] (2.55,0.32) -- (3.65,0.32);
+  \end{scope}
+\end{tikzpicture}
+\end{Fig}
+
+\medskip
+The figure is the course's central trade in miniature, and the trial makes it numerical. The
+observed rate $X/n$ is the left panel: unbiased, all of its risk variance,
+$\theta(1-\theta)/n$ (\xref{1.A.3}). The shaded estimator $(1+X)/(2+n)$ is the right panel:
+it accepts the bias $(1-2\theta)/(n+2)$ to shrink the spread (\xref{1.A.4}). With $n=10$: at
+$\theta=\tfrac12$ the shaded risk is $0.0174$ against the rate's $0.0250$---the purchase
+pays---while at $\theta=0.9$ it is $0.0107$ against $0.0090$---the purchase costs. Buying
+less variance with a little bias wins in the middle of the parameter space and loses at its
+edges: that is exactly why the two risk curves cross, why neither estimator is inadmissible,
+and why the prior's verdict in \xref{1.A.5} depends on where it puts its weight.
+
+\begin{ObjL}{Supplement}{1.A.3}{Risk of the difference of observed rates}
 For $\hat\delta = X_T/n_T - X_P/n_P$ in the model of \xref{1.8.4}:
 \[ R_{\hat\delta}(\theta)
    \;=\; \frac{\theta_T(1-\theta_T)}{n_T} + \frac{\theta_P(1-\theta_P)}{n_P} . \]
 \end{ObjL}
-\begin{Prf}{1.A.2}{Proof of the Rate-Difference Risk via Unbiasedness and Independence.}{Uses \xref{1.A.1}.}
+\begin{Prf}{1.A.3}{Proof of the Rate-Difference Risk via Unbiasedness and Independence.}{Uses \xref{1.A.1}.}
 \item Each arm's rate is unbiased: $\E^{\theta}\{X_T/n_T\}=n_T\theta_T/n_T=\theta_T$
       (linearity), and likewise for the placebo arm; so
       $b(\theta)=\E^{\theta}\{\hat\delta\}-(\theta_T-\theta_P)=0$.
@@ -1086,7 +1151,7 @@ For $\hat\delta = X_T/n_T - X_P/n_P$ in the model of \xref{1.8.4}:
       variance.
 \end{Prf}
 
-\begin{ObjL}{Supplement}{1.A.3}{Risk of the shaded estimator}
+\begin{ObjL}{Supplement}{1.A.4}{Risk of the shaded estimator}
 Write $T=\dfrac{1+X}{2+n}$ for one arm with $X\sim$ Binomial$(n,\theta)$. Then
 \[ \E^{\theta}\{T\}=\frac{1+n\theta}{n+2},\qquad
    b(\theta)=\frac{1-2\theta}{n+2},\qquad
@@ -1101,12 +1166,12 @@ At $\theta=\tfrac12$ the one-arm risk is $\tfrac{n}{4(n+2)^2}<\tfrac{1}{4n}$: sh
 $\tfrac12$ beats the raw rate in the middle of the parameter space, at the price of bias near
 the edges---neither estimator dominates the other.
 \end{ObjL}
-\begin{Prf}{1.A.3}{Proof of the Shaded Estimator's Risk by Linear-Combination Rules.}{Uses \xref{1.A.1}, \xref{1.A.2}.}
+\begin{Prf}{1.A.4}{Proof of the Shaded Estimator's Risk by Linear-Combination Rules.}{Uses \xref{1.A.1}, \xref{1.A.3}.}
 \item By linearity, $\E^{\theta}\{T\}=(1+\E^{\theta}\{X\})/(n+2)=(1+n\theta)/(n+2)$, so
       \[ b(\theta)=\frac{1+n\theta}{n+2}-\theta=\frac{1+n\theta-(n+2)\theta}{n+2}
       =\frac{1-2\theta}{n+2} . \]
 \item Adding constants does not change variance, and scaling squares:
-      $\Var^{\theta}(T)=\Var(X)/(n+2)^2=n\theta(1-\theta)/(n+2)^2$ (step (2) of \xref{1.A.2}).
+      $\Var^{\theta}(T)=\Var(X)/(n+2)^2=n\theta(1-\theta)/(n+2)^2$ (step (2) of \xref{1.A.3}).
 \item The one-arm risk is variance plus squared bias (\xref{1.A.1}).
 \item For the difference, the arms are independent, so variances add, while the bias of a
       difference is the difference of the biases; \xref{1.A.1} assembles the displayed risk.
@@ -1114,7 +1179,7 @@ the edges---neither estimator dominates the other.
       raw rate's $\tfrac{1}{4n}$ since $n^2<(n+2)^2$.
 \end{Prf}
 
-\begin{ObjL}{Supplement}{1.A.4}{Bayes risks under the uniform prior, and where $(1+X)/(2+n)$ comes from}
+\begin{ObjL}{Supplement}{1.A.5}{Bayes risks under the uniform prior, and where $(1+X)/(2+n)$ comes from}
 Under the Beta$(1,1)$ (uniform) prior on each arm's parameter, independently:
 \begin{enumerate}[leftmargin=2.2em,itemsep=2pt,topsep=2pt]
   \item the one-arm Bayes risk of the observed rate $X/n$ is
@@ -1130,7 +1195,7 @@ Under the Beta$(1,1)$ (uniform) prior on each arm's parameter, independently:
         arms' posteriors are independent, $T_T-T_P$ is the Bayes rule for the difference.)
 \end{enumerate}
 \end{ObjL}
-\begin{Prf}{1.A.4}{Proof of the Bayes Risks by Integration, and of the Bayes Rule by Identifying the Posterior.}{Uses \xref{1.A.2}, \xref{1.A.3}, \xref{1.8.5}.}
+\begin{Prf}{1.A.5}{Proof of the Bayes Risks by Integration, and of the Bayes Rule by Identifying the Posterior.}{Uses \xref{1.A.3}, \xref{1.A.4}, \xref{1.8.5}.}
 \item $\int_0^1\theta(1-\theta)\,d\theta=\tfrac12-\tfrac13=\tfrac16$, so the rate's risk
       $\theta(1-\theta)/n$ integrates to $1/(6n)$.
 \item For $T$: $\int_0^1(1-2\theta)^2\,d\theta=\int_0^1(1-4\theta+4\theta^2)\,d\theta
@@ -1138,7 +1203,7 @@ Under the Beta$(1,1)$ (uniform) prior on each arm's parameter, independently:
       \[ \int_0^1 \mathrm{MSE}_n(\theta)\,d\theta
       =\frac{n\cdot\frac16+\frac13}{(n+2)^2}
       =\frac{n+2}{6(n+2)^2}=\frac{1}{6(n+2)} . \]
-\item For the difference, expand the risk of \xref{1.A.3} and integrate under the independent
+\item For the difference, expand the risk of \xref{1.A.4} and integrate under the independent
       uniform priors. The cross term of the squared bias is
       \[ -2\int_0^1\!\!\int_0^1 \frac{(1-2\theta_T)(1-2\theta_P)}{(n_T+2)(n_P+2)}
       \,d\theta_T\,d\theta_P=0, \]
