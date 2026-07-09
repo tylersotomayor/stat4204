@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Homework 4 · Interactive — STAT S4204</title>
+<meta name="description" content="Interactive companion to Homework 4: HPS Chapter 1 exercises — risk curves that cross, minimax within a pair, Bayes within a class, and the loss that flattens a risk.">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="icon" href="favicon.ico" sizes="32x32">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<link rel="stylesheet" href="assets/hw.css">
+</head>
+<body>
+  <div class="band"><div class="in">
+    <div class="topnav"><a href="./">← Notes in Statistical Inference</a></div>
+    <p class="course">STAT&nbsp;S4204 · Summer&nbsp;2026 · Problem Sets</p>
+    <h1>Homework 4 — Interactive Companion</h1>
+    <p class="sub">HPS Chapter 1 exercises: crossing risks, minimax within a pair, Bayes within a class, and a loss that flattens the curve</p>
+  </div></div>
+  <div class="wrap">
+
+    <p class="lead">Assignment 4 works exercises 1, 3, 4, 5, 6, and 7 from the end of HPS's
+    first chapter. The write-up carries the derivations in the book's own notation
+    (\(\mathscr{R}(\theta,d)\), \(r(\pi,d)\)); the laboratories below generalize the three
+    ideas the exercises are built to teach—two rules whose risks cross, a linear family
+    priced by a prior, and a weighted loss chosen to flatten a risk function.</p>
+    <div class="pdfbar">
+      <a class="btn" href="homework-04.pdf">Read the write-up (PDF)</a>
+      <a class="btn ghost" href="./">All notes</a>
+    </div>
+
+    <!-- ============ Widget 1: Exercise 3 generalized ============ -->
+    <div class="widget" id="w1">
+      <h2>Exercise 3 · Minimax within a pair</h2>
+      <h3>The rate against the shaded rule, at any n</h3>
+      <p>Exercise 3 pits \(d_1=x/n\) against \(d_2=(x+1)/(n+2)\) at \(n=2\). Slide \(n\)
+      and watch the whole exercise generalize: the risks cross at
+      \( \theta^{*}=\tfrac12\bigl(1\pm\sqrt{(n+1)/(2n+1)}\bigr) \), the rate's worst case is
+      \(1/4n\) at \(\theta=\tfrac12\), and the shaded rule's worst case sits at the edges for
+      small \(n\)—so the shaded rule is minimax within the pair at every \(n\), while neither
+      rule is ever superior.</p>
+      <div class="controls">
+        <span class="ctl"><label>n</label>
+          <input type="range" min="2" max="100" step="1" value="2" id="w1n" data-out="w1nv" data-fmt="int">
+          <span class="val" id="w1nv"></span></span>
+      </div>
+      <div class="charts">
+        <div class="chartwrap" style="max-width:560px" id="w1c"></div>
+      </div>
+      <div class="legend">
+        <span class="chip"><span class="sw" style="border-color:var(--s1)"></span>\(\mathscr{R}(\theta,d_1)\), the rate</span>
+        <span class="chip"><span class="sw dash" style="border-color:var(--s2)"></span>\(\mathscr{R}(\theta,d_2)\), shaded</span>
+        <span class="chip"><span class="sw" style="border-color:#9aa1a9;border-top-style:dotted"></span>suprema · crossings</span>
+      </div>
+      <div class="readout" id="w1read"></div>
+      <p class="note">At \(n=2\) this is the exercise verbatim: worst cases \(\tfrac18\)
+      against \(\tfrac1{16}\), crossings at \((5\mp\sqrt{15})/10\). As \(n\) grows the
+      crossings drift outward and the two curves close on each other—Assignment 2's
+      asymptotics, seen from the minimax side.</p>
+    </div>
+
+    <!-- ============ Widget 2: Exercises 1 & 4 ============ -->
+    <div class="widget" id="w2">
+      <h2>Exercises 1 &amp; 4 · Bayes within a class</h2>
+      <h3>The linear family for a normal observation</h3>
+      <p>One draw \(X\sim N(\theta,1)\), rules \(d(x)=cx\), risk
+      \( \mathscr{R}(\theta,d)=c^2+(c-1)^2\theta^2 \). Price the family with a uniform prior
+      on \((-w,w)\): the mean risk is \( r(\pi,d)=c^2+(c-1)^2v \) with \(v=w^2/3\), minimized
+      at \(c^{*}=v/(1+v)\). Exercise 4 is the case \(w=1\): \(c^{*}=\tfrac14\), mean risk
+      \(\tfrac14\), against constant risk \(1\) for the unbiased \(c=1\).</p>
+      <div class="controls">
+        <span class="ctl"><label>c</label>
+          <input type="range" min="0" max="1.25" step="0.01" value="0.25" id="w2c" data-out="w2cv" data-dec="2">
+          <span class="val" id="w2cv"></span></span>
+        <span class="ctl"><label>prior half-width w</label>
+          <input type="range" min="0.2" max="3" step="0.05" value="1" id="w2w" data-out="w2wv" data-dec="2">
+          <span class="val" id="w2wv"></span></span>
+      </div>
+      <div class="charts">
+        <div class="chartwrap" id="w2risk"><div class="ct">risk over θ (prior support shaded)</div></div>
+        <div class="chartwrap" id="w2bayes"><div class="ct">mean risk r(π, d) over the family</div></div>
+      </div>
+      <div class="legend">
+        <span class="chip"><span class="sw dash" style="border-color:var(--s2)"></span>\(\mathscr{R}(\theta, cx)\) at the slider's \(c\)</span>
+        <span class="chip"><span class="sw" style="border-color:var(--s2)"></span>\(r(\pi,d)\) as a function of \(c\)</span>
+        <span class="chip"><span class="sw dot" style="background:var(--s3)"></span>the Bayes choice \(c^{*}\)</span>
+      </div>
+      <div class="readout" id="w2read"></div>
+      <p class="note">\(c^{*}=v/(1+v)\) is the prior's share of the total spread—the same
+      precision arithmetic as Assignment 3's \(a^{*}\), shrinking toward the prior mean
+      \(0\). Widen the prior and \(c^{*}\) climbs toward the unbiased \(c=1\); narrow it and
+      the data lose the argument.</p>
+    </div>
+
+    <!-- ============ Widget 3: Exercises 5 & 6 ============ -->
+    <div class="widget" id="w3">
+      <h2>Exercises 5 &amp; 6 · A loss that flattens the risk</h2>
+      <h3>Same rule, two accountings</h3>
+      <p>The observed rate \(d(x)=x/n\) has risk \( \theta(1-\theta)/n \) under plain squared
+      error—but under the weighted loss
+      \( \mathscr{L}(\theta,a)=(a-\theta)^2/\theta(1-\theta) \) its risk is the constant
+      \(1/n\): errors are charged relative to the difficulty of the problem at \(\theta\),
+      and the bump flattens into an equalizer. The mean risks under the uniform prior are
+      \(1/6n\) and \(1/n\).</p>
+      <div class="controls">
+        <span class="ctl"><label>n</label>
+          <input type="range" min="1" max="100" step="1" value="10" id="w3n" data-out="w3nv" data-fmt="int">
+          <span class="val" id="w3nv"></span></span>
+      </div>
+      <div class="charts">
+        <div class="chartwrap" style="max-width:560px" id="w3c"></div>
+      </div>
+      <div class="legend">
+        <span class="chip"><span class="sw" style="border-color:var(--s1)"></span>plain loss: \(\theta(1-\theta)/n\)</span>
+        <span class="chip"><span class="sw dash" style="border-color:var(--s2)"></span>weighted loss: \(1/n\), flat</span>
+      </div>
+      <div class="readout" id="w3read"></div>
+      <p class="note">The flattening is engineered: under the weighted loss the rate is the
+      Bayes rule for the uniform prior (the weight turns the Beta\((x{+}1,n{-}x{+}1)\)
+      posterior into Beta\((x,n{-}x)\), whose mean is \(x/n\)), and a constant-risk Bayes
+      rule is minimax. Exercise 3's loser becomes optimal by changing what a mistake costs.</p>
+    </div>
+
+    <footer>
+      Interactive companion to the Homework&nbsp;4 write-up; the PDF is the submitted
+      document. Any errors are my own.
+      <div class="ln"><a href="homework-04.pdf">homework-04.pdf</a> ·
+        <a href="./">all notes</a> ·
+        <a href="mailto:tyler.sotomayor@columbia.edu">errata</a></div>
+    </footer>
+  </div>
+  <div class="footerband"><div class="in"><img src="assets/summer-logo.svg" alt="Columbia University Summer Session"></div></div>
+
+<script src="assets/hw.js"></script>
+<script>
+"use strict";
+/* ---------- Widget 1: Exercise 3 generalized ---------- */
+const w1host = document.getElementById("w1c");
+function drawW1(){
+  const n = +document.getElementById("w1n").value;
+  const R1 = t => t*(1-t)/n;
+  const R2 = t => (n*t*(1-t) + (1-2*t)*(1-2*t))/((n+2)*(n+2));
+  const sup1 = 0.25/n;
+  const sup2 = Math.max(R2(0.5), R2(0));
+  const root = Math.sqrt((n+1)/(2*n+1));
+  const tlo = (1-root)/2, thi = (1+root)/2;
+  const ymax = Math.max(sup1, sup2)*1.18;
+  w1host.querySelectorAll("svg").forEach(s=>s.remove());
+  w1host.querySelectorAll(".tip").forEach(s=>s.remove());
+  const ch = makeChart(w1host, {w:560, h:330, xdom:[0,1], ydom:[0,ymax],
+    xticks:[{v:0,l:"0"},{v:tlo,l:fmt(tlo,2)},{v:0.5,l:"1/2"},{v:thi,l:fmt(thi,2)},{v:1,l:"1"}],
+    yticks:[{v:sup2,l:fmt(sup2,3)},{v:sup1,l:fmt(sup1,3)}],
+    xlab:"θ", ylab:"risk", aria:"exercise 3 risks"});
+  hline(ch, sup1, "refline"); hline(ch, sup2, "refline");
+  line(ch, fnPath(ch, R1, 0, 1), S1);
+  line(ch, fnPath(ch, R2, 0, 1), S2, "7 5");
+  vline(ch, tlo, "crossline"); vline(ch, thi, "crossline");
+  attachHover(w1host, ch, [{name:"rate", color:S1, f:R1},{name:"shaded", color:S2, f:R2}],
+    x => "θ = " + fmt(x,3), y => fmt(y,4));
+  document.getElementById("w1read").innerHTML =
+    `<span><span class="k">sup risk, rate</span> <b>= ${fmt(sup1,4)}</b></span>` +
+    `<span><span class="k">sup risk, shaded</span> <b>= ${fmt(sup2,4)}</b></span>` +
+    `<span><span class="k">minimax within pair</span> <b>${sup2 < sup1 ? "shaded (x+1)/(n+2)" : "rate x/n"}</b></span>` +
+    `<span><span class="k">crossings θ*</span> <b>= ${fmt(tlo,3)}, ${fmt(thi,3)}</b></span>`;
+}
+bindControls(document.getElementById("w1"), drawW1);
+drawW1();
+
+/* ---------- Widget 2: Exercises 1 & 4 ---------- */
+const w2riskH = document.getElementById("w2risk");
+const w2bayesH = document.getElementById("w2bayes");
+function drawW2(){
+  const c = +document.getElementById("w2c").value;
+  const w = +document.getElementById("w2w").value;
+  const v = w*w/3;
+  const cstar = v/(1+v);
+  const rc = t => t*t + (t-1)*(t-1)*v;
+  [w2riskH, w2bayesH].forEach(h => { h.querySelectorAll("svg").forEach(s=>s.remove());
+                                     h.querySelectorAll(".tip").forEach(s=>s.remove()); });
+  const span = Math.max(w*1.35, 1.6);
+  const Rc = t => c*c + (c-1)*(c-1)*t*t;
+  const ymaxR = Math.max(Rc(span), 1.15);
+  const chR = makeChart(w2riskH, {w:430, h:310, xdom:[-span,span], ydom:[0,ymaxR],
+    xticks:[{v:-w,l:"−w"},{v:0,l:"0"},{v:w,l:"w"}],
+    yticks:[{v:1,l:"1"},{v:c*c,l:fmt(c*c,2)}],
+    xlab:"θ", ylab:"risk", aria:"risk of cx"});
+  el("rect", {x:chR.sx(-w), y:0, width:chR.sx(w)-chR.sx(-w), height:chR.ih,
+              fill:"#eff5fb"}, chR.grid);
+  hline(chR, 1, "refline");
+  el("text", {x:chR.sx(span*0.97), y:chR.sy(1)-6, "text-anchor":"end", class:"ticklab"}, chR.fore)
+    .textContent = "risk of c = 1 (unbiased)";
+  line(chR, fnPath(chR, Rc, -span, span), S2, "7 5");
+  attachHover(w2riskH, chR, [{name:"R(θ, cx)", color:S2, f:Rc}],
+    x => "θ = " + fmt(x,2), y => fmt(y,3));
+  const ymaxB = Math.max(rc(0), rc(1.25))*1.12;
+  const chB = makeChart(w2bayesH, {w:430, h:310, xdom:[0,1.25], ydom:[0,ymaxB],
+    xticks:[{v:0,l:"0"},{v:cstar,l:"c*"},{v:1,l:"1"}],
+    yticks:[{v:rc(cstar),l:fmt(rc(cstar),2)},{v:v,l:fmt(v,2)}],
+    xlab:"c", ylab:"r(π, d)", aria:"mean risk over c"});
+  line(chB, fnPath(chB, rc, 0, 1.25), S2);
+  vline(chB, cstar, "crossline");
+  dot(chB, cstar, rc(cstar), S3, 5);
+  dot(chB, c, rc(c), S2, 5);
+  attachHover(w2bayesH, chB, [{name:"r(c)", color:S2, f:rc}],
+    x => "c = " + fmt(x,2), y => fmt(y,3));
+  document.getElementById("w2read").innerHTML =
+    `<span><span class="k">prior second moment v = w²/3</span> <b>= ${fmt(v,3)}</b></span>` +
+    `<span><span class="k">c* = v/(1+v)</span> <b>= ${fmt(cstar,3)}</b></span>` +
+    `<span><span class="k">r at slider c</span> <b>= ${fmt(rc(c),3)}</b></span>` +
+    `<span><span class="k">r(c*)</span> <b>= ${fmt(rc(cstar),3)}</b></span>`;
+}
+bindControls(document.getElementById("w2"), drawW2);
+drawW2();
+
+/* ---------- Widget 3: Exercises 5 & 6 ---------- */
+const w3host = document.getElementById("w3c");
+function drawW3(){
+  const n = +document.getElementById("w3n").value;
+  const Rp = t => t*(1-t)/n;
+  const ymax = (1/n)*1.25;
+  w3host.querySelectorAll("svg").forEach(s=>s.remove());
+  w3host.querySelectorAll(".tip").forEach(s=>s.remove());
+  const ch = makeChart(w3host, {w:560, h:310, xdom:[0,1], ydom:[0,ymax],
+    xticks:[{v:0,l:"0"},{v:0.5,l:"1/2"},{v:1,l:"1"}],
+    yticks:[{v:0.25/n,l:fmt(0.25/n,3)},{v:1/n,l:fmt(1/n,3)}],
+    xlab:"θ", ylab:"risk", aria:"plain vs weighted loss"});
+  line(ch, fnPath(ch, Rp, 0, 1), S1);
+  line(ch, fnPath(ch, () => 1/n, 0, 1, 2), S2, "7 5");
+  attachHover(w3host, ch, [{name:"plain", color:S1, f:Rp},{name:"weighted", color:S2, f:()=>1/n}],
+    x => "θ = " + fmt(x,3), y => fmt(y,4));
+  document.getElementById("w3read").innerHTML =
+    `<span><span class="k">mean risk, plain</span> <b>= 1/6n = ${fmt(1/(6*n),4)}</b></span>` +
+    `<span><span class="k">mean risk, weighted</span> <b>= 1/n = ${fmt(1/n,4)}</b></span>`;
+}
+bindControls(document.getElementById("w3"), drawW3);
+drawW3();
+
+/* KaTeX */
+document.addEventListener("DOMContentLoaded", () => {
+  if (window.renderMathInElement) renderMathInElement(document.body, {
+    delimiters:[{left:"\\(",right:"\\)",display:false},{left:"$$",right:"$$",display:true}],
+    macros:{"\\E":"\\mathrm{E}"}
+  });
+});
+</script>
+</body>
+</html>
