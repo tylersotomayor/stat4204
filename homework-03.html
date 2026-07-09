@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Homework 3 · Interactive — STAT S4204</title>
+<meta name="description" content="Interactive companion to Homework 3: risks and Bayes risks in the two-sample Bernoulli trial, and a normal shrinkage lab for choosing priors.">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="icon" href="favicon.ico" sizes="32x32">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<link rel="stylesheet" href="assets/hw.css">
+</head>
+<body>
+  <div class="band"><div class="in">
+    <div class="topnav"><a href="./">← Notes in Statistical Inference</a></div>
+    <p class="course">STAT&nbsp;S4204 · Summer&nbsp;2026 · Problem Sets</p>
+    <h1>Homework 3 — Interactive Companion</h1>
+    <p class="sub">Risks and Bayes risks: the two-sample trial, and a laboratory for choosing priors</p>
+  </div></div>
+  <div class="wrap">
+
+    <p class="lead">Assignment 3 works the class example—two Bernoulli arms, squared-error
+    loss, independent uniform priors—and a new normal problem whose shrinkage family
+    \((1-a)\,S/n + a\) contains the Bayes rule as one member. The write-up carries the
+    derivations; these two laboratories let you steer the sample sizes, the shrinkage
+    weight, and the prior itself, and watch every formula respond.</p>
+    <div class="pdfbar">
+      <a class="btn" href="homework-03.pdf">Read the write-up (PDF)</a>
+      <a class="btn ghost" href="./">All notes</a>
+    </div>
+
+    <!-- ============ Widget 1: the trial ============ -->
+    <div class="widget" id="w1">
+      <h2>Problem 1 · The two-sample Bernoulli trial</h2>
+      <h3>Rates against shaded rates</h3>
+      <p>Two estimators of \( \theta_T-\theta_P \): the difference of observed rates
+      \(\hat\delta\) (unbiased) and the difference of shaded rates
+      \(\tilde\delta\), built from \((1+X)/(2+n)\) in each arm. The risks live on the square
+      \((\theta_T,\theta_P)\in[0,1]^2\); the two panels slice it along equal rates and
+      opposite rates. Under independent uniform priors the Bayes risks are
+      \( \tfrac16\!\left(\tfrac1{n_T}+\tfrac1{n_P}\right) \) against
+      \( \tfrac16\!\left(\tfrac1{n_T+2}+\tfrac1{n_P+2}\right) \)—the shaded rule wins for
+      every pair of arm sizes, because it is the Bayes rule.</p>
+      <div class="controls">
+        <span class="ctl"><label>n_T</label>
+          <input type="range" min="2" max="200" step="1" value="20" id="w1nt" data-out="w1ntv" data-fmt="int">
+          <span class="val" id="w1ntv"></span></span>
+        <span class="ctl"><label>n_P</label>
+          <input type="range" min="2" max="200" step="1" value="20" id="w1np" data-out="w1npv" data-fmt="int">
+          <span class="val" id="w1npv"></span></span>
+      </div>
+      <div class="charts">
+        <div class="chartwrap" id="w1diag"><div class="ct">equal rates: θ_T = θ_P = θ</div></div>
+        <div class="chartwrap" id="w1anti"><div class="ct">opposite rates: θ_P = 1 − θ_T</div></div>
+      </div>
+      <div class="legend">
+        <span class="chip"><span class="sw" style="border-color:var(--s1)"></span>\(R_{\hat\delta}\) (observed rates)</span>
+        <span class="chip"><span class="sw dash" style="border-color:var(--s2)"></span>\(R_{\tilde\delta}\) (shaded rates)</span>
+      </div>
+      <div class="readout" id="w1read"></div>
+      <p class="note">With equal arms the shading biases cancel along the diagonal and the
+      dashed curve sits strictly below—a pure variance gain; try unequal arms and watch the
+      cancellation fail. On the anti-diagonal the biases reinforce and the rate difference
+      wins near the corners: the surfaces cross, neither rule dominates, and only the prior's
+      verdict—the Bayes risks above—breaks the tie.</p>
+    </div>
+
+    <!-- ============ Widget 2: normal prior lab ============ -->
+    <div class="widget" id="w2">
+      <h2>Problem 2 · The normal location problem</h2>
+      <h3>Choosing the prior: a shrinkage laboratory</h3>
+      <p>Data \(Y_1,\dots,Y_n\) i.i.d.\ \(N(\varphi,\sigma^2)\), \(\sigma^2\) known; prior
+      \(\varphi\sim N(\mu_0, v_0^2)\); estimators \(d_a=(1-a)\,\bar Y + a\,\mu_0\). The risk
+      of \(d_a\) is \((1-a)^2\sigma^2/n + a^2(\mu_0-\varphi)^2\), its Bayes risk is
+      \(r(a)=(1-a)^2\sigma^2/n + a^2v_0^2\), and the minimizing weight is the prior's share
+      of the total precision,
+      $$ a^{*} \;=\; \frac{\sigma^2/n}{\,v_0^2+\sigma^2/n\,}, $$
+      at which \(d_{a^{*}}\) is the posterior mean and \(r(a^{*})\) the posterior variance.
+      The assignment's case is \(\mu_0=1\), \(v_0=1\). Steer everything.</p>
+      <div class="controls">
+        <span class="ctl"><label>n</label>
+          <input type="range" min="1" max="200" step="1" value="12" id="w2n" data-out="w2nv" data-fmt="int">
+          <span class="val" id="w2nv"></span></span>
+        <span class="ctl"><label>σ²</label>
+          <input type="range" min="0.25" max="16" step="0.25" value="4" id="w2s2" data-out="w2s2v" data-dec="2">
+          <span class="val" id="w2s2v"></span></span>
+        <span class="ctl"><label>prior mean μ₀</label>
+          <input type="range" min="-3" max="5" step="0.1" value="1" id="w2m0" data-out="w2m0v" data-dec="1">
+          <span class="val" id="w2m0v"></span></span>
+        <span class="ctl"><label>prior sd v₀</label>
+          <input type="range" min="0.2" max="3" step="0.05" value="1" id="w2v0" data-out="w2v0v" data-dec="2">
+          <span class="val" id="w2v0v"></span></span>
+        <span class="ctl"><label>weight a</label>
+          <input type="range" min="0" max="1" step="0.01" value="0.25" id="w2a" data-out="w2av" data-dec="2">
+          <span class="val" id="w2av"></span></span>
+        <span class="ctl"><label>observed x̄</label>
+          <input type="range" min="-3" max="5" step="0.1" value="2.4" id="w2xb" data-out="w2xbv" data-dec="1">
+          <span class="val" id="w2xbv"></span></span>
+      </div>
+      <div class="charts">
+        <div class="chartwrap" id="w2risk"><div class="ct">risk functions over φ</div></div>
+        <div class="chartwrap" id="w2bayes"><div class="ct">Bayes risk r(a), with a* marked</div></div>
+      </div>
+      <div class="charts">
+        <div class="chartwrap" id="w2dens"><div class="ct">prior · likelihood of x̄ · posterior</div></div>
+      </div>
+      <div class="legend">
+        <span class="chip"><span class="sw" style="border-color:var(--s1)"></span>data: \(R_{d_0}\), likelihood</span>
+        <span class="chip"><span class="sw dash" style="border-color:var(--s2)"></span>prior-side: \(R_{d_a}\), prior</span>
+        <span class="chip"><span class="sw" style="border-color:var(--s3)"></span>posterior</span>
+      </div>
+      <div class="readout" id="w2read"></div>
+      <p class="note">Three experiments worth running. <em>Asymptotics:</em> grow \(n\) and
+      watch \(a^{*}\) fall toward zero—the data buy out the prior. <em>Confidence:</em>
+      shrink \(v_0\) and watch \(a^{*}\) climb and the posterior hug the prior mean—a
+      confident prior takes more of the average. <em>Misplacement:</em> drag \(\mu_0\) away
+      from \(\bar x\): the machinery still averages, and the posterior sits between the two,
+      which is exactly why the choice of prior is a modeling decision and not a formality.</p>
+    </div>
+
+    <footer>
+      Interactive companion to the Homework&nbsp;3 write-up; the PDF is the submitted
+      document. Any errors are my own.
+      <div class="ln"><a href="homework-03.pdf">homework-03.pdf</a> ·
+        <a href="./">all notes</a> ·
+        <a href="mailto:tyler.sotomayor@columbia.edu">errata</a></div>
+    </footer>
+  </div>
+  <div class="footerband"><div class="in"><img src="assets/summer-logo.svg" alt="Columbia University Summer Session"></div></div>
+
+<script src="assets/hw.js"></script>
+<script>
+"use strict";
+/* ---------- Widget 1: two-sample trial ---------- */
+const w1d = document.getElementById("w1diag");
+const w1a = document.getElementById("w1anti");
+function drawW1(){
+  const nT = +document.getElementById("w1nt").value;
+  const nP = +document.getElementById("w1np").value;
+  const Rhat = th => th*(1-th)*(1/nT + 1/nP);
+  const bT = th => (1-2*th)/(nT+2), bP = th => (1-2*th)/(nP+2);
+  const varTilde = (tT,tP) => nT*tT*(1-tT)/((nT+2)**2) + nP*tP*(1-tP)/((nP+2)**2);
+  const Rt_diag = th => varTilde(th,th) + (bT(th)-bP(th))**2;
+  const Rt_anti = th => varTilde(th,1-th) + (bT(th)-bP(1-th))**2;
+  const ymax = Math.max(Rhat(0.5), Rt_anti(0), Rt_anti(0.5)) * 1.2;
+  [w1d, w1a].forEach(h => { h.querySelectorAll("svg").forEach(s=>s.remove());
+                            h.querySelectorAll(".tip").forEach(s=>s.remove()); });
+  const mk = (host, Rt, xlab) => {
+    const ch = makeChart(host, {w:420, h:300, xdom:[0,1], ydom:[0,ymax],
+      xticks:[{v:0,l:"0"},{v:0.5,l:"1/2"},{v:1,l:"1"}],
+      yticks:[ymax/3, 2*ymax/3].map(v=>({v,l:fmt(v,3)})),
+      xlab, ylab:"risk", aria:"risk slice"});
+    line(ch, fnPath(ch, Rhat, 0, 1), S1);
+    line(ch, fnPath(ch, Rt, 0, 1), S2, "7 5");
+    attachHover(host, ch, [{name:"rates", color:S1, f:Rhat},{name:"shaded", color:S2, f:Rt}],
+      x => "θ = " + fmt(x,3), y => fmt(y,4));
+  };
+  mk(w1d, Rt_diag, "θ");
+  mk(w1a, Rt_anti, "θ_T");
+  const r1 = (1/nT + 1/nP)/6, r2 = (1/(nT+2) + 1/(nP+2))/6;
+  document.getElementById("w1read").innerHTML =
+    `<span><span class="k">Bayes risk, rates</span> <b>= ${fmt(r1,4)}</b></span>` +
+    `<span><span class="k">Bayes risk, shaded</span> <b>= ${fmt(r2,4)}</b></span>` +
+    `<span><span class="k">shaded saves</span> <b>${fmt(100*(1-r2/r1),1)}%</b></span>`;
+}
+bindControls(document.getElementById("w1"), drawW1);
+drawW1();
+
+/* ---------- Widget 2: normal prior lab ---------- */
+const w2riskH = document.getElementById("w2risk");
+const w2bayesH = document.getElementById("w2bayes");
+const w2densH = document.getElementById("w2dens");
+function drawW2(){
+  const n  = +document.getElementById("w2n").value;
+  const s2 = +document.getElementById("w2s2").value;
+  const m0 = +document.getElementById("w2m0").value;
+  const v0 = +document.getElementById("w2v0").value;
+  const a  = +document.getElementById("w2a").value;
+  const xb = +document.getElementById("w2xb").value;
+  const v = s2/n;                       // sampling variance of the mean
+  const astar = v/(v0*v0 + v);
+  const ra = t => (1-t)*(1-t)*v + t*t*v0*v0;
+  const post_v = (v0*v0*v)/(v0*v0 + v);
+  const post_m = (1-astar)*xb + astar*m0;
+  [w2riskH, w2bayesH, w2densH].forEach(h => { h.querySelectorAll("svg").forEach(s=>s.remove());
+                                              h.querySelectorAll(".tip").forEach(s=>s.remove()); });
+  // (a) risk functions over phi
+  const R0 = () => v;
+  const Ra = phi => (1-a)*(1-a)*v + a*a*(m0-phi)*(m0-phi);
+  const win = 4.2;
+  const ymaxR = Math.max(v*1.6, Ra(m0-win)*0.55, v + 0.05);
+  const chR = makeChart(w2riskH, {w:420, h:300, xdom:[m0-win, m0+win], ydom:[0, ymaxR],
+    xticks:[{v:m0-3,l:fmt(m0-3,0)},{v:m0,l:"μ₀"},{v:m0+3,l:fmt(m0+3,0)}],
+    yticks:[{v:v,l:"σ²/n"}], xlab:"φ", ylab:"risk", aria:"risk functions"});
+  line(chR, fnPath(chR, R0, m0-win, m0+win, 2), S1);
+  line(chR, fnPath(chR, Ra, m0-win, m0+win), S2, "7 5");
+  vline(chR, m0);
+  attachHover(w2riskH, chR, [{name:"d0", color:S1, f:R0},{name:"d_a", color:S2, f:Ra}],
+    x => "φ = " + fmt(x,2), y => fmt(y,4));
+  // (b) Bayes risk over a
+  const ymaxB = Math.max(ra(0), ra(1)) * 1.15;
+  const chB = makeChart(w2bayesH, {w:420, h:300, xdom:[0,1], ydom:[0, ymaxB],
+    xticks:[{v:0,l:"0"},{v:astar,l:"a*"},{v:1,l:"1"}],
+    yticks:[{v:ra(0),l:"σ²/n"},{v:post_v,l:"r(a*)"}],
+    xlab:"a", ylab:"r(a)", aria:"bayes risk over a"});
+  hline(chB, ra(0), "refline");
+  line(chB, fnPath(chB, ra, 0, 1), S2);
+  vline(chB, astar, "crossline");
+  dot(chB, astar, post_v, S3, 5);
+  dot(chB, a, ra(a), S2, 5);
+  attachHover(w2bayesH, chB, [{name:"r(a)", color:S2, f:ra}],
+    x => "a = " + fmt(x,2), y => fmt(y,4));
+  // (c) densities
+  const sl = Math.sqrt(v), sp = Math.sqrt(post_v);
+  const lo = Math.min(m0 - 3.4*v0, xb - 3.4*sl), hi = Math.max(m0 + 3.4*v0, xb + 3.4*sl);
+  const ymaxD = Math.max(normPdf(0,0,v0), normPdf(0,0,sl), normPdf(0,0,sp)) * 1.14;
+  const chD = makeChart(w2densH, {w:860, h:280, xdom:[lo,hi], ydom:[0,ymaxD],
+    xticks:[{v:m0,l:"μ₀"},{v:xb,l:"x̄"},{v:post_m,l:"post."}],
+    yticks:[], xlab:"φ", ylab:"density", aria:"prior likelihood posterior",
+    margin:{t:14,r:14,b:40,l:52}});
+  line(chD, fnPath(chD, x => normPdf(x, m0, v0), lo, hi, 301), S2, "7 5");
+  line(chD, fnPath(chD, x => normPdf(x, xb, sl), lo, hi, 301), S1);
+  line(chD, fnPath(chD, x => normPdf(x, post_m, sp), lo, hi, 301), S3);
+  vline(chD, post_m, "crossline");
+  document.getElementById("w2read").innerHTML =
+    `<span><span class="k">a*</span> <b>= ${fmt(astar,3)}</b></span>` +
+    `<span><span class="k">r(a) at slider</span> <b>= ${fmt(ra(a),4)}</b></span>` +
+    `<span><span class="k">r(a*) = posterior variance</span> <b>= ${fmt(post_v,4)}</b></span>` +
+    `<span><span class="k">posterior mean = (1−a*)x̄ + a*μ₀</span> <b>= ${fmt(post_m,3)}</b></span>`;
+}
+bindControls(document.getElementById("w2"), drawW2);
+drawW2();
+
+/* KaTeX */
+document.addEventListener("DOMContentLoaded", () => {
+  if (window.renderMathInElement) renderMathInElement(document.body, {
+    delimiters:[{left:"\\(",right:"\\)",display:false},{left:"$$",right:"$$",display:true}],
+    macros:{"\\E":"\\mathrm{E}"}
+  });
+});
+</script>
+</body>
+</html>
