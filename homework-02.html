@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Homework 2 · Interactive — STAT S4204</title>
+<meta name="description" content="Interactive companion to Homework 2: conditional expectation, the bias–variance decomposition, and how a shrinkage estimator's risk behaves as n grows.">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="icon" href="favicon.ico" sizes="32x32">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<link rel="stylesheet" href="assets/hw.css">
+</head>
+<body>
+  <div class="band"><div class="in">
+    <div class="topnav"><a href="./">← Notes in Statistical Inference</a></div>
+    <p class="course">STAT&nbsp;S4204 · Summer&nbsp;2026 · Problem Sets</p>
+    <h1>Homework 2 — Interactive Companion</h1>
+    <p class="sub">Conditional expectation, the two ways to miss, and what the sample size does to a shrinkage estimator</p>
+  </div></div>
+  <div class="wrap">
+
+    <p class="lead">Assignment 2 rebuilds conditional expectation and the decision-theoretic
+    vocabulary, then compares two estimators of a binomial probability: the observed rate
+    \(d_0=Y/n\) and the shrunken \(d_1=Y/(n+c)\). The write-up derives the risk functions
+    \(R_{d_0}(p)=p(1-p)/n\) and \(R_{d_1}(p)=\bigl(np(1-p)+c^2p^2\bigr)/(n+c)^2\) and shows
+    their ratio tends to one. The widgets below animate the three moving parts.</p>
+    <div class="pdfbar">
+      <a class="btn" href="homework-02.pdf">Read the write-up (PDF)</a>
+      <a class="btn ghost" href="./">All notes</a>
+    </div>
+
+    <!-- ============ Widget 1: conditional expectation ============ -->
+    <div class="widget" id="w1">
+      <h2>Problems 4–6 · Conditional expectation</h2>
+      <h3>A number and a random variable</h3>
+      <p>For a standardized bivariate normal pair with correlation \(\rho\), the conditional
+      distribution of \(Y\) given \(X=x_0\) is the renormalized slice of the joint at
+      \(x_0\), and its mean is \( \E\{Y\mid X=x_0\}=\rho x_0 \)—one <em>number</em>. Collect
+      those numbers over every \(x\) and you have the line \(x\mapsto\rho x\); the random
+      variable \( \E\{Y\mid X\}=\rho X \) is that line evaluated wherever \(X\) lands.</p>
+      <div class="controls">
+        <span class="ctl"><label>ρ</label>
+          <input type="range" min="-0.9" max="0.9" step="0.05" value="0.6" id="w1rho" data-out="w1rhov" data-dec="2">
+          <span class="val" id="w1rhov"></span></span>
+        <span class="ctl"><label>x₀</label>
+          <input type="range" min="-2.4" max="2.4" step="0.05" value="1.5" id="w1x0" data-out="w1x0v" data-dec="2">
+          <span class="val" id="w1x0v"></span></span>
+      </div>
+      <div class="charts">
+        <div class="chartwrap" style="max-width:480px" id="w1c"></div>
+      </div>
+      <div class="legend">
+        <span class="chip"><span class="sw" style="border-color:var(--s1)"></span>the function \(x\mapsto \E\{Y\mid X=x\}\)</span>
+        <span class="chip"><span class="sw" style="border-color:var(--s2);border-top-style:dashed"></span>conditional density of \(Y\) at \(x_0\) (drawn sideways)</span>
+        <span class="chip"><span class="sw dot" style="background:var(--s2)"></span>\(\E\{Y\mid X=x_0\}\)</span>
+      </div>
+      <div class="readout" id="w1read"></div>
+      <p class="note">Slide \(x_0\): the dot walks the line—that is the random variable in
+      action, its value crystallizing once \(X\) does. Slide \(\rho\): the whole prediction
+      rule changes. Averaging the line's height over the distribution of \(X\) gives
+      \(\E\{\E\{Y\mid X\}\}=\rho\,\E\{X\}=0=\E\{Y\}\): iterated expectations, visible.</p>
+    </div>
+
+    <!-- ============ Widget 2: bias–variance ============ -->
+    <div class="widget" id="w2">
+      <h2>Problem 12 · The bias–variance decomposition</h2>
+      <h3>The two ways to miss</h3>
+      <p>Under squared-error loss an estimator pays for exactly two defects:
+      $$ \E^{\theta}\{(\delta-g(\theta))^2\} \;=\; \operatorname{Var}^{\theta}(\delta) + b(\theta)^2 . $$
+      Move the estimator's spread and its systematic offset and watch the mean squared error
+      re-apportion—same currency, two sins.</p>
+      <div class="controls">
+        <span class="ctl"><label>bias b</label>
+          <input type="range" min="-2" max="2" step="0.05" value="0.9" id="w2b" data-out="w2bv" data-dec="2">
+          <span class="val" id="w2bv"></span></span>
+        <span class="ctl"><label>sd σ</label>
+          <input type="range" min="0.2" max="2" step="0.05" value="0.8" id="w2s" data-out="w2sv" data-dec="2">
+          <span class="val" id="w2sv"></span></span>
+      </div>
+      <div class="charts">
+        <div class="chartwrap" style="max-width:520px" id="w2c"></div>
+        <div class="chartwrap" style="max-width:260px" id="w2bar"><div class="ct">MSE, decomposed</div></div>
+      </div>
+      <div class="readout" id="w2read"></div>
+      <p class="note">An unbiased estimator lives at \(b=0\), where risk is all variance—the
+      case the course text uses to compare unbiased estimators by variance alone. A little
+      bias is worth buying whenever it comes with a large enough variance reduction; the
+      next widget prices exactly that trade.</p>
+    </div>
+
+    <!-- ============ Widget 3: risk lab ============ -->
+    <div class="widget" id="w3">
+      <h2>Problems 15–16 · Risk functions and the limit</h2>
+      <h3>Shrinkage against sample size</h3>
+      <p>The two rules for \(Y\sim\text{Binomial}(n,p)\) under \(L(p,a)=(p-a)^2\):
+      the unbiased rate \(d_0=Y/n\) and the shrunken \(d_1=Y/(n+c)\), which pulls toward
+      \(0\). Their risk curves cross at
+      \( p^{*}(n)=\dfrac{2n+c}{(c+2)n+c} \), so neither dominates at any sample size—but the
+      stakes collapse as \(n\) grows: the bias² that distinguishes \(d_1\) is
+      \(O(1/n^2)\) against variances of \(O(1/n)\). Hover the left chart to read both risks.</p>
+      <div class="controls">
+        <span class="ctl"><label>n</label>
+          <input type="range" min="0" max="1" step="0.001" value="0.28" id="w3n" data-out="w3nv" data-fmt="int">
+          <span class="val" id="w3nv"></span></span>
+        <span class="ctl"><label>c</label>
+          <input type="range" min="0.25" max="10" step="0.25" value="2" id="w3c" data-out="w3cv" data-dec="2">
+          <span class="val" id="w3cv"></span></span>
+        <span class="ctl"><label>probe p</label>
+          <input type="range" min="0.02" max="0.98" step="0.01" value="0.3" id="w3p" data-out="w3pv" data-dec="2">
+          <span class="val" id="w3pv"></span></span>
+      </div>
+      <div class="charts">
+        <div class="chartwrap" id="w3risk"><div class="ct">risk functions</div></div>
+        <div class="chartwrap" id="w3ratio"><div class="ct">R<sub>d₁</sub>/R<sub>d₀</sub> at the probe p, as n grows</div></div>
+      </div>
+      <div class="legend">
+        <span class="chip"><span class="sw" style="border-color:var(--s1)"></span>\(R_{d_0}\) (unbiased rate)</span>
+        <span class="chip"><span class="sw dash" style="border-color:var(--s2)"></span>\(R_{d_1}\) (shrunken)</span>
+        <span class="chip"><span class="sw" style="border-color:#9aa1a9;border-top-style:dotted"></span>crossing \(p^{*}\) · probe \(p\)</span>
+      </div>
+      <div class="readout" id="w3read"></div>
+      <p class="note">Small \(n\): the curves separate and the choice of estimator is a real
+      decision. Large \(n\): the data drown the shrinkage and the ratio (right) flattens onto
+      \(1\)—the limit of Problem 16, arriving in real time. Keeping the trade alive forever
+      requires \(c\propto\sqrt{n}\), which is precisely how the course text's minimax
+      estimator is built.</p>
+    </div>
+
+    <footer>
+      Interactive companion to the Homework&nbsp;2 write-up; the PDF is the submitted
+      document. Any errors are my own.
+      <div class="ln"><a href="homework-02.pdf">homework-02.pdf</a> ·
+        <a href="./">all notes</a> ·
+        <a href="mailto:tyler.sotomayor@columbia.edu">errata</a></div>
+    </footer>
+  </div>
+  <div class="footerband"><div class="in"><img src="assets/summer-logo.svg" alt="Columbia University Summer Session"></div></div>
+
+<script src="assets/hw.js"></script>
+<script>
+"use strict";
+/* ---------- Widget 1: conditional expectation slicer ---------- */
+const w1host = document.getElementById("w1c");
+function drawW1(){
+  const rho = +document.getElementById("w1rho").value;
+  const x0  = +document.getElementById("w1x0").value;
+  w1host.querySelectorAll("svg").forEach(s => s.remove());
+  const ch = makeChart(w1host, {w:480, h:390, xdom:[-3.1,3.6], ydom:[-3.1,3.1],
+    xticks:[-2,0,2], yticks:[-2,0,2], xlab:"x", ylab:"y", aria:"conditional expectation"});
+  // contour ellipses of the standardized bivariate normal (axes at 45°)
+  const cos45 = Math.SQRT1_2;
+  [0.8, 1.5, 2.2].forEach(k => {
+    const A = k*Math.sqrt(1+rho), B = k*Math.sqrt(Math.max(1-rho, 0.02));
+    const pts = [];
+    for (let i=0; i<=120; i++){
+      const t = 2*Math.PI*i/120;
+      const u = A*Math.cos(t), v = B*Math.sin(t);
+      pts.push([u*cos45 - v*cos45, u*cos45 + v*cos45]);
+    }
+    el("path", {d:pathFrom(pts, ch)+"Z", fill:"none", stroke:"#c3c8ce", "stroke-width":1.4}, ch.plot);
+  });
+  // regression line and slice
+  line(ch, fnPath(ch, x => rho*x, -3.1, 3.1, 2), S1);
+  vline(ch, x0, "refline");
+  // conditional density, drawn sideways at the slice
+  const cm = rho*x0, cs = Math.sqrt(Math.max(1-rho*rho, 1e-4));
+  const pts = [];
+  for (let i=0; i<=90; i++){
+    const y = cm - 3*cs + 6*cs*i/90;
+    pts.push([x0 + 0.9*cs*Math.exp(-((y-cm)**2)/(2*cs*cs)), y]);
+  }
+  el("path", {d:pathFrom(pts, ch), fill:"none", stroke:S2, "stroke-width":2,
+              "stroke-dasharray":"5 4"}, ch.plot);
+  dot(ch, x0, cm, S2, 5);
+  dirlab(ch, 2.55, rho*2.55, "E{Y | X}", S1, "start", rho >= 0 ? -8 : 16);
+  document.getElementById("w1read").innerHTML =
+    `<span><span class="k">the number</span> <b>E{Y | X=${fmt(x0,2)}} = ρ·x₀ = ${fmt(rho*x0,3)}</b></span>` +
+    `<span><span class="k">the random variable</span> <b>E{Y | X} = ${fmt(rho,2)}·X</b></span>` +
+    `<span><span class="k">conditional sd</span> <b>√(1−ρ²) = ${fmt(cs,3)}</b></span>`;
+}
+bindControls(document.getElementById("w1"), drawW1);
+drawW1();
+
+/* ---------- Widget 2: bias–variance anatomy ---------- */
+const w2host = document.getElementById("w2c");
+const w2barHost = document.getElementById("w2bar");
+function drawW2(){
+  const b = +document.getElementById("w2b").value;
+  const s = +document.getElementById("w2s").value;
+  w2host.querySelectorAll("svg").forEach(x => x.remove());
+  w2barHost.querySelectorAll("svg").forEach(x => x.remove());
+  const ch = makeChart(w2host, {w:520, h:300, xdom:[-4.2,4.2], ydom:[0, 2.15],
+    xticks:[{v:-2,l:"-2"},{v:0,l:"g(θ)"},{v:2,l:"2"}], yticks:[],
+    xlab:"values of δ", ylab:"density", aria:"bias variance anatomy"});
+  line(ch, fnPath(ch, x => normPdf(x, b, s), -4.2, 4.2), S2);
+  el("line", {x1:ch.sx(0), y1:ch.sy(0), x2:ch.sx(0), y2:ch.sy(2.0),
+              stroke:"#1c2024", "stroke-width":1.4}, ch.plot);
+  vline(ch, b, "refline");
+  if (Math.abs(b) > 0.08){
+    const y = 1.72;
+    el("line", {x1:ch.sx(0), y1:ch.sy(y), x2:ch.sx(b), y2:ch.sy(y),
+      stroke:"#646a72", "stroke-width":1.6, "marker-end":"", }, ch.fore);
+    el("text", {x:ch.sx(b/2), y:ch.sy(y)-7, "text-anchor":"middle", class:"ticklab"}, ch.fore)
+      .textContent = "bias";
+  }
+  document.getElementById("w2read").innerHTML =
+    `<span><span class="k">Var = σ²</span> <b>= ${fmt(s*s,3)}</b></span>` +
+    `<span><span class="k">bias² = b²</span> <b>= ${fmt(b*b,3)}</b></span>` +
+    `<span><span class="k">MSE = σ² + b²</span> <b>= ${fmt(s*s + b*b,3)}</b></span>`;
+  // stacked bar
+  const tot = s*s + b*b, maxTot = 8.05;
+  const chB = makeChart(w2barHost, {w:260, h:300, xdom:[0,1], ydom:[0, maxTot],
+    xticks:[], yticks:[2,4,6].map(v=>({v,l:fmt(v,0)})), ylab:"squared error", aria:"mse stacked bar",
+    margin:{t:14,r:14,b:40,l:52}});
+  const bx = chB.sx(0.28), bw = chB.sx(0.72)-chB.sx(0.28);
+  el("rect", {x:bx, y:chB.sy(s*s), width:bw, height:chB.sy(0)-chB.sy(s*s),
+              fill:S1, rx:3}, chB.plot);
+  el("rect", {x:bx, y:chB.sy(tot), width:bw, height:Math.max(chB.sy(s*s)-chB.sy(tot)-2, 0),
+              fill:S2, rx:3}, chB.plot);
+  el("text", {x:bx+bw/2, y:chB.sy(tot)-7, "text-anchor":"middle", class:"dirlab", fill:"#1c2024"},
+     chB.fore).textContent = "MSE " + fmt(tot,2);
+  el("text", {x:bx+bw+8, y:chB.sy(s*s/2)+4, class:"ticklab"}, chB.fore).textContent = "variance";
+  if (b*b > maxTot*0.045)
+    el("text", {x:bx+bw+8, y:chB.sy(s*s + b*b/2)+4, class:"ticklab"}, chB.fore).textContent = "bias²";
+}
+bindControls(document.getElementById("w2"), drawW2);
+drawW2();
+
+/* ---------- Widget 3: risk lab ---------- */
+const w3riskHost = document.getElementById("w3risk");
+const w3ratioHost = document.getElementById("w3ratio");
+const nFromSlider = t => Math.round(Math.exp(Math.log(2) + t*(Math.log(2000)-Math.log(2))));
+function drawW3(){
+  const t = +document.getElementById("w3n").value;
+  const n = nFromSlider(t);
+  document.getElementById("w3nv").textContent = n;
+  const c = +document.getElementById("w3c").value;
+  const pp = +document.getElementById("w3p").value;
+  const R0 = p => p*(1-p)/n;
+  const R1 = p => (n*p*(1-p) + c*c*p*p)/((n+c)*(n+c));
+  const pstar = (2*n+c)/((c+2)*n+c);
+  const ymax = Math.max(0.26/n, R1(1)) * 1.18;
+  w3riskHost.querySelectorAll("svg").forEach(s => s.remove());
+  w3riskHost.querySelectorAll(".tip").forEach(s => s.remove());
+  w3ratioHost.querySelectorAll("svg").forEach(s => s.remove());
+
+  const ch = makeChart(w3riskHost, {w:430, h:320, xdom:[0,1], ydom:[0, ymax],
+    xticks:[{v:0,l:"0"},{v:0.5,l:"1/2"},{v:1,l:"1"}],
+    yticks:[ymax/3, 2*ymax/3].map(v=>({v, l:fmt(v,3)})),
+    xlab:"p", ylab:"risk", aria:"risk functions"});
+  line(ch, fnPath(ch, R0, 0, 1), S1);
+  line(ch, fnPath(ch, R1, 0, 1), S2, "7 5");
+  vline(ch, pstar);
+  el("text", {x:ch.sx(pstar), y:12, "text-anchor":"middle", class:"ticklab"}, ch.fore)
+    .textContent = "p* = " + fmt(pstar,3);
+  vline(ch, pp, "crossline");
+  attachHover(w3riskHost, ch,
+    [{name:"R_d0", color:S1, f:R0},{name:"R_d1", color:S2, f:R1}],
+    x => "p = " + fmt(x,3), y => fmt(y,4));
+
+  // ratio vs n at probe p
+  const ratio = m => (m*pp*(1-pp) + c*c*pp*pp)/((m+c)*(m+c)) * m/(pp*(1-pp));
+  let rmin = 1, rmax = 1;
+  for (let m=2; m<=2000; m*=1.15){ const r = ratio(m); rmin = Math.min(rmin,r); rmax = Math.max(rmax,r); }
+  const pad = Math.max((rmax-rmin)*0.15, 0.02);
+  const chR = makeChart(w3ratioHost, {w:430, h:320, xdom:[2,2000], xlog:true,
+    ydom:[Math.min(rmin-pad, 0.9), rmax+pad],
+    xticks:[{v:2,l:"2"},{v:20,l:"20"},{v:200,l:"200"},{v:2000,l:"2000"}],
+    yticks:[{v:1,l:"1"},{v:rmax,l:fmt(rmax,2)}],
+    xlab:"n (log scale)", ylab:"risk ratio", aria:"risk ratio vs n"});
+  hline(chR, 1, "refline");
+  const pts = [];
+  for (let i=0; i<=160; i++){
+    const m = 2*Math.pow(1000, i/160);
+    pts.push([m, ratio(m)]);
+  }
+  el("path", {d:pathFrom(pts, chR), fill:"none", stroke:S2, "stroke-width":2}, chR.plot);
+  dot(chR, n, ratio(n), S2, 5);
+  document.getElementById("w3read").innerHTML =
+    `<span><span class="k">crossing p*(n,c)</span> <b>= ${fmt(pstar,3)}</b></span>` +
+    `<span><span class="k">R₁/R₀ at p=${fmt(pp,2)}, n=${n}</span> <b>= ${fmt(ratio(n),4)}</b></span>` +
+    `<span><span class="k">limit as n→∞</span> <b>= 1</b></span>`;
+}
+bindControls(document.getElementById("w3"), drawW3);
+drawW3();
+
+/* KaTeX */
+document.addEventListener("DOMContentLoaded", () => {
+  if (window.renderMathInElement) renderMathInElement(document.body, {
+    delimiters:[{left:"\\(",right:"\\)",display:false},{left:"$$",right:"$$",display:true}],
+    macros:{"\\E":"\\mathrm{E}"}
+  });
+});
+</script>
+</body>
+</html>

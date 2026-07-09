@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Homework 1 · Interactive — STAT S4204</title>
+<meta name="description" content="Interactive companion to Homework 1 (probability review): distributions, covariance, and why zero covariance is not independence.">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="icon" href="favicon.ico" sizes="32x32">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<link rel="stylesheet" href="assets/hw.css">
+</head>
+<body>
+  <div class="band"><div class="in">
+    <div class="topnav"><a href="./">← Notes in Statistical Inference</a></div>
+    <p class="course">STAT&nbsp;S4204 · Summer&nbsp;2026 · Problem Sets</p>
+    <h1>Homework 1 — Interactive Companion</h1>
+    <p class="sub">Probability review: distributions, moments, and the one-way street from independence to zero covariance</p>
+  </div></div>
+  <div class="wrap">
+
+    <p class="lead">Assignment 1 asks for twelve definitions from memory and three moment
+    computations. The full write-up—definitions, the discussion across the course texts, and
+    the worked computations—is in the PDF; the widgets below let you push on the three ideas
+    that reward pushing: what a distribution looks like from both of its portraits, what the
+    sign of covariance means in data, and why zero covariance is a much weaker promise than
+    independence.</p>
+    <div class="pdfbar">
+      <a class="btn" href="homework-01.pdf">Read the write-up (PDF)</a>
+      <a class="btn ghost" href="./">All notes</a>
+    </div>
+
+    <!-- ============ Widget 1: distribution explorer ============ -->
+    <div class="widget" id="w1">
+      <h2>Problem 3 · Distribution</h2>
+      <h3>One distribution, two portraits</h3>
+      <p>The distribution of a random variable is the assignment \(A \mapsto P(X\in A)\); in
+      practice it is handled through the pmf and reconstructed by the cdf, whose jump at
+      \(x\) is exactly \(P(X=x)\). Here \(X\sim\text{Binomial}(n,p)\)—the arm total of the
+      course's clinical trial. Drag \(n\) and \(p\) and watch both portraits carry the same
+      information.</p>
+      <div class="controls" id="w1c">
+        <span class="ctl"><label>n</label>
+          <input type="range" min="1" max="40" step="1" value="10" id="w1n" data-out="w1nv" data-fmt="int">
+          <span class="val" id="w1nv"></span></span>
+        <span class="ctl"><label>p</label>
+          <input type="range" min="0" max="1" step="0.01" value="0.5" id="w1p" data-out="w1pv" data-dec="2">
+          <span class="val" id="w1pv"></span></span>
+      </div>
+      <div class="charts">
+        <div class="chartwrap" id="w1pmf"><div class="ct">pmf&ensp;P(X = k)</div></div>
+        <div class="chartwrap" id="w1cdf"><div class="ct">cdf&ensp;F(x) = P(X ≤ x)</div></div>
+      </div>
+      <div class="readout" id="w1r"></div>
+      <p class="note">The expectation \( \E\{X\}=np \) is the balancing point of the left
+      panel—often a value the variable never takes—and \( \operatorname{Var}(X)=np(1-p) \)
+      is largest at \(p=\tfrac12\), where each trial is least predictable. Hover the stems
+      to read probabilities.</p>
+    </div>
+
+    <!-- ============ Widget 2: covariance cloud ============ -->
+    <div class="widget" id="w2">
+      <h2>Problem 10 · Covariance</h2>
+      <h3>The sign of covariance, in data</h3>
+      <p>Covariance asks one question of a cloud of points: when \(X\) lands above its mean,
+      does \(Y\) tend to land above its own? The slider sets the population correlation
+      \(\rho\) of a standardized pair; the cloud (a fixed sample of 140 draws) and the line
+      \(y=\rho x\) respond. The sample covariance printed below is computed from the dots you
+      see.</p>
+      <div class="controls">
+        <span class="ctl"><label>ρ</label>
+          <input type="range" min="-0.95" max="0.95" step="0.01" value="0.7" id="w2r" data-out="w2rv" data-dec="2">
+          <span class="val" id="w2rv"></span></span>
+      </div>
+      <div class="charts">
+        <div class="chartwrap" style="max-width:440px" id="w2c"></div>
+      </div>
+      <div class="legend">
+        <span class="chip"><span class="sw dot" style="background:var(--s1)"></span>sample (140 fixed draws)</span>
+        <span class="chip"><span class="sw" style="border-color:var(--muted);border-top-style:dashed"></span>population line \(y=\rho x\)</span>
+      </div>
+      <div class="readout" id="w2read"></div>
+      <p class="note">Positive \(\rho\): misses agree in direction. Negative: they oppose.
+      Near zero: no linear pattern. The magnitude of a covariance carries the two variables'
+      units, which is why the standardized version—the correlation—is what travels between
+      problems.</p>
+    </div>
+
+    <!-- ============ Widget 3: dependent but uncorrelated ============ -->
+    <div class="widget" id="w3">
+      <h2>Problem 12 · Independence and covariance</h2>
+      <h3>Dependent but uncorrelated</h3>
+      <p>Independence forces zero covariance; the converse fails. The standard counterexample:
+      \(X\) uniform on \(\{-1,0,1\}\) and \(Y=X^2\). Then
+      \( \operatorname{Cov}(X,Y)=\E\{X^3\}-\E\{X\}\E\{X^2\}=0 \), yet \(Y\) is a
+      <em>function</em> of \(X\). Draw samples and watch the running sample covariance settle
+      on zero while the dependence stays total—every point sits on the parabola.</p>
+      <div class="controls">
+        <span class="ctl"><button id="w3draw">Draw 25 samples</button></span>
+        <span class="ctl"><button id="w3reset">Reset</button></span>
+      </div>
+      <div class="charts">
+        <div class="chartwrap" style="max-width:440px" id="w3c"></div>
+      </div>
+      <div class="readout" id="w3read"></div>
+      <p class="note">Covariance registers only <em>linear</em> association, and this
+      dependence is pure curvature: \(P(Y=1\mid X=1)=1\) while \(P(Y=1)=\tfrac23\). Knowing
+      \(X\) determines \(Y\) exactly—no independence—yet the best-fitting line through the
+      cloud is flat.</p>
+    </div>
+
+    <footer>
+      Interactive companion to the Homework&nbsp;1 write-up; the PDF is the submitted
+      document. Any errors are my own.
+      <div class="ln"><a href="homework-01.pdf">homework-01.pdf</a> ·
+        <a href="./">all notes</a> ·
+        <a href="mailto:tyler.sotomayor@columbia.edu">errata</a></div>
+    </footer>
+  </div>
+  <div class="footerband"><div class="in"><img src="assets/summer-logo.svg" alt="Columbia University Summer Session"></div></div>
+
+<script src="assets/hw.js"></script>
+<script>
+"use strict";
+/* ---------- Widget 1: binomial pmf + cdf ---------- */
+const w1pmfHost = document.getElementById("w1pmf");
+const w1cdfHost = document.getElementById("w1cdf");
+let w1tip = document.createElement("div"); w1tip.className = "tip"; w1pmfHost.appendChild(w1tip);
+
+function drawW1(){
+  const n = +document.getElementById("w1n").value;
+  const p = +document.getElementById("w1p").value;
+  const pmf = binomPmf(n, p);
+  const ymax = Math.max(...pmf) * 1.15 || 1;
+  [w1pmfHost, w1cdfHost].forEach(h => { h.querySelectorAll("svg").forEach(s => s.remove()); });
+
+  const xt = [];
+  const step = n <= 10 ? 1 : n <= 20 ? 5 : 10;
+  for (let k=0; k<=n; k+=step) xt.push(k);
+  const chP = makeChart(w1pmfHost, {w:420, h:280, xdom:[-0.8, n+0.8], ydom:[0, ymax],
+    xticks:xt, yticks:[ymax/3, 2*ymax/3].map(v=>({v, l:fmt(v,2)})), xlab:"k", ylab:"P(X = k)",
+    aria:"binomial pmf"});
+  const stems = [];
+  pmf.forEach((q, k) => {
+    el("line", {x1:chP.sx(k), y1:chP.sy(0), x2:chP.sx(k), y2:chP.sy(q),
+                stroke:S1, "stroke-width":2}, chP.plot);
+    stems.push(el("circle", {cx:chP.sx(k), cy:chP.sy(q), r:Math.min(4.5, Math.max(2.4, 60/(n+6))),
+                fill:S1}, chP.plot));
+  });
+  // mean marker
+  vline(chP, n*p, "refline");
+  el("text", {x:chP.sx(n*p), y:12, "text-anchor":"middle", class:"ticklab"}, chP.fore)
+    .textContent = "E{X} = " + fmt(n*p, 2);
+  // hover on pmf
+  chP.svg.onmousemove = ev => {
+    const r = chP.svg.getBoundingClientRect();
+    const px = (ev.clientX - r.left) * chP.W / r.width - chP.m.l;
+    const k = Math.round(chP.xdom[0] + px/chP.iw * (chP.xdom[1]-chP.xdom[0]));
+    if (k < 0 || k > n){ w1tip.style.display = "none"; return; }
+    let F = 0; for (let j=0; j<=k; j++) F += pmf[j];
+    w1tip.innerHTML = `k = <b>${k}</b><br>P(X=k) = <b>${fmt(pmf[k],4)}</b><br>F(k) = <b>${fmt(F,4)}</b>`;
+    w1tip.style.display = "block";
+    const wr = w1pmfHost.getBoundingClientRect();
+    let tx = ev.clientX - wr.left + 14;
+    if (tx + w1tip.offsetWidth > wr.width - 4) tx -= w1tip.offsetWidth + 24;
+    w1tip.style.left = tx + "px";
+    w1tip.style.top = (ev.clientY - wr.top + 10) + "px";
+  };
+  chP.svg.onmouseleave = () => { w1tip.style.display = "none"; };
+
+  const chC = makeChart(w1cdfHost, {w:420, h:280, xdom:[-0.8, n+0.8], ydom:[0, 1.12],
+    xticks:xt, yticks:[{v:0.5,l:"0.5"},{v:1,l:"1"}], xlab:"x", ylab:"F(x)", aria:"binomial cdf"});
+  let F = 0;
+  el("line", {x1:chC.sx(-0.8), y1:chC.sy(0), x2:chC.sx(0), y2:chC.sy(0),
+              stroke:S1, "stroke-width":2}, chC.plot);
+  for (let k=0; k<=n; k++){
+    F += pmf[k];
+    el("line", {x1:chC.sx(k), y1:chC.sy(F), x2:chC.sx(Math.min(k+1, n+0.8)), y2:chC.sy(F),
+                stroke:S1, "stroke-width":2}, chC.plot);
+    if (n <= 25) el("circle", {cx:chC.sx(k), cy:chC.sy(F), r:2.6, fill:S1}, chC.plot);
+  }
+  document.getElementById("w1r").innerHTML =
+    `<span><span class="k">E{X} = np</span> <b>= ${fmt(n*p,3)}</b></span>` +
+    `<span><span class="k">Var(X) = np(1−p)</span> <b>= ${fmt(n*p*(1-p),3)}</b></span>`;
+}
+bindControls(document.getElementById("w1"), drawW1);
+drawW1();
+
+/* ---------- Widget 2: covariance cloud ---------- */
+const w2host = document.getElementById("w2c");
+const Z = gaussPairs(140, 42024);
+function drawW2(){
+  const rho = +document.getElementById("w2r").value;
+  w2host.querySelectorAll("svg").forEach(s => s.remove());
+  const ch = makeChart(w2host, {w:420, h:360, xdom:[-3,3], ydom:[-3,3],
+    xticks:[-2,0,2], yticks:[-2,0,2], xlab:"x", ylab:"y", aria:"correlation scatter"});
+  line(ch, fnPath(ch, x => rho*x, -3, 3, 2), "#9aa1a9", "5 5");
+  const pts = Z.map(([z1,z2]) => [z1, rho*z1 + Math.sqrt(1-rho*rho)*z2]);
+  pts.forEach(([x,y]) => el("circle", {cx:ch.sx(x), cy:ch.sy(y), r:3.2,
+    fill:S1, "fill-opacity":0.75}, ch.plot));
+  // sample moments
+  const n = pts.length;
+  const mx = pts.reduce((s,p)=>s+p[0],0)/n, my = pts.reduce((s,p)=>s+p[1],0)/n;
+  let cxy=0, vx=0, vy=0;
+  pts.forEach(([x,y]) => { cxy += (x-mx)*(y-my); vx += (x-mx)**2; vy += (y-my)**2; });
+  cxy/=n; vx/=n; vy/=n;
+  document.getElementById("w2read").innerHTML =
+    `<span><span class="k">population ρ</span> <b>= ${fmt(rho,2)}</b></span>` +
+    `<span><span class="k">sample covariance</span> <b>= ${fmt(cxy,3)}</b></span>` +
+    `<span><span class="k">sample correlation</span> <b>= ${fmt(cxy/Math.sqrt(vx*vy),3)}</b></span>`;
+}
+bindControls(document.getElementById("w2"), drawW2);
+drawW2();
+
+/* ---------- Widget 3: dependent but uncorrelated ---------- */
+const w3host = document.getElementById("w3c");
+let w3rng = mulberry32(7), w3data = [];
+function w3redraw(){
+  w3host.querySelectorAll("svg").forEach(s => s.remove());
+  const ch = makeChart(w3host, {w:420, h:330, xdom:[-1.6,1.6], ydom:[-0.35,1.5],
+    xticks:[-1,0,1], yticks:[{v:2/3,l:"2/3"},{v:1,l:"1"}], xlab:"x", ylab:"y",
+    aria:"uncorrelated but dependent scatter"});
+  line(ch, fnPath(ch, x => x*x, -1.2, 1.2), "#c3c8ce");
+  hline(ch, 2/3, "refline");
+  el("text", {x:ch.sx(-1.55), y:ch.sy(2/3)-6, class:"ticklab"}, ch.fore).textContent = "E{Y} = 2/3";
+  // jittered points
+  w3data.forEach(([x, jx, jy]) => el("circle",
+    {cx:ch.sx(x + jx), cy:ch.sy(x*x + jy), r:3.4, fill:S2, "fill-opacity":0.55}, ch.plot));
+  const n = w3data.length;
+  let out = `<span><span class="k">draws</span> <b>= ${n}</b></span>`;
+  if (n){
+    const xs = w3data.map(d=>d[0]), ys = xs.map(x=>x*x);
+    const mx = xs.reduce((a,b)=>a+b,0)/n, my = ys.reduce((a,b)=>a+b,0)/n;
+    let c = 0; xs.forEach((x,i)=>{ c += (x-mx)*(ys[i]-my); }); c/=n;
+    out += `<span><span class="k">sample Cov(X, Y)</span> <b>= ${fmt(c,4)}</b></span>` +
+           `<span><span class="k">share with Y = X²</span> <b>= 100%</b></span>`;
+  }
+  document.getElementById("w3read").innerHTML = out;
+}
+document.getElementById("w3draw").onclick = () => {
+  for (let i=0; i<25; i++){
+    const u = w3rng(), x = u < 1/3 ? -1 : u < 2/3 ? 0 : 1;
+    w3data.push([x, (w3rng()-0.5)*0.14, (w3rng()-0.5)*0.10]);
+  }
+  w3redraw();
+};
+document.getElementById("w3reset").onclick = () => { w3data = []; w3rng = mulberry32(7); w3redraw(); };
+w3redraw();
+
+/* KaTeX */
+document.addEventListener("DOMContentLoaded", () => {
+  if (window.renderMathInElement) renderMathInElement(document.body, {
+    delimiters:[{left:"\\(",right:"\\)",display:false},{left:"$$",right:"$$",display:true}],
+    macros:{"\\E":"\\mathrm{E}"}
+  });
+});
+</script>
+</body>
+</html>
