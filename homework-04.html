@@ -100,15 +100,20 @@
     <!-- ============ Widget 3: Exercises 5 & 6 ============ -->
     <div class="widget" id="w3">
       <h2>Exercises 5 &amp; 6 · A loss that flattens the risk</h2>
-      <h3>Same rule, two accountings</h3>
-      <p>The observed rate \(d(x)=x/n\) has risk \( \theta(1-\theta)/n \) under plain squared
-      error—but under the weighted loss
-      \( \mathscr{L}(\theta,a)=(a-\theta)^2/\theta(1-\theta) \) its risk is the constant
-      \(1/n\): errors are charged relative to the difficulty of the problem at \(\theta\),
-      and the bump flattens into an equalizer. The mean risks under the uniform prior are
-      \(1/6n\) and \(1/n\).</p>
+      <h3>Same rule, two accountings—and the dial between them</h3>
+      <p>The observed rate \(d(x)=x/n\) has risk \( \theta(1-\theta)/n \) under Exercise 5's
+      plain squared error, and the constant \(1/n\) under Exercise 6's weighted loss
+      \( (a-\theta)^2/\theta(1-\theta) \). The family
+      \( \mathscr{L}_{\gamma}(\theta,a)=(a-\theta)^2/[\theta(1-\theta)]^{\gamma} \)
+      interpolates between them, and under it the rate's risk is
+      \( [\theta(1-\theta)]^{1-\gamma}/n \). The chart plots \(n\times{}\)risk—so the picture
+      depends only on \(\gamma\)—and the slider sweeps Exercise 5 (\(\gamma=0\), the bump)
+      into Exercise 6 (\(\gamma=1\), the equalizer).</p>
       <div class="controls">
-        <span class="ctl"><label>n</label>
+        <span class="ctl"><label>weight exponent γ</label>
+          <input type="range" min="0" max="1" step="0.02" value="0" id="w3g" data-out="w3gv" data-dec="2">
+          <span class="val" id="w3gv"></span></span>
+        <span class="ctl"><label>n (for the mean risks)</label>
           <input type="range" min="1" max="100" step="1" value="10" id="w3n" data-out="w3nv" data-fmt="int">
           <span class="val" id="w3nv"></span></span>
       </div>
@@ -116,14 +121,16 @@
         <div class="chartwrap" style="max-width:560px" id="w3c"></div>
       </div>
       <div class="legend">
-        <span class="chip"><span class="sw" style="border-color:var(--s1)"></span>plain loss: \(\theta(1-\theta)/n\)</span>
-        <span class="chip"><span class="sw dash" style="border-color:var(--s2)"></span>weighted loss: \(1/n\), flat</span>
+        <span class="chip"><span class="sw" style="border-color:var(--s2)"></span>\(n\times{}\)risk under \(\mathscr{L}_{\gamma}\)</span>
+        <span class="chip"><span class="sw" style="border-color:#b7bdc4"></span>the endpoints: plain bump (\(\gamma=0\)), flat equalizer (\(\gamma=1\))</span>
       </div>
       <div class="readout" id="w3read"></div>
-      <p class="note">The flattening is engineered: under the weighted loss the rate is the
-      Bayes rule for the uniform prior (the weight turns the Beta\((x{+}1,n{-}x{+}1)\)
-      posterior into Beta\((x,n{-}x)\), whose mean is \(x/n\)), and a constant-risk Bayes
-      rule is minimax. Exercise 3's loser becomes optimal by changing what a mistake costs.</p>
+      <p class="note">Only \(\gamma=1\) finishes the job: for any \(\gamma<1\) the risk still
+      dies at the edges, and exactly at \(\gamma=1\) it locks flat. The flattening is
+      engineered: under the fully weighted loss the rate is the Bayes rule for the uniform
+      prior (the weight turns the Beta\((x{+}1,n{-}x{+}1)\) posterior into
+      Beta\((x,n{-}x)\), whose mean is \(x/n\)), and a constant-risk Bayes rule is minimax.
+      Exercise 3's loser becomes optimal by changing what a mistake costs.</p>
     </div>
 
     <footer>
@@ -220,22 +227,28 @@ drawW2();
 /* ---------- Widget 3: Exercises 5 & 6 ---------- */
 const w3host = document.getElementById("w3c");
 function drawW3(){
+  const g = +document.getElementById("w3g").value;
   const n = +document.getElementById("w3n").value;
-  const Rp = t => t*(1-t)/n;
-  const ymax = (1/n)*1.25;
+  const f = t => Math.pow(Math.max(t*(1-t), 0), 1-g);   // n × risk under L_gamma
   w3host.querySelectorAll("svg").forEach(s=>s.remove());
   w3host.querySelectorAll(".tip").forEach(s=>s.remove());
-  const ch = makeChart(w3host, {w:560, h:310, xdom:[0,1], ydom:[0,ymax],
+  const ch = makeChart(w3host, {w:560, h:330, xdom:[0,1], ydom:[0,1.15],
     xticks:[{v:0,l:"0"},{v:0.5,l:"1/2"},{v:1,l:"1"}],
-    yticks:[{v:0.25/n,l:fmt(0.25/n,3)},{v:1/n,l:fmt(1/n,3)}],
-    xlab:"θ", ylab:"risk", aria:"plain vs weighted loss"});
-  line(ch, fnPath(ch, Rp, 0, 1), S1);
-  line(ch, fnPath(ch, () => 1/n, 0, 1, 2), S2, "7 5");
-  attachHover(w3host, ch, [{name:"plain", color:S1, f:Rp},{name:"weighted", color:S2, f:()=>1/n}],
-    x => "θ = " + fmt(x,3), y => fmt(y,4));
+    yticks:[{v:0.25,l:"1/4"},{v:1,l:"1"}],
+    xlab:"θ", ylab:"n × risk", aria:"weighted loss morph"});
+  line(ch, fnPath(ch, t => t*(1-t), 0, 1), "#c3c8ce");
+  line(ch, fnPath(ch, () => 1, 0, 1, 2), "#c3c8ce", "5 5");
+  line(ch, fnPath(ch, f, 0, 1, 321), S2);
+  attachHover(w3host, ch, [{name:"n × risk", color:S2, f}],
+    x => "θ = " + fmt(x,3), y => fmt(y,3));
+  let I = 0; const M = 800;
+  for (let i=0; i<M; i++){ const t = (i+0.5)/M; I += f(t); }
+  I /= M;
   document.getElementById("w3read").innerHTML =
-    `<span><span class="k">mean risk, plain</span> <b>= 1/6n = ${fmt(1/(6*n),4)}</b></span>` +
-    `<span><span class="k">mean risk, weighted</span> <b>= 1/n = ${fmt(1/n,4)}</b></span>`;
+    `<span><span class="k">γ</span> <b>= ${fmt(g,2)}</b></span>` +
+    `<span><span class="k">mean risk at γ</span> <b>= ${fmt(I/n,4)}</b></span>` +
+    `<span><span class="k">plain (γ=0): 1/6n</span> <b>= ${fmt(1/(6*n),4)}</b></span>` +
+    `<span><span class="k">weighted (γ=1): 1/n</span> <b>= ${fmt(1/n,4)}</b></span>`;
 }
 bindControls(document.getElementById("w3"), drawW3);
 drawW3();
