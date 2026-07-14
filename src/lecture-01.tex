@@ -1,13 +1,14 @@
 %% ============================================================
-%%  Lecture 1 -- Monday, 6 July 2026
+%%  Lecture 1 -- Monday--Thursday, 6--9 July 2026
 %%  Subfile of main.tex: compiles standalone OR as part of the book.
-%%  Built from sources/2026-07-06/ (slide-transcript.md, outline.md).
+%%  Built from sources/2026-07-06/ (slide-transcript.md, outline.md) and
+%%  sources/2026-07-09/ (Fisher-information handout -> S1.9 + 1.A.6, 1.A.7).
 %% ============================================================
 \documentclass[main.tex]{subfiles}
 
 \begin{document}
 
-\beginlecture{1}{Monday, 6 July 2026}%
+\beginlecture{1}{Monday--Thursday, 6--9 July 2026}%
   {From Data to Decisions: Statistical Models, Loss, and Risk}
 
 \epigraph{Far better an approximate answer to the right question, which is often vague, than an
@@ -23,6 +24,7 @@ exact answer to the wrong question, which can always be made precise.}%
   \item \hyperlink{1.6}{1.6\quad Bayesian Decision Theory}
   \item \hyperlink{1.7}{1.7\quad The Cheat Sheet: Decision Theory in Eleven Items}
   \item \hyperlink{1.8}{1.8\quad Estimation, Testing, and the Clinical Trial}
+  \item \hyperlink{1.9}{1.9\quad The Score, Fisher Information, and the Information Bound}
 \end{lecturecontents}
 
 \bigskip
@@ -35,8 +37,13 @@ joint distribution is organized into a \emph{statistical model}, the study's pur
 decision problem: an action space, a loss function, and---as the figure of merit---the
 \emph{risk function}, the expected loss as a function of the parameter. Admissibility and the
 Bayes principle give the two classical answers to what ``good'' means, and both are put to work
-on a two-arm clinical trial in which two estimators of a cure-rate difference compete. The
-companion text is Hoel--Port--Stone, Chapter~1 (\HPS{1}).
+on a two-arm clinical trial in which two estimators of a cure-rate difference compete.
+Thursday's handout then pushes the estimation half one level deeper: restricting attention to
+\emph{unbiased} methods, it builds the \emph{score} and the \emph{Fisher information} and
+proves the \emph{information bound}---a floor under the variance of every unbiased estimator,
+computed from the model alone and attained exactly by the average of a normal sample. The
+companion text is Hoel--Port--Stone, Chapter~1 (\HPS{1}); the closing section opens the door
+to Chapter~2's estimation theory (\HPS{2}).
 
 \clearpage
 % ============================================================
@@ -1044,11 +1051,335 @@ for you?
 \end{ObjL}
 
 % ============================================================
+\sub{1.9}{The Score, Fisher Information, and the Information Bound}
+
+Thursday's session opens with a confession---``We got through the chapter pretty
+quickly''---and a promise to save the broad overview for Monday; today, the handout says, ``we
+will just attack an interesting and important problem.'' The problem: ``Suppose you want to
+know if your unbiased estimator is as good as it can be under squared error loss.'' Section
+\xref{1.5} judged methods by comparing them---risk curve against risk curve, the dominated
+discarded (\xref{1.5.13})---but comparison needs a rival, and a crowd of undominated rules
+survives it. This section changes the question. Restrict attention to \emph{unbiased}
+estimators, so that risk collapses to variance (\appref{1.A.1} with the bias term dead), and ask
+not ``is mine better than yours?'' but ``how small can the variance possibly be?''
+
+The astonishment is that the model answers by itself. From the density alone---before any
+estimator is proposed---one computes a single function of $\theta$, the \emph{Fisher
+information}, and its inverse is a floor beneath the variance of \emph{every} unbiased
+estimator; in the handout's words, ``the inverse of the information is the Fisher information
+bound'' (though it warns, correctly, that this is ``a not sharp bound''---\xref{1.9.14}).
+Building the floor takes two new objects, the score and the information; the proof is a single
+covariance computation, and behind it a right triangle; and in the normal sample the floor is
+not merely approached but hit exactly. \HPS{2}
+
+\begin{Obj}{Definition}{1.9.1}{Unbiased estimator}
+In a model with densities (or pmfs) $f(y;\theta)$, $\theta\in\Theta\subseteq\mathbb{R}$, an
+\emph{estimator} $d=d(Y)$ is a method (\xref{1.5.5}) whose action space is the parameter
+space (\xref{1.8.1}). The estimator is \emph{unbiased}\note{Notation,
+following the handout: the estimator is $d(Y)$ (the week's deck wrote decision rules as
+$\delta$), and the density is $f(y;\theta)$---the handout itself writes $f^{\theta}$ on its
+setup page and $f(Y;\theta)$ in its displays; the semicolon form keeps visible the variable
+we are about to differentiate in, so these notes adopt it for this section.} if
+\[ \E^{\theta}\{d(Y)\} \;=\; \theta \qquad\text{for all } \theta\in\Theta . \]
+\end{Obj}
+
+\begin{ObjL}{Remark}{1.9.2}{Reading unbiasedness}
+The teeth are in ``for all $\theta$'': wherever the truth sits, the estimator's sampling
+distribution centers exactly there---the bias $b(\theta)$ of \appref{1.A.1} is identically
+zero. Two consequences. First, for an unbiased estimator the squared-error risk \emph{is} the
+variance, $R_d(\theta)=\Var^{\theta}(d)$, so ``as good as it can be'' becomes a question
+about one number per $\theta$: the spread. Second, unbiasedness is a \emph{constraint}, not a
+virtue in itself: the shaded estimator $(1+X)/(2+n)$ of \xref{1.8.3} is biased and, in the
+middle of the parameter space, beats the unbiased rate (\appref{1.A.4}). The floor built below
+governs the class that accepts the constraint.
+\end{ObjL}
+
+\begin{Obj}{Definition}{1.9.3}{The score}
+For a model $f(y;\theta)$ smooth in $\theta$, the \emph{score} is
+\[ U(\theta) \;=\; \frac{\partial}{\partial\theta}\,\log f(Y;\theta) : \]
+the derivative in the parameter of the log of the density, \emph{evaluated at the random
+data}. It is a random variable (through $Y$) and a function of $\theta$ (through the
+differentiation point).
+\end{Obj}
+
+\begin{ObjL}{Remark}{1.9.4}{Reading the score}
+By the chain rule $U(\theta)=\dfrac{\partial f(Y;\theta)/\partial\theta}{f(Y;\theta)}$: the
+\emph{relative} rate at which the probability of what you actually observed changes as
+$\theta$ nudges upward. A positive score says the data would become more probable under a
+slightly larger $\theta$---the data ``argue'' for raising the estimate; a negative score
+argues for lowering it; a score near zero says the data are locally indifferent. The
+logarithm is not cosmetic: for independent observations the joint density is a product, so
+the log is a sum and \emph{the score of a sample is the sum of the scores of its
+observations}---evidence adds (\xref{1.9.9} turns this into a formula). The handout
+introduces the word in quotation marks---the span of ``the `score'\,''---and its closing
+N.B.\ insists on ``the key role of the score!''; the next four objects are that role.
+\end{ObjL}
+
+\begin{Obj}{Lemma}{1.9.5}{The score has expectation zero}
+Under the regularity conditions of \xref{1.9.14},
+\[ \E^{\theta}\{U(\theta)\} \;=\; 0 \qquad\text{for all } \theta\in\Theta . \]
+\end{Obj}
+\begin{Prf}{1.9.5}{Proof of the Centered Score by Differentiating the Total-Probability Identity.}{}
+\item Every density integrates to one at every parameter value:
+      $\int f(y;\theta)\,dy = 1$ identically in $\theta$ (sums replace integrals in the
+      discrete case, here and throughout).
+\item Differentiate both sides in $\theta$. The right side is constant, and on the left the
+      derivative may be passed under the integral (regularity):
+      \[ \int \frac{\partial f(y;\theta)}{\partial\theta}\,dy \;=\; 0 . \]
+\item Rewrite the integrand through the log (chain rule in reverse):
+      \[ \frac{\partial f(y;\theta)}{\partial\theta}
+         \;=\; \frac{\partial \log f(y;\theta)}{\partial\theta}\; f(y;\theta) . \]
+\item Substituting,
+      \[ 0 \;=\; \int \frac{\partial \log f(y;\theta)}{\partial\theta}\,
+         f(y;\theta)\,dy \;=\; \E^{\theta}\{U(\theta)\} , \]
+      the integral of a function of $y$ against the density being exactly an expectation
+      (\xref{1.4.4}).
+\end{Prf}
+
+\begin{Obj}{Definition}{1.9.6}{Fisher information}
+The \emph{Fisher information} of the model at $\theta$ is
+\[ I(\theta) \;=\; \E^{\theta}\big\{ U(\theta)^2 \big\}
+   \;=\; \E^{\theta}\!\left\{\left(\frac{\partial}{\partial\theta}\,
+   \log f(Y;\theta)\right)^{\!2}\right\} , \]
+the expected squared score.
+\end{Obj}
+
+\begin{Obj}{Lemma}{1.9.7}{The second face of the information}
+Under the regularity conditions of \xref{1.9.14},
+\[ I(\theta) \;=\; -\,\E^{\theta}\!\left\{\frac{\partial^2}{\partial\theta^2}\,
+   \log f(Y;\theta)\right\} . \]
+\end{Obj}
+\begin{Prf}{1.9.7}{Proof of the Second Face by Differentiating the Score Identity Once More.}{Uses \xref{1.9.5}.}
+\item Start from the identity proved in \xref{1.9.5}, written as an integral and holding for
+      every $\theta$:
+      \[ \int \frac{\partial \log f(y;\theta)}{\partial\theta}\,f(y;\theta)\,dy \;=\; 0 . \]
+\item Differentiate in $\theta$ again, passing the derivative under the integral
+      (regularity) and applying the product rule to the two $\theta$-dependent factors:
+      \[ \int \frac{\partial^2 \log f(y;\theta)}{\partial\theta^2}\,f(y;\theta)\,dy
+         \;+\; \int \frac{\partial \log f(y;\theta)}{\partial\theta}\,
+         \frac{\partial f(y;\theta)}{\partial\theta}\,dy \;=\; 0 . \]
+\item In the second integral substitute
+      $\dfrac{\partial f}{\partial\theta}=\dfrac{\partial \log f}{\partial\theta}\,f$ (step
+      (3) of \xref{1.9.5}), turning it into
+      \[ \int \left(\frac{\partial \log f(y;\theta)}{\partial\theta}\right)^{\!2}
+         f(y;\theta)\,dy \;=\; \E^{\theta}\{U(\theta)^2\} \;=\; I(\theta) . \]
+\item The first integral is $\E^{\theta}\{\partial^2 \log f(Y;\theta)/\partial\theta^2\}$;
+      the displayed identity is therefore
+      $\E^{\theta}\{\partial^2\log f/\partial\theta^2\} + I(\theta)=0$. Rearranging gives the
+      claim---the handout's second panel.
+\end{Prf}
+
+\begin{ObjL}{Remark}{1.9.8}{Reading the information}
+Three faces of one number. \emph{Variance of the evidence}: since $\E^{\theta}\{U\}=0$
+(\xref{1.9.5}), the definition says $I(\theta)=\Var^{\theta}(U(\theta))$---how much the
+data's ``argument'' about $\theta$ swings from sample to sample; a model in which different
+data sets argue very differently is a model in which data can discriminate. \emph{Curvature}:
+by \xref{1.9.7}, $I(\theta)$ is the expected downward curvature of the log-likelihood at
+$\theta$---sharply peaked means nearby parameter values produce visibly different data.
+\emph{Precision}: $I(\theta)$ carries the units of an inverse variance, and the theorem below
+makes that literal---its inverse is the best variance an unbiased estimator can hope for. In
+computations the curvature form of \xref{1.9.7} is usually the easier route: differentiate
+the log-density twice and take an expectation.
+\end{ObjL}
+
+\begin{Obj}{Lemma}{1.9.9}{Information adds across independent observations}
+Under the regularity conditions of \xref{1.9.14} (imposed on the one-observation model, and
+inherited by the sample), if $Y=(X_1,\dots,X_n)$ with the $X_i$ independent, each
+contributing information $I_1(\theta)$ (identical models), then the sample's information is
+\[ I_n(\theta) \;=\; n\, I_1(\theta) . \]
+\end{Obj}
+\begin{Prf}{1.9.9}{Proof of Additivity by Turning a Product into a Sum.}{Uses \xref{1.9.5}.}
+\item Independence factorizes the joint density,
+      $f(y;\theta)=\prod_{i=1}^n f_1(x_i;\theta)$, so the log is a sum and so is the score:
+      \[ U(\theta) \;=\; \sum_{i=1}^n U_i(\theta), \qquad
+         U_i(\theta)=\frac{\partial}{\partial\theta}\log f_1(X_i;\theta) . \]
+\item The $U_i$ are independent (each is a function of its own $X_i$) and each has mean zero
+      (\xref{1.9.5} applied to one observation).
+\item Variances of independent summands add (\xref{1.8.5}), so
+      \[ I_n(\theta) \;=\; \Var^{\theta}(U) \;=\; \sum_{i=1}^n \Var^{\theta}(U_i)
+         \;=\; n\, I_1(\theta) . \]
+\end{Prf}
+
+\medskip
+Everything is in place: a class of estimators (unbiased), a yardstick (variance), and a
+number computed from the model alone (the information). The theorem connects them, and its
+proof is one covariance and one inequality.
+
+\begin{Obj}{Theorem}{1.9.10}{The information bound}
+Suppose the model $f(y;\theta)$ satisfies the regularity conditions of \xref{1.9.14} with
+$0<I(\theta)<\infty$, and let $d=d(Y)$ be any unbiased estimator of $\theta$ with
+$\Var^{\theta}(d)<\infty$. Then\note{The handout states this as its title
+sentence---``The inverse of the information is the Fisher information bound''---and develops
+the proof in the geometric language of \xref{1.9.11}; it displays no inequality. The result's
+standard name is the \emph{Cram\'er--Rao bound} (C.~R. Rao and Harald Cram\'er, mid-1940s);
+the name Cram\'er--Rao is ours, the mathematics is the handout's.}
+\[ \Var^{\theta}\big(d(Y)\big) \;\ge\; \frac{1}{I(\theta)}
+   \qquad\text{for all } \theta\in\Theta . \]
+\end{Obj}
+\begin{Prf}{1.9.10}{Proof of the Information Bound by One Covariance and Cauchy--Schwarz.}{Uses \xref{1.9.5}, \xref{1.9.6}.}
+\item The score is centered: $\E^{\theta}\{U(\theta)\}=0$, by \xref{1.9.5}.
+\item Next, the estimator covaries with the score at rate exactly one. Differentiate the
+      unbiasedness identity $\int d(y)\,f(y;\theta)\,dy=\theta$ in $\theta$ (the left side
+      through the integral sign, by regularity; the right side has derivative $1$):
+      \[ 1 \;=\; \int d(y)\,\frac{\partial f(y;\theta)}{\partial\theta}\,dy
+         \;=\; \int d(y)\,\frac{\partial \log f(y;\theta)}{\partial\theta}\,
+         f(y;\theta)\,dy
+         \;=\; \E^{\theta}\big\{ d(Y)\,U(\theta) \big\} , \]
+      the middle equality by the log-derivative substitution of \xref{1.9.5}(3). Since
+      $\E^{\theta}\{U\}=0$, the covariance loses nothing to the means:
+      \[ \Cov^{\theta}\big(d(Y),\,U(\theta)\big)
+         \;=\; \E^{\theta}\{dU\} - \E^{\theta}\{d\}\,\E^{\theta}\{U\}
+         \;=\; 1 - \theta\cdot 0 \;=\; 1 . \]
+      This holds at every $\theta$ and for every unbiased $d$---the handout's emphasis: the
+      inner product of the difference and the score ``is ALWAYS 1.''
+\item Subtracting the target changes nothing: at fixed $\theta$ the number $\theta$ is
+      a constant, and constants do not covary, so also
+      $\Cov^{\theta}(d-\theta,\,U)=1$. (This is the handout's cast: $d-\theta$, ``the
+      difference between an unbiased estimator and the value of the parameter,'' is an
+      unbiased estimator of zero.)
+\item Now Cauchy--Schwarz: for any two random variables,
+      $\Cov(V,W)^2\le \Var(V)\,\Var(W)$. Take $V=d(Y)$ and $W=U(\theta)$:
+      \[ 1 \;=\; \Cov^{\theta}(d,U)^2 \;\le\; \Var^{\theta}(d)\,\Var^{\theta}(U)
+         \;=\; \Var^{\theta}(d)\; I(\theta) , \]
+      the last equality because the information is the variance of the centered score
+      (\xref{1.9.8}).
+\item Divide by $I(\theta)>0$: $\Var^{\theta}(d)\ge 1/I(\theta)$.
+\end{Prf}
+
+\begin{ObjL}{Remark}{1.9.11}{The geometry: a projection onto the score line}
+The handout's own proof is the picture behind step (4). Fix one $\theta$ (its sub-bullet is
+explicit: ``the variance at a fixed but arbitrary value of the parameter''), and consider the
+statistics with mean zero and finite variance there---in the handout's words, ``the unbiased
+estimators of zero.'' They form a vector space, and
+\[ \langle V, W\rangle \;=\; \Cov^{\theta}(V,W)\;=\;\E^{\theta}\{VW\} \]
+is an inner product on it, so that \emph{squared length is variance}. Inside this space live
+both of our objects: $d-\theta$ (mean zero by unbiasedness) and the score $U$ (mean zero by
+\xref{1.9.5}), whose span is a line. Project $d-\theta$ onto that line: the projection is
+\[ \frac{\langle d-\theta,\,U\rangle}{\langle U,\,U\rangle}\; U
+   \;=\; \frac{1}{I(\theta)}\,U , \qquad\text{with squared length}\quad
+   \left(\frac{1}{I(\theta)}\right)^{\!2} \langle U,U\rangle \;=\; \frac{1}{I(\theta)} , \]
+using $\langle d-\theta,U\rangle=1$ (always!) and $\langle U,U\rangle=I(\theta)$. The
+residual $d-\theta-U/I(\theta)$ is orthogonal to the line, so Pythagoras splits the squared
+length of $d-\theta$ into the projection's plus the residual's:
+\[ \Var^{\theta}(d) \;=\; \frac{1}{I(\theta)} \;+\;
+   \Big\| \,d-\theta-\tfrac{1}{I(\theta)}U\, \Big\|^2 \;\ge\; \frac{1}{I(\theta)} \]
+---``by abstract linear algebra, then, the variance of the difference exceeds the inverse
+information.'' The geometry also names the case of equality: the bound is attained exactly
+when the residual is the zero vector, that is, when
+\[ d - \theta \;=\; \frac{U(\theta)}{I(\theta)} \]
+identically. That is the question the handout leaves us with---``Is the difference between
+our estimator and the value of the parameter equal to the score divided by the
+information?!''---and \xref{1.9.13} answers it.
+\end{ObjL}
+
+\begin{Fig}{1.9.12}{The information bound as a right triangle}{At a fixed $\theta$, in the
+space of mean-zero statistics with covariance as inner product (squared length $=$ variance):
+the estimator's deviation $d-\theta$ is the hypotenuse, its projection onto the score line is
+$U/I(\theta)$ with squared length $1/I(\theta)$, and the residual is orthogonal. Pythagoras
+gives $\Var^{\theta}(d)=1/I(\theta)+\|\text{residual}\|^2$: the bound of \xref{1.9.10}, with
+equality exactly when the triangle degenerates onto its base---which is what happens for the
+normal sample of \xref{1.9.13}. The handout gives this geometry in prose (\xref{1.9.11});
+the picture is the notes'.}
+\begin{tikzpicture}[x=1cm,y=1cm, every node/.style={font=\small}]
+  \coordinate (O) at (0,0);
+  \coordinate (P) at (5.2,0);
+  \coordinate (D) at (5.2,2.6);
+  % score line
+  \draw[black!55] (-1.2,0) -- (7.4,0);
+  \node[black!55, font=\footnotesize, below] at (6.9,-0.06) {span of $U(\theta)$};
+  % projection leg
+  \draw[figLim, very thick] (O) -- (P);
+  \node[figLim!85!black, font=\footnotesize, below] at (2.6,-0.06)
+    {$\dfrac{U(\theta)}{I(\theta)}$\quad $\big(\text{squared length } \tfrac{1}{I(\theta)}\big)$};
+  % residual
+  \draw[figBad, very thick, densely dashed] (P) -- (D);
+  \node[figBad!90!black, font=\footnotesize, right=2pt] at (5.2,1.3) {residual};
+  % hypotenuse
+  \draw[figTerm, very thick] (O) -- (D);
+  \node[figTerm, font=\footnotesize, above left=-2pt] at (2.7,1.5)
+    {$d-\theta$\quad $\big(\text{squared length } \Var^{\theta}(d)\big)$};
+  % right angle
+  \draw[black!60] (4.85,0) -- (4.85,0.35) -- (5.2,0.35);
+  % origin dot
+  \fill (O) circle (1.6pt);
+  \node[below left, font=\footnotesize] at (O) {$0$};
+\end{tikzpicture}
+\end{Fig}
+
+\begin{ObjL}{Example}{1.9.13}{The normal sample: the floor is hit exactly}
+The handout's test case: $Y=(X_1,\dots,X_n)$ iid normal with unknown expectation $\mu$ and
+known variance $\sigma^2$, and $d(Y)=\bar X=\frac1n\sum_i X_i$. Its three questions, in
+order.
+\emph{Is the sample average unbiased?} Yes:
+$\E^{\mu}\{\bar X\}=\frac1n\sum_i \E^{\mu}\{X_i\}=\frac1n\cdot n\mu=\mu$ (linearity), for
+every $\mu$.
+\emph{What is the information?} The log-density of the sample is
+\[ \log f(Y;\mu) \;=\; -\frac{1}{2\sigma^2}\sum_{i=1}^n (X_i-\mu)^2
+   \;-\; n\log\big(\sigma\sqrt{2\pi}\big) , \]
+so differentiating in $\mu$,
+\[ U(\mu) \;=\; \frac{1}{\sigma^2}\sum_{i=1}^n (X_i-\mu)
+   \;=\; \frac{n(\bar X-\mu)}{\sigma^2} , \]
+and the information comes out the same by all three routes. As a variance,
+\[ I(\mu) \;=\; \Var^{\mu}\big(U(\mu)\big)
+   \;=\; \frac{1}{\sigma^4}\,\Var^{\mu}\Big(\sum_{i=1}^n X_i\Big)
+   \;=\; \frac{n\sigma^2}{\sigma^4} \;=\; \frac{n}{\sigma^2} ; \]
+by curvature, $\partial U/\partial\mu=-n/\sigma^2$ is constant, so
+$I(\mu)=-\E^{\mu}\{-n/\sigma^2\}=n/\sigma^2$ (\xref{1.9.7}); and by additivity, one
+observation carries $I_1=1/\sigma^2$ and the sample $n$ times that (\xref{1.9.9}).
+\emph{Does the estimator achieve the variance bound?} The floor is
+$1/I(\mu)=\sigma^2/n$; and $\Var^{\mu}(\bar X)=\sigma^2/n$. Yes---at every $n$ and every
+$\mu$, not just in a limit.
+And the handout's closing check, ``is the difference between our estimator and the value of
+the parameter equal to the score divided by the information?!'':
+\[ \frac{U(\mu)}{I(\mu)} \;=\; \frac{n(\bar X-\mu)}{\sigma^2}\cdot\frac{\sigma^2}{n}
+   \;=\; \bar X - \mu \;=\; d - \mu \quad\text{---exactly.} \]
+The residual of \xref{1.9.11} is the zero vector; the triangle of \xref{1.9.12} sits flat on
+the score line. Among unbiased estimators of a normal mean, nothing anywhere beats the
+average.
+\end{ObjL}
+
+\begin{ObjL}{Remark}{1.9.14}{Reading the bound, and its small print}
+\emph{Both sides are curves.} The handout's first N.B.: ``the variance and the bound are
+functions of the parameter!'' The theorem compares two functions on $\Theta$, pointwise---a
+floor curve under every unbiased estimator's risk curve, in exactly the sense of
+\S\,\xref{1.5}'s pictures.
+\emph{The floor belongs to the model.} $I(\theta)$ is computed from $f$ alone. Before
+proposing a single estimator you know the best that unbiased estimation could ever do---and
+when a candidate attains it, as in \xref{1.9.13}, the search is over.
+\emph{The small print.} Three times the proofs passed a $\theta$-derivative through an
+integral (\xref{1.9.5}(2), \xref{1.9.7}(2), \xref{1.9.10}(2)). That is legitimate for smooth
+models but not free: the density must be differentiable in $\theta$ (twice over, for
+\xref{1.9.7}), and the set where $f(y;\theta)>0$ must not move with $\theta$. When the support does move, the bound can simply fail---the uniform
+sample of \appref{1.A.7} has unbiased estimators whose variance falls like $1/n^2$, beneath
+every floor of the form $c(\theta)/n$.
+\emph{``A not sharp bound.''} The handout promises no more than that, and the care is
+warranted twice over. First, equality forces $d=\theta+U(\theta)/I(\theta)$
+(\xref{1.9.11})---and the left side is a statistic, computable from the data alone, so the
+right side, assembled from the model separately at each $\theta$, must happen to come out
+free of $\theta$; that is a lucky accident of special models (in the normal sample,
+$\mu+(\bar X-\mu)=\bar X$), not the rule. Second, the floor constrains \emph{unbiased} estimators only: a biased rule may
+tunnel under it, as the shaded estimator does in the middle of the parameter space
+(\appref{1.A.4}). Neither caveat weakens the theorem; both sharpen what it says---and what it
+does not.
+\end{ObjL}
+
+\medskip
+The handout defers the big picture: ``Wait for Monday.'' Monday's topic---estimation as its
+own chapter---will turn the score from a yardstick into a tool: choose the parameter value
+that maximizes the likelihood of what was observed. The estimator so built differs from the
+truth by, approximately, the score over the information---the very expression whose exactness
+made the normal sample perfect above---so the floor built today becomes the benchmark that
+maximum likelihood approximately attains. That story is Lecture~2's.
+
+% ============================================================
 \lectureappendix
 
 The deck names the bias--variance decomposition, the risk functions of the two estimators, and
 their Bayes risks (Slides 40--41 and the closing checklist), but works none of them. They are
-worked here, beyond the deck, in the deck's own notation. Throughout, $X\sim$
+worked here, beyond the deck, in the deck's own notation. Thursday's handout
+(\S\,\xref{1.9}) then prompts two more, beyond anything the handout itself works: the
+information of a Bernoulli arm, which closes the circle on the trial (\appref{1.A.6}), and a
+uniform sample showing why the information bound carries small print (\appref{1.A.7}). Throughout, $X\sim$
 Binomial$(n,\theta)$ denotes an arm total, so $\E\{X\}=n\theta$ and
 $\Var(X)=n\theta(1-\theta)$.
 
@@ -1220,6 +1551,98 @@ Under the Beta$(1,1)$ (uniform) prior on each arm's parameter, independently:
       risk is the expectation over $X$ of the posterior expected loss (iterated expectations,
       \xref{1.4.16}), minimizing the latter for each $x$ minimizes the former, so $T$ is the
       Bayes rule.
+\end{Prf}
+
+\medskip
+The last two supplements are prompted by \S\,\xref{1.9} but go beyond the handout: the first
+runs its whole program on the course's own running example; the second, entirely ours, shows
+what the regularity conditions are protecting us from.
+
+\begin{ObjL}{Supplement}{1.A.6}{The information of a Bernoulli arm: the observed rate is efficient}
+For one arm of the trial---$X_1,\dots,X_n$ iid Bernoulli$(\theta)$ with arm total
+$X=\sum_i X_i$ and $0<\theta<1$---the per-observation and sample informations are
+\[ I_1(\theta) \;=\; \frac{1}{\theta(1-\theta)}, \qquad
+   I_n(\theta) \;=\; \frac{n}{\theta(1-\theta)} , \]
+so the information bound for unbiased estimators of $\theta$ is
+$1/I_n(\theta)=\theta(1-\theta)/n$---which is exactly the variance of the observed rate
+$X/n$ (\xref{1.A.3}). The rate attains the floor at every $\theta$: no unbiased estimator of
+an arm's cure rate has smaller variance anywhere in $(0,1)$.
+\end{ObjL}
+\begin{Prf}{1.A.6}{Proof of the Rate's Efficiency by Both Faces of the Information.}{Uses \xref{1.9.7}, \xref{1.9.9}, \xref{1.A.3}.}
+\item A single observation $X_1\sim$ Bernoulli$(\theta)$ has pmf
+      $f(x;\theta)=\theta^{x}(1-\theta)^{1-x}$ for $x\in\{0,1\}$, so
+      \[ \log f(x;\theta) \;=\; x\log\theta + (1-x)\log(1-\theta) . \]
+\item The one-observation score, by differentiating in $\theta$ and putting the two terms
+      over the common denominator $\theta(1-\theta)$:
+      \[ U_1(\theta) \;=\; \frac{x}{\theta}-\frac{1-x}{1-\theta}
+         \;=\; \frac{x(1-\theta)-(1-x)\theta}{\theta(1-\theta)}
+         \;=\; \frac{x-x\theta-\theta+x\theta}{\theta(1-\theta)}
+         \;=\; \frac{x-\theta}{\theta(1-\theta)} , \]
+      so at the random observation, $U_1(\theta)=(X_1-\theta)/\big(\theta(1-\theta)\big)$.
+\item Since $\Var(X_1)=\theta(1-\theta)$ (\xref{1.A.3}(2)), the information computed as a
+      variance is
+      \[ I_1(\theta) \;=\; \Var^{\theta}\big(U_1(\theta)\big)
+         \;=\; \frac{\Var(X_1)}{\big(\theta(1-\theta)\big)^2}
+         \;=\; \frac{\theta(1-\theta)}{\theta^2(1-\theta)^2}
+         \;=\; \frac{1}{\theta(1-\theta)} . \]
+\item Computed instead as curvature (\xref{1.9.7}), differentiating $\log f$ twice gives
+      $\partial^2\log f/\partial\theta^2 = -x/\theta^2 - (1-x)/(1-\theta)^2$, so, in
+      agreement,
+      \[ -\E^{\theta}\!\left\{\frac{\partial^2 \log f}{\partial\theta^2}\right\}
+         \;=\; \frac{\E\{X_1\}}{\theta^2}+\frac{1-\E\{X_1\}}{(1-\theta)^2}
+         \;=\; \frac{1}{\theta}+\frac{1}{1-\theta}
+         \;=\; \frac{1}{\theta(1-\theta)} . \]
+\item The sample multiplies the information by $n$ (\xref{1.9.9}), giving
+      $I_n=n/(\theta(1-\theta))$ and the floor $\theta(1-\theta)/n$; the observed rate's
+      variance equals it (\xref{1.A.3}(2)), so the bound is attained.
+\item The equality check of \xref{1.9.11} confirms it is no accident: summing the
+      one-observation scores of step (2), the sample score is
+      \[ U(\theta) \;=\; \sum_{i=1}^n \frac{X_i-\theta}{\theta(1-\theta)}
+         \;=\; \frac{X-n\theta}{\theta(1-\theta)} , \]
+      and therefore
+      \[ \frac{U(\theta)}{I_n(\theta)}
+         \;=\; \frac{X-n\theta}{\theta(1-\theta)}\cdot\frac{\theta(1-\theta)}{n}
+         \;=\; \frac{X}{n}-\theta , \]
+      exactly as for the normal sample of \xref{1.9.13}. Within unbiased rules the trial's
+      rate estimator is unimprovable; the shaded estimator of \xref{1.A.4} gets beneath the
+      floor only by giving up unbiasedness.
+\end{Prf}
+
+\begin{ObjL}{Supplement}{1.A.7}{Where the small print binds: the uniform sample}
+Let $X_1,\dots,X_n$ be iid Uniform$(0,\theta)$, $\theta>0$, and let $M=\max_i X_i$. Then
+\[ d(Y) \;=\; \frac{n+1}{n}\,M \quad\text{is unbiased, with}\quad
+   \Var^{\theta}(d) \;=\; \frac{\theta^2}{n(n+2)} : \]
+a variance of order $1/n^2$, beneath every floor of the form $c(\theta)/n$. There is no
+contradiction with \xref{1.9.10}: the support $[0,\theta]$ moves with $\theta$, the density
+is not smooth in $\theta$ where it matters, and the differentiation-under-the-integral steps
+of \S\,\xref{1.9} are illegal here. The regularity conditions are not decoration.
+\end{ObjL}
+\begin{Prf}{1.A.7}{Proof of the $1/n^2$ Variance by the Distribution of the Maximum.}{}
+\item The maximum's cdf factorizes by independence: for $0\le x\le\theta$,
+      \[ P^{\theta}(M\le x) \;=\; P^{\theta}(X_1\le x,\dots,X_n\le x)
+         \;=\; \left(\frac{x}{\theta}\right)^{\!n} , \]
+      so $M$ has density $n x^{n-1}/\theta^n$ on $[0,\theta]$.
+\item The first moment comes straight from the density:
+      \[ \E^{\theta}\{M\} \;=\; \int_0^{\theta} x\cdot\frac{n x^{n-1}}{\theta^n}\,dx
+         \;=\; \frac{n}{\theta^n}\cdot\frac{\theta^{\,n+1}}{n+1}
+         \;=\; \frac{n\theta}{n+1} , \]
+      so $\E^{\theta}\{d\}=\frac{n+1}{n}\cdot\frac{n\theta}{n+1}=\theta$: unbiased.
+\item The second moment follows the same way,
+      \[ \E^{\theta}\{M^2\} \;=\; \frac{n}{\theta^n}\cdot\frac{\theta^{\,n+2}}{n+2}
+         \;=\; \frac{n\theta^2}{n+2} , \]
+      so
+      \[ \Var^{\theta}(M) \;=\; \frac{n\theta^2}{n+2}-\left(\frac{n\theta}{n+1}\right)^{\!2}
+         \;=\; n\theta^2\,\frac{(n+1)^2-n(n+2)}{(n+2)(n+1)^2}
+         \;=\; \frac{n\theta^2}{(n+2)(n+1)^2} , \]
+      the last step because $(n+1)^2-n(n+2)=n^2+2n+1-n^2-2n=1$.
+\item Scaling by $\big(\tfrac{n+1}{n}\big)^2$,
+      \[ \Var^{\theta}(d) \;=\; \left(\frac{n+1}{n}\right)^{\!2}\Var^{\theta}(M)
+         \;=\; \frac{(n+1)^2}{n^2}\cdot\frac{n\theta^2}{(n+2)(n+1)^2}
+         \;=\; \frac{\theta^2}{n(n+2)} . \]
+\item For comparison, the unbiased estimator $2\bar X$ (twice the sample mean; unbiased since
+      $\E\{X_1\}=\theta/2$) has variance $4\cdot\frac{\theta^2/12}{n}=\frac{\theta^2}{3n}$:
+      order $1/n$. The maximum-based estimator is better by a whole factor of $n$---precisely
+      the kind of collapse the regularity conditions rule out in smooth models.
 \end{Prf}
 
 \ifSubfilesClassLoaded{\clearpage\objindex}{}

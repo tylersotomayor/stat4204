@@ -1,0 +1,1172 @@
+%% ============================================================
+%%  Lecture 2 -- Monday--Thursday, 13--16 July 2026
+%%  Subfile of main.tex: compiles standalone OR as part of the book.
+%%  Built from sources/2026-07-13/ (slide-transcript.md, outline.md).
+%%  The deck ("2.1 Lecture", 18 slides) is agenda-style: most slides
+%%  name what is developed at the board, and these notes work each
+%%  named item in full (provenance tracked in the outline).
+%% ============================================================
+\documentclass[main.tex]{subfiles}
+
+\begin{document}
+
+\beginlecture{2}{Monday--Thursday, 13--16 July 2026}%
+  {Estimation: Unbiasedness, Maximum Likelihood, and Confidence}
+
+\epigraph{\ldots the object of statistical methods is the reduction of data.}%
+{R. A. Fisher, ``On the Mathematical Foundations of Theoretical Statistics'' (1922)}
+
+\begin{lecturecontents}{Contents of this lecture}
+  \item \hyperlink{2.1}{2.1\quad Estimation as a Decision Problem}
+  \item \hyperlink{2.2}{2.2\quad The Efficiency Bound, Revisited}
+  \item \hyperlink{2.3}{2.3\quad Two Information Computations}
+  \item \hyperlink{2.4}{2.4\quad Maximum Likelihood}
+  \item \hyperlink{2.5}{2.5\quad Four Samples, Four Maximum-Likelihood Estimators}
+  \item \hyperlink{2.6}{2.6\quad Several Parameters at Once}
+  \item \hyperlink{2.7}{2.7\quad Confidence Sets}
+  \item \hyperlink{2.8}{2.8\quad Prediction, and the Return of Conditional Expectation}
+  \item \hyperlink{2.9}{2.9\quad If You Have a Prior: the Posterior Mean}
+  \item \hyperlink{2.10}{2.10\quad Shrinkage and Penalization}
+  \item \hyperlink{2.11}{2.11\quad Looking Ahead: Sufficiency}
+\end{lecturecontents}
+
+\bigskip
+\noindent\textbf{Overview.} Estimation gets its own unit: the decision problem in which the
+action space \emph{is} the parameter space and the loss is squared error. The week's deck is
+an itinerary---most of its slides name what is then developed at the board---and these notes
+work each named item in full. Unbiasedness is defined in its general form (an estimand
+$g(\theta)$, an estimator $T(X)$) and defended as a way of choosing among admissible rules;
+the information bound of \S\,\xrefL{1.9} is restated and then lifted to models with several
+parameters, where the price of nuisance parameters becomes visible. The unit's centerpiece is
+the course's first general-purpose \emph{constructor} of estimators: maximum likelihood,
+whose estimate sits---approximately, when the information is high---at truth plus score over
+information, and therefore approximately attains the floor. Four classical samples make that
+exact or nearly so. Confidence sets then turn point estimates into precision statements via
+pivot statistics; conditional expectation returns as the best predictor under squared error;
+and when a prior is on the table, the posterior mean is \emph{proved} to minimize the Bayes
+risk---the theorem whose special case the trial met in \xrefL{1.A.5}---with the
+normal--normal, binomial--beta, and Poisson--gamma trios worked out. A closing pair of
+slides reads Bayes methods as shrinkage and penalization, and names the next horizon:
+sufficiency. \HPS{2}
+
+\clearpage
+% ============================================================
+\sub{2.1}{Estimation as a Decision Problem}
+
+Unit 1 built a general machine---action space, loss function, method, risk
+(\S\,\xrefL{1.5})---and then named its two workhorse special cases (\S\,\xrefL{1.8}). This
+week the first of them takes over. The deck's opening slide re-fixes the frame in three
+bullets, and the first two objects below are those bullets; the third bullet---``squared
+error loss is a reasonable choice''---turns out to lean on the second in a way worth making
+explicit.
+
+\begin{ObjL}{Concept}{2.1.1}{Estimation, resumed}
+Estimation is the class of ``decision problems where the action space is the parameter
+space'' (\xrefL{1.8.1}): the act is a guess at the unknown, and reporting $a$ when the truth
+is $\theta$ costs $(a-\theta)^2$---``squared error loss is a reasonable choice.'' Everything
+Unit 1 said about methods and risk applies verbatim; what is new this week is structure
+special to this action space: a floor on risk, a machine for building estimators, and a way
+to report precision.
+\end{ObjL}
+
+\begin{ObjL}{Remark}{2.1.2}{``Close parameters are good guesses''}
+The deck's middle bullet is a condition, not a throwaway: ``parameterization satisfies:
+close parameters are good guesses.'' Squared error charges by \emph{distance in the
+parameter}, so it is a sensible price only when parameter distance tracks practical
+distance---when being off by $0.01$ matters about equally everywhere in $\Theta$. That is a
+property of the \emph{parameterization}, not of nature: the same family of distributions can
+be labeled in ways that make squared error reasonable or misleading. The exponential sample
+of \xref{2.5.4} will make this concrete---labeled by its mean, the model hands the obvious
+estimator a clean optimality; labeled by its rate, the ``same'' estimator is not even
+unbiased. Choosing the parameterization is part of posing the estimation problem.
+\end{ObjL}
+
+\begin{Obj}{Definition}{2.1.3}{Estimand and estimator}
+Let $\{P_{\theta} : \theta\in\Theta\}$ be a statistical model (\xrefL{1.3.1}) and let $X$ be
+a random element---a single observation, a vector, or an entire data set---whose distribution
+is $P_{\theta}$ for some unknown $\theta\in\Theta$. The \emph{estimand} is a map
+$g:\Theta\to\mathbb{R}^k$, the quantity to be estimated; an \emph{estimator} of $g(\theta)$
+is a statistic
+\[ T \;=\; T(X) , \]
+a function of the data alone.\note{Letters follow the deck's typeset Definition~1: data $X$,
+estimator $T$, estimand $g$ (the week-1 deck wrote data $Y$ and rules $\delta$; the Fisher
+handout wrote $d(Y)$---see \xrefL{1.9.1}). The deck also switches the parameter to a
+subscript, $\E_{\theta}$; these notes keep the superscript $\E^{\theta}$ of
+\xrefL{1.3.1}---same object, same fixed candidate truth.}
+\end{Obj}
+
+\begin{Obj}{Definition}{2.1.4}{Unbiased estimator, general case}
+The estimator $T=T(X)$ is \emph{unbiased} for $g(\theta)$ if
+\[ \E^{\theta}\{T(X)\} \;=\; g(\theta) \qquad\text{for all } \theta\in\Theta ; \]
+equivalently, if its \emph{bias} vanishes identically:
+\[ \mathrm{Bias}^{\theta}(T) \;:=\; \E^{\theta}\{T(X)\} - g(\theta) \;=\; 0
+   \qquad\text{for all } \theta\in\Theta . \]
+\end{Obj}
+
+\begin{ObjL}{Remark}{2.1.5}{Reading the definition}
+The teeth are, as always, in ``for all $\theta$'': the identity must hold at every candidate
+truth, not at a lucky one---this is the same quantifier that powered the differentiation
+trick of \xrefL{1.9.10}. The general $g$ earns its keep at once: in the trial the estimand is
+$g(\theta_T,\theta_P)=\theta_T-\theta_P$, not the parameter itself, and \xrefL{1.9.1} is
+recovered by taking $g$ the identity. For $k>1$ the display is read coordinate by
+coordinate. And the usual case discipline applies (\xrefL{1.1.7}): the \emph{estimator} $T$
+is a random variable; the \emph{estimate} $t=T(x)$ is the number computed from your data.
+\end{ObjL}
+
+\begin{ObjL}{Example}{2.1.6}{Unbiased or not: three classics}
+(a) \emph{The sample mean.} For draws $X_1,\dots,X_n$ with common expectation $\mu$,
+linearity gives $\E\{\bar X\}=\tfrac1n\sum_i \E\{X_i\}=\mu$: the average is unbiased for
+$\mu$ in \emph{any} model with a mean---no shape assumptions used.
+(b) \emph{The observed rate.} The arm total's rate $X/n$ is unbiased for a cure probability
+(\xrefL{1.A.3}), and \xrefL{1.A.6} showed it is, among unbiased estimators, unimprovable.
+(c) \emph{The sample variance, and the $n-1$ mystery.} The natural plug-in
+$\widehat{\sigma^2}=\frac1n\sum_i (X_i-\bar X)^2$ is \emph{biased}:
+\[ \E\Big\{\tfrac1n\textstyle\sum_i (X_i-\bar X)^2\Big\} \;=\; \frac{n-1}{n}\,\sigma^2
+   \;<\;\sigma^2 , \]
+because deviations are measured from $\bar X$, which has chased the data part of the way
+(the computation, every step, is \appref{2.A.1}). Dividing by $n-1$ instead of $n$ repairs
+the average exactly---that, and nothing deeper, is where the $n-1$ comes from. The repaired
+version is unbiased; whether it is \emph{better} is a risk question, not an unbiasedness
+question.
+\end{ObjL}
+
+\begin{ObjL}{Concept}{2.1.7}{Why restrict to unbiased estimators?}
+The deck's four bullets, in order. \emph{``Need to have a way to choose from admissible
+estimators''}: admissibility (\xrefL{1.5.13}) discards the dominated but leaves a crowd whose
+risk curves cross; restricting the contest is one way to get a winner. \emph{``It makes
+sense''}: deadpan, but real---a rule that is systematically off at some $\theta$ is lying
+about that corner of the parameter space, and forbidding that is a defensible ground rule.
+\emph{``The class will typically have a unique uniformly optimum''}: within the unbiased
+class, risk is variance (\xrefL{1.9.2}), and in well-behaved models one estimator has the
+smallest variance at \emph{every} $\theta$ simultaneously---a \emph{uniformly} best member
+(the usual name, for later, is UMVU: uniformly minimum-variance unbiased). No such uniform
+winner exists among all rules (the crossing curves of \xrefL{1.5.14}); inside the class, the
+contest has a champion. \emph{``Unbiased estimators in largish samples with
+smallish-dimensional parameters are usually just fine''}: the honest disclaimer---with much
+data and few parameters, the bias one could profitably trade away is small anyway. Unit 1's
+counterpoint stands: with little data, a shaded (biased) estimator can beat every unbiased
+one over most of the parameter space (\xrefL{1.A.4}). The restriction is a choice, and the
+deck presents it as one.
+\end{ObjL}
+
+% ============================================================
+\sub{2.2}{The Efficiency Bound, Revisited}
+
+``We did the efficiency bound last time,'' the deck's fifth slide begins, and compresses
+\S\,\xrefL{1.9} into four bullets. The compression is worth reading closely---it contains the
+whole proof---and then the section does what the deck does next: it removes the assumption
+that $\theta$ is the only unknown.
+
+\begin{ObjL}{Concept}{2.2.1}{The bound in one paragraph}
+The deck's recap, unpacked. ``Deviation of unbiased estimate from Score divided by
+information is uncorrelated with Score (because derivative of expectation is covariance with
+score)'': differentiating the unbiasedness identity showed
+$\Cov^{\theta}(T,U)=1$ (\xrefL{1.9.10}, step (2)), and since $U/I(\theta)$ has
+$\Cov(U/I,U)=I/I=1$ as well, the residual $T-\theta-U/I(\theta)$ has covariance
+$1-1=0$ with the score: the projection geometry of \xrefL{1.9.11}. The variance of that
+projection, $U/I(\theta)$, is $1/I(\theta)$---no larger than the variance of the unbiased
+estimator, which carries the residual too.\note{As printed, the slide's second bullet reads
+``So variance of score is less than variance of unbiased estimate''---a compression: the
+variance of the \emph{score} is $I(\theta)$, typically enormous; the object meant is the
+variance of the score \emph{divided by the information}, i.e.\ of the projection. The
+slide's own first bullet has it right. (Recorded in the errata file.)} ``And variance of
+score is the information\dots'': \xrefL{1.9.8}. And the conclusion, paraphrased (the
+original carries two typos, preserved in the transcript): the variance of an unbiased
+estimate is no less than the inverse information---the bound, \xrefL{1.9.10}.
+\end{ObjL}
+
+\begin{Obj}{Definition}{2.2.2}{Score vector and information matrix}
+For a model $f(x;\theta)$ with $\theta=(\theta_1,\dots,\theta_p)^{\top}\in\Theta\subseteq
+\mathbb{R}^p$ smooth in $\theta$, the \emph{score vector} is
+\[ U(\theta) \;=\; \left( \frac{\partial}{\partial\theta_1}\log f(X;\theta),\;
+   \dots,\; \frac{\partial}{\partial\theta_p}\log f(X;\theta) \right)^{\!\top} , \]
+and the \emph{information matrix} is the $p\times p$ matrix
+\[ I(\theta) \;=\; \E^{\theta}\big\{ U(\theta)\,U(\theta)^{\top} \big\} , \qquad
+   I(\theta)_{jk} \;=\; \E^{\theta}\{ U_j(\theta)\,U_k(\theta) \} . \]
+\end{Obj}
+
+\medskip
+Each component score is the one-parameter score of \xrefL{1.9.3} taken while the other
+coordinates hold still, so each has mean zero by \xrefL{1.9.5} applied coordinatewise; the
+information matrix is therefore the covariance matrix of the score vector, and the argument
+of \xrefL{1.9.7} gives, entry by entry, the curvature form
+$I(\theta)_{jk}=-\E^{\theta}\{\partial^2 \log f/\partial\theta_j\partial\theta_k\}$. The
+bound now reads as follows; its proof is \xrefL{1.9.10}'s with one new ingredient, the
+matrix inverse.
+
+\begin{Obj}{Theorem}{2.2.3}{The information bound when there are other parameters}
+In a regular model with $I(\theta)$ invertible, let $\hat\theta=\hat\theta(X)$ be an
+unbiased estimator of the \emph{first coordinate}: $\E^{\theta}\{\hat\theta\}=\theta_1$ for
+all $\theta$. Then
+\[ \Var^{\theta}(\hat\theta) \;\ge\; e_1^{\top} I(\theta)^{-1} e_1
+   \;=\; \big(I(\theta)^{-1}\big)_{11} , \qquad e_1=(1,0,\dots,0)^{\top} . \]
+\end{Obj}
+\begin{Prf}{2.2.3}{Proof of the Multiparameter Bound by Projecting onto the Span of the Score Components.}{Uses \xrefL{1.9.5}, \xrefL{1.9.10}, \xref{2.2.2}.}
+\item First, one covariance per coordinate. Differentiate the unbiasedness identity
+      $\int \hat\theta(x) f(x;\theta)\,dx = \theta_1$ in each $\theta_j$, passing the
+      derivative under the integral and substituting
+      $\partial f/\partial\theta_j = U_j f$ as in \xrefL{1.9.10}(2):
+      \[ \E^{\theta}\{\hat\theta\, U_j(\theta)\} \;=\;
+         \frac{\partial\,\theta_1}{\partial\theta_j} \;=\;
+         \begin{cases} 1, & j=1\\ 0, & j\ne 1 \end{cases}
+         \qquad\text{i.e.}\qquad
+         \E^{\theta}\{\hat\theta\, U(\theta)\} \;=\; e_1 . \]
+      Since each $U_j$ has mean zero, the same holds with $\hat\theta-\theta_1$ in place of
+      $\hat\theta$: the deviation covaries with the score components according to $e_1$.
+\item Next, the candidate projection: consider the scalar random variable
+      $e_1^{\top} I(\theta)^{-1} U(\theta)$, a fixed linear combination of the score
+      components. Its covariances with the components are
+      \[ \E^{\theta}\big\{ \big(e_1^{\top} I^{-1} U\big)\, U^{\top} \big\}
+         \;=\; e_1^{\top} I^{-1}\, \E^{\theta}\{U U^{\top}\}
+         \;=\; e_1^{\top} I^{-1} I \;=\; e_1^{\top} . \]
+      Identical to step (1)---so the difference is orthogonal to every score component:
+      \[ \E^{\theta}\Big[ \Big( \hat\theta - \theta_1 - e_1^{\top} I(\theta)^{-1}
+         U(\theta) \Big)\, U(\theta) \Big] \;=\; \mathbf{0} . \]
+      This is the deck's displayed equation (its $\theta_0$ is the true parameter value, the
+      estimand being its first coordinate); ``geometrically, we are projecting the unbiased
+      estimator onto the span of the components of the score.''
+\item The projection's variance, by squaring the linear combination:
+      \[ \Var^{\theta}\big( e_1^{\top} I^{-1} U \big)
+         = e_1^{\top} I^{-1}\,\E^{\theta}\{U U^{\top}\}\, I^{-1} e_1
+         = e_1^{\top} I^{-1} I\, I^{-1} e_1
+         = e_1^{\top} I^{-1} e_1 = \big(I^{-1}\big)_{11} . \]
+\item Pythagoras finishes it: by step (2) the deviation splits into the projection plus an
+      orthogonal residual, so variances add as in \xrefL{1.9.11}:
+      \[ \Var^{\theta}(\hat\theta)
+         \;=\; \big(I^{-1}\big)_{11} \;+\;
+         \Var^{\theta}\Big( \hat\theta-\theta_1- e_1^{\top} I^{-1} U \Big)
+         \;\ge\; \big(I^{-1}\big)_{11} . \]
+\end{Prf}
+
+\begin{ObjL}{Remark}{2.2.4}{The geometry, upgraded}
+Nothing changed but the dimension of the stage. In \xrefL{1.9.11} the score spanned a
+\emph{line} and the bound was the squared length of a projection onto it; here the $p$
+score components span a $p$-dimensional subspace, the projection of $\hat\theta-\theta_1$
+onto that subspace is $e_1^{\top}I^{-1}U$, and the right triangle of \xrefL{1.9.12} is
+intact---hypotenuse the deviation, base the projection, and the bound again the base's
+squared length.
+\end{ObjL}
+
+\begin{ObjL}{Remark}{2.2.5}{Nuisance parameters cost information}
+Why $\big(I^{-1}\big)_{11}$ and not $1/I_{11}$? Because they differ, and the difference is
+the price of company:
+\[ \big(I^{-1}\big)_{11} \;\ge\; \frac{1}{I_{11}} ,
+   \qquad\text{with equality if and only if } I_{1j}=0 \text{ for all } j\ne 1 \]
+(the $2\times2$ case, with every step, is \appref{2.A.2}). If the other coordinates were
+\emph{known}, the model would be one-parameter and the floor would be $1/I_{11}$; having to
+carry them raises the floor unless their scores are uncorrelated with the first's---the
+\emph{orthogonal} case. The normal sample of \xref{2.6.3} lands exactly there: its
+information matrix is diagonal, so not knowing the variance costs the mean's estimator
+nothing. When the off-diagonals do not vanish, estimating your parameter of interest is
+genuinely harder because you must estimate its neighbors' influence too.
+\end{ObjL}
+
+% ============================================================
+\sub{2.3}{Two Information Computations}
+
+The deck's seventh slide names two models and then asks, flatly, ``What is information?''
+The two computations first; the question, with its three answers, after.
+
+\begin{ObjL}{Example}{2.3.1}{Binomial}
+One arm of the trial, revisited with the new vocabulary: $X\sim$ Binomial$(n,\theta)$ (the
+total of $n$ iid Bernoulli variables). Its information was computed, both ways and with
+every step, in \xrefL{1.A.6}:
+\[ I_n(\theta) \;=\; \frac{n}{\theta(1-\theta)} , \qquad
+   \frac{1}{I_n(\theta)} \;=\; \frac{\theta(1-\theta)}{n} \;=\; \Var^{\theta}(X/n) : \]
+the observed rate attains the floor. Note where the floor is \emph{highest}:
+$\theta(1-\theta)$ peaks at $\theta=\tfrac12$, so the middle of the parameter space is the
+noisiest place to estimate a proportion---and the information, its reciprocal (times $n$),
+is smallest there. A coin near fair is the hardest coin to pin down.
+\end{ObjL}
+
+\begin{ObjL}{Example}{2.3.2}{Multivariate normal with known covariance}
+Let $Y\sim N_p(\theta,\Sigma)$ with $\Sigma$ known and invertible: the estimand is the mean
+vector itself. The log-density is
+\[ \log f(y;\theta) \;=\; -\tfrac12\,(y-\theta)^{\top}\Sigma^{-1}(y-\theta)
+   \;-\; \tfrac12\log\big((2\pi)^p\,|\Sigma|\big) , \]
+and differentiating in $\theta$ kills the constant and unfolds the quadratic:
+\[ U(\theta) \;=\; \Sigma^{-1}(Y-\theta) , \qquad
+   I(\theta) \;=\; \E^{\theta}\big\{\Sigma^{-1}(Y-\theta)(Y-\theta)^{\top}\Sigma^{-1}\big\}
+   \;=\; \Sigma^{-1}\,\Sigma\,\Sigma^{-1} \;=\; \Sigma^{-1} . \]
+The information is the \emph{precision matrix}---the covariance's inverse---and it does not
+depend on $\theta$. For an iid sample of size $n$ the information is $n\Sigma^{-1}$
+(\xrefL{1.9.9}, coordinatewise), the floor for the first coordinate is
+$\big((n\Sigma^{-1})^{-1}\big)_{11}=\Sigma_{11}/n$, and $\bar X_1$---with variance exactly
+$\Sigma_{11}/n$---attains it.
+\end{ObjL}
+
+\begin{ObjL}{Remark}{2.3.3}{``What is information?''}
+The deck's question, and the three answers the course now owns. \emph{Algebraically}: the
+variance (matrix) of the score---how much the data's argument about $\theta$ swings from
+sample to sample (\xrefL{1.9.8}). \emph{Geometrically}: the expected curvature of the
+log-likelihood at the truth---how sharply the model distinguishes $\theta$ from its
+neighbors (\xrefL{1.9.7}). \emph{Operationally}: an inverse variance---the best precision
+any unbiased estimator can achieve, attained in the two examples above. And it is additive:
+$n$ independent observations carry $n$ times the information of one (\xrefL{1.9.9})---the
+sense in which evidence accumulates.
+\end{ObjL}
+
+% ============================================================
+\sub{2.4}{Maximum Likelihood}
+
+Everything so far judges estimators after someone proposes one; the floor of \xref{2.2.3}
+says how good a proposal could possibly be, and stays silent about where proposals come
+from. The deck's eighth slide supplies the factory. The idea is a reversal: the density
+$f(x;\theta)$ was built to be read as a function of $x$ at a fixed $\theta$---probabilities
+of data under a hypothesis. Read it the other way.
+
+\begin{Obj}{Definition}{2.4.1}{The likelihood}
+Given observed data $X$, the \emph{likelihood function} of the model $f(x;\theta)$ is
+\[ \mathrm{lik}(\theta) \;=\; f(X;\theta) , \qquad \theta\in\Theta , \]
+the joint density (or pmf) of the data, evaluated at the data, read as a function of the
+parameter. Its logarithm $\ell(\theta)=\log \mathrm{lik}(\theta)$ is the
+\emph{log-likelihood}.
+\end{Obj}
+
+\begin{ObjL}{Remark}{2.4.2}{Reading the likelihood}
+$\mathrm{lik}(\theta)$ answers, for each candidate truth: \emph{how probable was what I
+actually saw, if this candidate were the truth?} It ranks explanations. It is
+\emph{not} a probability distribution over $\theta$---nothing says
+$\int \mathrm{lik}(\theta)\,d\theta=1$, and no randomness attaches to $\theta$
+here\note{The distinction is worth a sentence, because the word ``likely'' invites the
+slide. ``The probability of the data given $\theta$'' is a statement about \emph{data};
+the likelihood re-reads that number as a score for \emph{$\theta$}, the data now frozen. A
+statement like ``$\theta$ is probably near $0.4$'' needs $\theta$ to be random---which is
+Bayesian territory, where \S\,\xref{2.9}'s posterior, prior $\times$ likelihood normalized,
+makes it legitimate.}---only its \emph{ratios} across candidate $\theta$ carry meaning, which
+is why multiplicative constants (in $\theta$) are routinely dropped. The score of
+\xrefL{1.9.3} is exactly the log-likelihood's slope: the two sections have been talking
+about the same curve all along.
+\end{ObjL}
+
+\begin{Obj}{Definition}{2.4.3}{Maximum likelihood estimator}
+The \emph{maximum likelihood estimator} (MLE) is the parameter value at which the
+likelihood---equivalently the log-likelihood---is largest:
+\[ \hat\theta \;=\; \hat\theta(X) \;=\; \argmax_{\theta\in\Theta}\, \mathrm{lik}(\theta)
+   \;=\; \argmax_{\theta\in\Theta}\, \ell(\theta) . \]
+\end{Obj}
+
+\begin{ObjL}{Remark}{2.4.4}{``The score!''}
+The deck's sub-bullet under ``The MLE'' is two words and an exclamation point, and it is the
+right reaction. If the maximum sits in the interior of $\Theta$ and $\ell$ is smooth, the
+first-order condition is
+\[ 0 \;=\; \ell'(\hat\theta) \;=\; U(\hat\theta) : \]
+\emph{the MLE is the parameter value at which the score vanishes}---where the data stop
+arguing for a nudge in either direction (\xrefL{1.9.4}). The object built in \S\,\xrefL{1.9}
+to measure estimators turns out to be the equation that constructs one.
+\end{ObjL}
+
+\begin{ObjL}{Concept}{2.4.5}{Truth plus score over information}
+The deck: ``The MLE differs from parameter by the ratio of score to information
+(approximately with high information).'' Here is the calculation behind the sentence. Expand
+the score equation $0=\ell'(\hat\theta)$ in a Taylor series about the true value $\theta$:
+\[ 0 \;=\; \ell'(\hat\theta) \;\approx\; \ell'(\theta) + (\hat\theta-\theta)\,
+   \ell''(\theta) , \]
+keeping the linear term. Solve for the deviation:
+\[ \hat\theta - \theta \;\approx\; \frac{\ell'(\theta)}{-\ell''(\theta)}
+   \;=\; \frac{U(\theta)}{-\ell''(\theta)}
+   \;\approx\; \frac{U(\theta)}{I(\theta)} , \]
+the last step replacing the realized curvature $-\ell''(\theta)$ by its expectation
+$I(\theta)$ (\xrefL{1.9.7})---a substitution that is good when the information is high,
+because the curvature, a sum of $n$ independent contributions, then concentrates near its
+mean. Both approximations sharpen as $I(\theta)$ grows; neither is a theorem as stated, and
+the deck's parenthetical---``approximately with high information''---is the honest label.
+The notes will treat it as the deck does: a heuristic with excellent credentials, exact in
+the cleanest models (\xref{2.5.1}) and provable-with-care in wide generality (a story for a
+later course).
+\end{ObjL}
+
+\begin{ObjL}{Remark}{2.4.6}{What the heuristic buys}
+Take the approximation $\hat\theta-\theta\approx U(\theta)/I(\theta)$ seriously and compute
+with it. The right side has expectation $\E^{\theta}\{U\}/I=0$ (\xrefL{1.9.5}): the MLE is
+\emph{approximately unbiased}. Its variance is
+$\Var^{\theta}(U)/I(\theta)^2=I(\theta)/I(\theta)^2=1/I(\theta)$ (\xrefL{1.9.8}): the MLE
+\emph{approximately attains the information bound}. That is the week's arc in one line: the
+floor of \S\,\xrefL{1.9} is not just a benchmark---maximum likelihood is a general-purpose
+recipe that (approximately, eventually) reaches it. And the expression $U/I$ is an old
+friend: it is exactly the quantity whose \emph{exact} equality with $\hat\theta-\theta$
+characterized the models where the bound is hit on the nose
+(\xrefL{1.9.11}, \xrefL{1.9.13}).
+\end{ObjL}
+
+\begin{Fig}{2.4.7}{Likelihood, score, and information in one picture}{Two log-likelihoods
+with the same maximizer $\hat\theta$ (dashed drop). The slope of the curve is the score,
+zero at the peak (\xref{2.4.4}); at a candidate $\theta$ left of the peak the slope is
+positive---the data argue for moving right. The curvature is the information's realized
+version: on the left the curve is sharply bent ($-\ell''$ large), so parameter values away
+from $\hat\theta$ are much worse explanations and the peak deserves trust; on the right the
+same peak sits on a nearly flat ridge ($-\ell''$ small)---many candidates explain the data
+almost equally well, and the estimate, while the same number, means less. The information
+bound $1/I$ of \xrefL{1.9.10} is this picture's moral quantified.}
+\begin{tikzpicture}[x=1cm,y=1cm, every node/.style={font=\small}]
+  % ---- left: high information ----
+  \node[align=center] at (2.2,2.6) {high information};
+  \draw[black!60] (-0.2,0) -- (4.6,0);
+  \draw[figTerm, very thick, domain=1.05:3.35, smooth, samples=60]
+    plot (\x, {2.0 - 1.55*(\x-2.2)^2});
+  \draw[black!55, densely dashed, thick] (2.2,0) -- (2.2,2.0);
+  \node[black!70, font=\footnotesize, below] at (2.2,-0.04) {$\hat\theta$};
+  % tangent segment showing positive slope (score) at theta = 1.3 < thetahat
+  % curve y = 2.0 - 1.55(x-2.2)^2: point (1.3, 0.7445), slope 2.79
+  \draw[black!65, thick] (1.15,0.326) -- (1.55,1.442);
+  \node[black!65, font=\footnotesize, fill=white, inner sep=1.5pt, left=2pt]
+    at (1.26,1.14) {slope $=U(\theta)$};
+  \node[black!75, font=\footnotesize] at (2.2,-0.62) {$-\ell''$ large: peak trusted};
+  % ---- right: low information ----
+  \begin{scope}[shift={(6.9,0)}]
+    \node[align=center] at (2.2,2.6) {low information};
+    \draw[black!60] (-0.2,0) -- (4.6,0);
+    \draw[figTerm, very thick, domain=0.15:4.25, smooth, samples=60]
+      plot (\x, {2.0 - 0.22*(\x-2.2)^2});
+    \draw[figLim, densely dashed, thick] (2.2,0) -- (2.2,2.0);
+    \node[figLim!80!black, font=\footnotesize, below] at (2.2,-0.04) {$\hat\theta$};
+    \node[black!75, font=\footnotesize] at (2.2,-0.62) {$-\ell''$ small: peak vague};
+  \end{scope}
+\end{tikzpicture}
+\end{Fig}
+
+% ============================================================
+\sub{2.5}{Four Samples, Four Maximum-Likelihood Estimators}
+
+The deck's ninth slide is four one-word prompts---``Normal, Bernoulli, Exponential,
+Poisson''---and two questions: ``What is the MLE,'' and ``How does it compare to the
+information inequality?'' As with Unit 1's closing checklist, the notes work what the deck
+names. Each example runs the same drill: likelihood, log, score, MLE, information, and the
+comparison. Throughout, $X_1,\dots,X_n$ are iid and $\bar X$ is their average.
+
+\begin{ObjL}{Example}{2.5.1}{Normal, known variance}
+$X_i\sim N(\mu,\sigma^2)$ with $\sigma^2$ known. The score was computed in \xrefL{1.9.13}:
+$U(\mu)=n(\bar X-\mu)/\sigma^2$, which vanishes exactly at
+\[ \hat\mu \;=\; \bar X . \]
+(The log-likelihood is a downward parabola in $\mu$, so the critical point is the global
+maximum.) Information $I_n(\mu)=n/\sigma^2$; floor $\sigma^2/n$; and
+$\Var^{\mu}(\bar X)=\sigma^2/n$: the MLE is unbiased and attains the bound \emph{exactly, at
+every} $n$---the degenerate-triangle model of \xrefL{1.9.13}, where
+$\hat\mu-\mu=U(\mu)/I(\mu)$ holds with no approximation at all.
+\end{ObjL}
+
+\begin{ObjL}{Example}{2.5.2}{Bernoulli}
+$X_i\sim$ Bernoulli$(\theta)$, $0<\theta<1$, with arm total $X=\sum_i X_i$. The
+log-likelihood and score, from \xrefL{1.A.6}(1)--(2) summed over the sample:
+\[ \ell(\theta) \;=\; X\log\theta + (n-X)\log(1-\theta) , \qquad
+   U(\theta) \;=\; \frac{X}{\theta}-\frac{n-X}{1-\theta}
+   \;=\; \frac{X-n\theta}{\theta(1-\theta)} . \]
+The score vanishes exactly when $X=n\theta$, i.e.\ at
+\[ \hat\theta \;=\; \frac{X}{n} = \bar X \]
+(and $\ell''<0$ throughout, so this is the maximum; for the boundary samples $X=0$ and
+$X=n$ the likelihood is monotone, and its maximum sits at the same $X/n$, now an endpoint).
+The observed rate---Unit 1's estimator of choice---\emph{is} the MLE. Information $I_n(\theta)=n/(\theta(1-\theta))$
+(\xrefL{1.A.6}); floor $\theta(1-\theta)/n$; variance of the rate: the same
+(\xrefL{1.A.3}). Attained exactly.
+\end{ObjL}
+
+\begin{ObjL}{Example}{2.5.3}{Poisson}
+$X_i\sim$ Poisson$(\lambda)$, $\lambda>0$: pmf $f(x;\lambda)=e^{-\lambda}\lambda^x/x!$, so
+\[ \ell(\lambda) \;=\; -n\lambda + \Big(\sum_i X_i\Big)\log\lambda - \sum_i \log(X_i!) ,
+   \qquad
+   U(\lambda) \;=\; -n + \frac{\sum_i X_i}{\lambda}
+   \;=\; \frac{\sum_i X_i - n\lambda}{\lambda} . \]
+For samples with $\sum_i X_i>0$ the score vanishes at $\hat\lambda=\bar X$, and the second
+derivative $-\sum_i X_i/\lambda^2<0$ confirms a maximum (an all-zero sample makes the
+likelihood $e^{-n\lambda}$ monotone decreasing, driving the maximizer to the boundary,
+where $\bar X=0$ still names it). Information, by the curvature form
+(\xrefL{1.9.7}): $I_n(\lambda)=\E\{\sum_i X_i\}/\lambda^2=n\lambda/\lambda^2=n/\lambda$.
+Floor $\lambda/n$; and since a Poisson variable has variance equal to its mean,
+$\Var(\bar X)=\lambda/n$. Attained exactly---and indeed
+$U(\lambda)/I_n(\lambda)=\frac{\sum_i X_i-n\lambda}{\lambda}\cdot\frac{\lambda}{n}
+=\bar X-\lambda$, the equality case once more.
+\end{ObjL}
+
+\begin{ObjL}{Example}{2.5.4}{Exponential: one sample, two parameterizations}
+Exponential variables can be labeled by their \emph{mean} $\mu$ (density
+$f(x;\mu)=\mu^{-1}e^{-x/\mu}$, $x>0$) or by their \emph{rate} $\lambda=1/\mu$ (density
+$\lambda e^{-\lambda x}$). The choice, innocuous-looking, decides how estimation goes---the
+promise of \xref{2.1.2} kept.
+
+\emph{Mean parameterization.}
+\[ \ell(\mu) \;=\; -n\log\mu - \frac{n\bar X}{\mu} , \qquad
+   U(\mu) \;=\; -\frac{n}{\mu} + \frac{n\bar X}{\mu^2}
+   \;=\; \frac{n(\bar X-\mu)}{\mu^2} , \]
+so $\hat\mu=\bar X$: unbiased (linearity). Information: differentiating,
+$\ell''(\mu)=n/\mu^2-2n\bar X/\mu^3$, so
+$I_n(\mu)=-\E\{\ell''(\mu)\}=-n/\mu^2+2n\mu/\mu^3=n/\mu^2$; the floor is $\mu^2/n$; and
+since an exponential's variance is its squared mean, $\Var(\bar X)=\mu^2/n$. Attained
+exactly ($U/I_n=\bar X-\mu$ once again).
+
+\emph{Rate parameterization.}
+\[ \ell(\lambda) \;=\; n\log\lambda - \lambda\, n\bar X , \qquad
+   U(\lambda) \;=\; \frac{n}{\lambda} - n\bar X , \]
+so $\hat\lambda=1/\bar X$---by invariance the natural counterpart, but \emph{not} unbiased:
+\[ \E^{\lambda}\{\hat\lambda\} \;=\; \frac{n\lambda}{n-1} \;>\; \lambda
+   \qquad (n\ge 2) , \]
+computed through the Gamma distribution of the sample total in \appref{2.A.3}. The bound of
+\xrefL{1.9.10} does not even apply to it as stated; and the repaired, unbiased version
+$(n-1)/(n\bar X)$ has variance $\lambda^2/(n-2)$ (\appref{2.A.3})---strictly \emph{above}
+the floor $\lambda^2/n$, at every $n\ge3$. Same data, same principle; the parameterization
+alone separates ``exactly optimal'' from ``biased, and above the floor even after repair.''
+\end{ObjL}
+
+\begin{ObjL}{Remark}{2.5.5}{The pattern, and its limits}
+The deck's second question---``How does it compare to the information inequality?''---now
+has four answers:
+\begin{center}\footnotesize
+\begin{tabular}{llccl}
+\hline
+model & MLE & $I_n$ & floor $1/I_n$ & bound attained? \\
+\hline
+Normal mean ($\sigma^2$ known) & $\bar X$ & $n/\sigma^2$ & $\sigma^2/n$ & yes---exactly \\
+Bernoulli $\theta$ & $X/n$ & $n/(\theta(1-\theta))$ & $\theta(1-\theta)/n$ & yes---exactly \\
+Poisson $\lambda$ & $\bar X$ & $n/\lambda$ & $\lambda/n$ & yes---exactly \\
+Exponential mean $\mu$ & $\bar X$ & $n/\mu^2$ & $\mu^2/n$ & yes---exactly \\
+Exponential rate $\lambda$ & $1/\bar X$ & $n/\lambda^2$ & $\lambda^2/n$ &
+  no---biased; repaired, still above \\
+\hline
+\end{tabular}
+\end{center}
+\smallskip
+The run of ``exactly'' is not the general situation---it is the luck of these particular
+families under these particular labelings, the models where $\theta+U(\theta)/I(\theta)$
+happens to assemble into a statistic (\xrefL{1.9.11})---here, each time, into $\bar X$
+itself. The exponential-rate row shows how thin the luck is: a
+smooth relabeling of the \emph{same} model breaks exactness. What survives relabeling is
+\xref{2.4.6}'s asymptotic version---approximately unbiased, approximately at the floor, when
+the information is high---and that, not exactness, is maximum likelihood's true general
+credential.
+\end{ObjL}
+
+% ============================================================
+\sub{2.6}{Several Parameters at Once}
+
+Real models rarely have a single unknown. The deck's tenth slide asks for the
+multi-parameter version of \xref{2.4.5} and of its variance consequence, then names two
+examples; \xref{2.2.2}'s score vector and information matrix are already on the table.
+
+\begin{ObjL}{Concept}{2.6.1}{Taylor series expansion for the MLE}
+For $\theta\in\Theta\subseteq\mathbb{R}^p$, the MLE solves the $p$ score equations
+$U(\hat\theta)=\mathbf 0$. Expanding each coordinate of $U$ about the truth, to first
+order,
+\[ \mathbf 0 \;=\; U(\hat\theta) \;\approx\; U(\theta) +
+   \nabla U(\theta)\,(\hat\theta-\theta) , \]
+where $\nabla U(\theta)$ is the $p\times p$ matrix of second partials of $\ell$. Replacing
+that realized curvature matrix by its expectation $-I(\theta)$ (\xref{2.2.2}) and solving,
+\[ \hat\theta - \theta \;\approx\; I(\theta)^{-1}\, U(\theta) : \]
+truth plus \emph{matrix} inverse of information times score---\xref{2.4.5} with the division
+promoted to a solve. The same two approximations, with the same ``high information'' license.
+\end{ObjL}
+
+\begin{ObjL}{Concept}{2.6.2}{Covariance matrix of the multivariate MLE}
+Compute with the approximation. The score vector has mean $\mathbf 0$ and covariance matrix
+$I(\theta)$ (\xref{2.2.2}), so $\hat\theta$ is approximately unbiased and
+\[ \Cov(\hat\theta) \;\approx\; I^{-1}\,\E\{U U^{\top}\}\, I^{-1}
+   \;=\; I^{-1}\, I\, I^{-1} \;=\; I(\theta)^{-1} : \]
+the full inverse information matrix. In particular
+$\Var(\hat\theta_1)\approx (I^{-1})_{11}$---each coordinate of the MLE approximately attains
+the several-parameter floor of \xref{2.2.3}, nuisance tax included.
+\end{ObjL}
+
+\begin{ObjL}{Example}{2.6.3}{Normal sample, expectation and variance both unknown}
+$X_i\sim N(\mu,\sigma^2)$, both parameters unknown: $\theta=(\mu,\sigma^2)$. The
+log-likelihood is
+\[ \ell(\mu,\sigma^2) \;=\; -\frac{n}{2}\log(2\pi\sigma^2)
+   -\frac{1}{2\sigma^2}\sum_{i=1}^n (X_i-\mu)^2 , \]
+with the two score components
+\[ \frac{\partial\ell}{\partial\mu} \;=\; \frac{1}{\sigma^2}\sum_i (X_i-\mu) , \qquad
+   \frac{\partial\ell}{\partial(\sigma^2)} \;=\; -\frac{n}{2\sigma^2}
+   +\frac{1}{2\sigma^4}\sum_i (X_i-\mu)^2 . \]
+Setting both to zero: the first gives $\hat\mu=\bar X$ regardless of $\sigma^2$; substituting
+into the second and solving, $\frac{n}{2\sigma^2}=\frac{1}{2\sigma^4}\sum_i(X_i-\bar X)^2$,
+so
+\[ \hat\mu \;=\; \bar X , \qquad
+   \widehat{\sigma^2} \;=\; \frac1n\sum_{i=1}^n (X_i-\bar X)^2 . \]
+Note which variance estimator maximum likelihood picked: the \emph{biased} $1/n$ version of
+\xref{2.1.6}(c)---the two principles of this unit genuinely disagree here, by the factor
+$(n-1)/n$. For the information matrix, differentiate the scores once more and take
+expectations (using $\E\{X_i-\mu\}=0$ and $\E\{(X_i-\mu)^2\}=\sigma^2$):
+\[ -\E\!\left[\frac{\partial^2 \ell}{\partial\mu^2}\right] = \frac{n}{\sigma^2}, \qquad
+   -\E\!\left[\frac{\partial^2 \ell}{\partial\mu\,\partial(\sigma^2)}\right]
+   = \E\!\left[\frac{\sum_i(X_i-\mu)}{\sigma^4}\right] = 0 , \qquad
+   -\E\!\left[\frac{\partial^2 \ell}{\partial(\sigma^2)^2}\right]
+   = -\frac{n}{2\sigma^4}+\frac{n\sigma^2}{\sigma^6} = \frac{n}{2\sigma^4} , \]
+so
+\[ I(\mu,\sigma^2) \;=\;
+   \begin{pmatrix} \dfrac{n}{\sigma^2} & 0\\[6pt] 0 & \dfrac{n}{2\sigma^4} \end{pmatrix} ,
+   \qquad
+   I(\mu,\sigma^2)^{-1} \;=\;
+   \begin{pmatrix} \dfrac{\sigma^2}{n} & 0\\[6pt] 0 & \dfrac{2\sigma^4}{n} \end{pmatrix} . \]
+The matrix is \emph{diagonal}: the two scores are uncorrelated, the parameters are
+orthogonal, and $(I^{-1})_{11}=\sigma^2/n=1/I_{11}$---by \xref{2.2.5}, not knowing the
+variance costs the mean's estimator nothing (to this order). The floor for $\hat\mu$ is the
+same $\sigma^2/n$ as when $\sigma^2$ was known, and $\bar X$ still attains it.
+\end{ObjL}
+
+\begin{ObjL}{Example}{2.6.4}{Multivariate normal with known covariance, again}
+For an iid sample from $N_p(\theta,\Sigma)$, \xref{2.3.2} gives $I_n(\theta)=n\Sigma^{-1}$;
+the MLE solves $\sum_i \Sigma^{-1}(X_i-\theta)=\mathbf 0$, i.e.\ $\hat\theta=\bar X$, whose
+covariance matrix is exactly $\Sigma/n=(n\Sigma^{-1})^{-1}=I_n(\theta)^{-1}$. Here
+\xref{2.6.2}'s approximation is an identity---the multivariate analogue of the degenerate
+triangle.
+\end{ObjL}
+
+% ============================================================
+\sub{2.7}{Confidence Sets}
+
+An estimate alone is a bare number: $\hat\theta=0.31$ does not say whether the data would
+have supported $0.30$ and $0.32$ almost equally (low information) or ruled them out (high).
+The deck's eleventh slide asks for the definition and for its reading ``as a measure of
+precision''; the twelfth builds the standard construction; the thirteenth, a title with no
+body, names a duality the testing unit will cash in.
+
+\begin{Obj}{Definition}{2.7.1}{Confidence set}
+A \emph{confidence set} of level $1-\alpha$ for the parameter $\theta$ is a set $S(X)$,
+computed from the data alone, such that
+\[ P^{\theta}\big\{\, \theta \in S(X) \,\big\} \;\ge\; 1-\alpha
+   \qquad\text{for all } \theta\in\Theta . \]
+When $S(X)$ is an interval it is called a \emph{confidence interval}.
+\end{Obj}
+
+\begin{ObjL}{Remark}{2.7.2}{Reading ``confidence''}
+Look hard at the display: the random object inside the braces is $S(X)$, \emph{not}
+$\theta$. The parameter sits still; the \emph{set} jumps around with the data; the
+guarantee---at every candidate truth, and before the data arrive---is that the procedure's
+set captures the truth with probability at least $1-\alpha$. It is a statement about the
+\emph{method}, in exactly \xrefL{1.5.6}'s sense of a plan graded before the data
+arrive.\note{Hence the classical caution: after computing, say, the interval $[0.22,0.40]$,
+the statement ``$\theta$ is in $[0.22,0.40]$ with probability $0.95$'' is not licensed---%
+nothing random remains in it. The honest post-data sentence is operational: the interval was
+produced by a procedure that traps the truth $95\%$ of the time. A probability distribution
+\emph{for $\theta$ itself} requires a prior, and then \S\,\xref{2.9}'s posterior supplies
+genuine probability statements of just that kind.}
+And the deck's phrase ``as a measure of precision'' is the point of reporting the whole set:
+its \emph{size} is the resolution of the study. \xref{2.7.5} will make that literal---the
+width shrinks exactly like the square root of the inverse information.
+\end{ObjL}
+
+\begin{Obj}{Definition}{2.7.3}{Pivot statistic}
+A \emph{pivot} is a function $T(X,\theta)$ of the data \emph{and} the parameter whose
+distribution under $P^{\theta}$ is the same known distribution for every
+$\theta\in\Theta$.
+\end{Obj}
+
+\begin{ObjL}{Remark}{2.7.4}{From pivot to confidence set}
+A pivot converts distributional knowledge into coverage. Choose a region $A$ with
+$P\{T(X,\theta)\in A\}=1-\alpha$---possible because the distribution of the pivot is known
+and free of $\theta$---and \emph{invert}: define
+\[ S(X) \;=\; \{\, \theta : T(X,\theta)\in A \,\} . \]
+Then for every $\theta$,
+\[ P^{\theta}\{\theta\in S(X)\} \;=\; P^{\theta}\{T(X,\theta)\in A\} \;=\; 1-\alpha : \]
+the two events are the \emph{same} event, described from the two ends of the
+$(\text{data},\text{parameter})$ pair. All the standard intervals are this one identity
+wearing different pivots.
+\end{ObjL}
+
+\begin{ObjL}{Example}{2.7.5}{The $z$-interval: normal mean, known variance}
+$X_i\sim N(\mu,\sigma^2)$, $\sigma^2$ known. Since $\bar X\sim N(\mu,\sigma^2/n)$,
+standardizing gives
+\[ Z \;=\; \frac{\sqrt n\,(\bar X-\mu)}{\sigma} \;\sim\; N(0,1)
+   \qquad\text{under } P^{\mu},\ \text{for every } \mu : \]
+a pivot. Take $A=[-z_{\alpha/2},z_{\alpha/2}]$, the central interval catching probability
+$1-\alpha$ of the standard normal, and invert the two inequalities in $\mu$:
+\[ -z_{\alpha/2} \le \frac{\sqrt n\,(\bar X-\mu)}{\sigma} \le z_{\alpha/2}
+   \quad\Longleftrightarrow\quad
+   \mu \;\in\; \Big[\, \bar X - z_{\alpha/2}\tfrac{\sigma}{\sqrt n},\;
+   \bar X + z_{\alpha/2}\tfrac{\sigma}{\sqrt n} \,\Big] . \]
+The width is $2z_{\alpha/2}\,\sigma/\sqrt n = 2z_{\alpha/2}\sqrt{1/I_n(\mu)}$: the
+information of \S\,\xrefL{1.9} is not only the variance floor but the \emph{ruler} for the
+precision report. Quadrupling the data halves the width.
+\end{ObjL}
+
+\begin{ObjL}{Example}{2.7.6}{The $t$ statistic: normal mean, unknown variance}
+With $\sigma^2$ unknown, the $z$ pivot is not a statistic-and-parameter pair we can use---%
+$\sigma$ is not known. Replace it by the sample's own scale,
+$s^2=\frac{1}{n-1}\sum_i(X_i-\bar X)^2$ (the unbiased version of \xref{2.1.6}(c)). The
+resulting ratio
+\[ T \;=\; \frac{\sqrt n\,(\bar X-\mu)}{s} \]
+is again a pivot: its distribution---Student's $t$ with $n-1$ degrees of freedom---is the
+same for every $(\mu,\sigma^2)$ (the classical distribution theory of the normal sample is
+taken from the text here rather than re-derived, \HPS{2}). Inverting exactly as before,
+\[ \mu \;\in\; \Big[\, \bar X - t_{n-1,\alpha/2}\tfrac{s}{\sqrt n},\;
+   \bar X + t_{n-1,\alpha/2}\tfrac{s}{\sqrt n} \,\Big] , \]
+with $t_{n-1,\alpha/2}>z_{\alpha/2}$: the interval is systematically wider than the known-%
+$\sigma$ interval. That widening is \xref{2.2.5}'s nuisance tax, paid in quantiles---not
+knowing $\sigma^2$ costs nothing in the information matrix (which is diagonal,
+\xref{2.6.3}) but does cost in having to estimate the ruler itself; the surcharge
+$t_{n-1,\alpha/2}-z_{\alpha/2}$ fades as $n$ grows.
+\end{ObjL}
+
+\begin{ObjL}{Example}{2.7.7}{Confidence sets for ratios}
+The deck's last worked prompt, and the reason it says confidence \emph{sets}. Two
+independent sample means estimate $\mu_1$ and $\mu_2$, say $\bar X\sim N(\mu_1,\sigma^2/n)$
+and $\bar Y\sim N(\mu_2,\sigma^2/m)$ with $\sigma^2$ known, and the estimand is the ratio
+$\rho=\mu_1/\mu_2$, with $\mu_2\ne0$ so that the ratio is defined (a treatment-to-control
+ratio, a slope through the origin). For each
+candidate $\rho$, under any truth with $\mu_1=\rho\,\mu_2$ the combination
+$\bar X-\rho\,\bar Y$ is normal with mean zero and known variance
+$\sigma^2(1/n+\rho^2/m)$, so
+\[ Z(\rho) \;=\; \frac{\bar X-\rho\,\bar Y}{\sigma\sqrt{1/n+\rho^2/m}} \;\sim\; N(0,1) , \]
+and the inversion recipe of \xref{2.7.4} yields
+\[ S(X,Y) \;=\; \Big\{\, \rho :\ (\bar X-\rho\,\bar Y)^2 \;\le\;
+   z_{\alpha/2}^2\,\sigma^2\big(\tfrac1n+\tfrac{\rho^2}{m}\big) \Big\} . \]
+The condition is a \emph{quadratic} inequality in $\rho$ (Fieller's construction), and the
+shape of its solution set depends on the leading coefficient
+$\bar Y^2-z_{\alpha/2}^2\sigma^2/m$: an interval when $\bar Y$ is convincingly nonzero; two
+half-lines, or all of $\mathbb{R}$, when it is not (\appref{2.A.5} runs the cases). The
+strange shapes are honesty, not pathology: when the denominator's sign is in doubt, the data
+genuinely cannot bound the ratio, and a procedure with guaranteed coverage must say
+so.\note{An interval-valued report would have to fail its coverage promise for some
+$(\mu_1,\mu_2)$; the exotic sets are the price of the ``for all $\theta$'' in
+\xref{2.7.1}.}
+\end{ObjL}
+
+\begin{ObjL}{Concept}{2.7.8}{Duality with families of point-null tests}
+The deck's thirteenth slide is a bare title: ``Duality between families of point null tests
+and confidence sets.'' The one-sentence preview: deciding whether each candidate value
+$\theta_0$ is \emph{plausible} (a test of the point null $\theta=\theta_0$, in the sense of
+\xrefL{1.8.2}) and collecting the plausible ones is the same act as reporting a confidence
+set---$\theta_0\in S(X)$ exactly when the test of $\theta_0$ accepts. \xref{2.7.7} was
+secretly this: a family of $z$-tests, one per candidate $\rho$, inverted. The testing unit
+will make the correspondence precise and run it in both directions.
+\end{ObjL}
+
+\begin{Fig}{2.7.9}{Coverage is a property of the procedure}{Fourteen replications of the
+same experiment, each yielding an interval (dot at the estimate). The truth $\theta$ (dashed
+green) never moves; the intervals do. Twelve of the fourteen catch $\theta$; two (red) miss.
+``$95\%$ confidence'' is a statement about the long-run frequency of catches over
+replications---not about any single computed interval, which either contains $\theta$ or
+does not (\xref{2.7.2}).}
+\begin{tikzpicture}[x=1cm,y=1cm, every node/.style={font=\small}]
+  \draw[figLim, densely dashed, thick] (3,-0.15) -- (3,6.75);
+  \node[figLim!80!black, font=\footnotesize, above] at (3,6.75) {$\theta$};
+  % covering intervals (blue)
+  \foreach \a/\b/\y in {1.8/3.6/0.50, 2.3/4.3/0.95, 2.1/3.7/1.40, 2.0/4.2/2.30,
+                        1.65/3.35/2.75, 2.5/4.3/3.20, 1.75/3.85/3.65, 2.35/3.75/4.10,
+                        1.65/3.55/4.55, 2.4/4.0/5.45, 1.95/3.95/5.90, 2.3/4.4/6.35}{
+    \draw[figTerm, thick] (\a,\y) -- (\b,\y);
+    \fill[figTerm] ({(\a+\b)/2},\y) circle (1.5pt);
+  }
+  % missing intervals (red)
+  \foreach \a/\b/\y in {3.1/5.0/1.85, 0.85/2.85/5.00}{
+    \draw[figBad, thick] (\a,\y) -- (\b,\y);
+    \fill[figBad] ({(\a+\b)/2},\y) circle (1.5pt);
+  }
+\end{tikzpicture}
+\end{Fig}
+
+% ============================================================
+\sub{2.8}{Prediction, and the Return of Conditional Expectation}
+
+``More probability review,'' the fourteenth slide announces, modestly. Its two questions are
+the engine of everything after: ``How to minimize the expected prediction error under
+squared error loss?''---and the same again ``when you have a predictor?'' The answers are
+two small theorems about squared error, and the second is conditional expectation's second
+star turn (after \xrefL{1.4.16}).
+
+\begin{Obj}{Theorem}{2.8.1}{The best constant predictor is the mean}
+Let $Y$ have $\E\{Y^2\}<\infty$. Among all constants $c$,
+\[ \E\big\{(Y-c)^2\big\} \;=\; \Var(Y) + \big(\E\{Y\}-c\big)^2 \]
+is minimized uniquely at $c=\E\{Y\}$, with minimum value $\Var(Y)$.
+\end{Obj}
+\begin{Prf}{2.8.1}{Proof of the Best Constant by Adding and Subtracting the Mean.}{Uses \xrefL{1.A.1}.}
+\item Route the error through the mean: $Y-c=(Y-\E\{Y\})+(\E\{Y\}-c)$.
+\item Square the two-term sum:
+      \[ (Y-c)^2 \;=\; (Y-\E\{Y\})^2 + 2\,(Y-\E\{Y\})(\E\{Y\}-c) + (\E\{Y\}-c)^2 . \]
+\item Take expectations term by term. The middle term dies---$\E\{Y\}-c$ is a constant and
+      deviations about the mean average to zero---leaving the display:
+      $\E\{(Y-c)^2\}=\Var(Y)+(\E\{Y\}-c)^2$.
+\item The first term does not involve $c$; the second is a square, zero exactly at
+      $c=\E\{Y\}$ and positive elsewhere.
+\end{Prf}
+
+\begin{Obj}{Theorem}{2.8.2}{The best predictor using $X$ is the conditional expectation}
+Let $(X,Y)$ be jointly distributed with $\E\{Y^2\}<\infty$. Among all functions $h$ of the
+predictor $X$,
+\[ \E\big\{ \big(Y-h(X)\big)^2 \big\} \]
+is minimized by
+\[ h(X) \;=\; \E\{Y\mid X\} . \]
+\end{Obj}
+\begin{Prf}{2.8.2}{Proof of the Best Predictor by Conditioning, Slice by Slice.}{Uses \xrefL{1.4.14}, \xrefL{1.4.16}, \xref{2.8.1}.}
+\item Iterate the expectation through the predictor (\xrefL{1.4.16}):
+      \[ \E\big\{(Y-h(X))^2\big\}
+         \;=\; \E\Big[\, \E\big\{ (Y-h(X))^2 \bigm| X \big\} \,\Big] . \]
+\item Fix a slice $X=x$. Inside it, $h(x)$ is a \emph{constant}, and the conditional
+      distribution of $Y$ given $X=x$ is a genuine probability distribution
+      (\xrefL{1.4.14})---so \xref{2.8.1} applies verbatim \emph{within the slice}:
+      \[ \E\big\{ (Y-h(x))^2 \bigm| X=x \big\}
+         \;\ge\; \Var(Y\mid X=x) , \]
+      with equality exactly at $h(x)=\E\{Y\mid X=x\}$.
+\item The choice $h(x)=\E\{Y\mid X=x\}$ therefore minimizes the inner expectation at
+      \emph{every} $x$ simultaneously; averaging over the slices (step (1)) preserves the
+      domination, so no other $h$ can do better overall.
+\end{Prf}
+
+\begin{ObjL}{Remark}{2.8.3}{The regression function}
+The minimizer $x\mapsto \E\{Y\mid X=x\}$ has a name---the \emph{regression function} of $Y$
+on $X$---and the two theorems assign the season's roles: with no predictor in hand, report
+the mean; with one, report the conditional mean. This is \emph{prediction} (the target $Y$
+is a random quantity not yet seen), a cousin of estimation (the target $g(\theta)$ is a
+fixed unknown); the machinery of the regression weeks will be theorem \xref{2.8.2} worked
+into linear form. More immediately: the deck placed this ``review'' exactly where it did
+because the Bayes section next door is \xref{2.8.2} in disguise.
+\end{ObjL}
+
+% ============================================================
+\sub{2.9}{If You Have a Prior: the Posterior Mean}
+
+``What if you have a prior?'' Unit 1 built the Bayesian scaffolding---prior, Bayes risk,
+Bayes principle (\S\,\xrefL{1.6})---and, in the trial, found by direct computation that the
+Bayes rule was a posterior mean (\xrefL{1.A.5}). The deck now asks the structural question
+outright: ``How do we minimize the Bayes risk with squared error loss? (The posterior
+expectation!)''---and, just above it, plants the hint: ``Is this the same structure?'' It
+is. In the Bayesian computation the parameter is a random variable, the data are the
+predictor, and \S\,\xref{2.8} has already done all the work.
+
+\begin{Obj}{Definition}{2.9.1}{The posterior distribution}
+Let the parameter have prior density $\pi(\theta)$ (\xrefL{1.6.1}) and the data have
+conditional density $f(x\mid\theta)$ given $\theta$.\note{Notation shift, deliberate: in
+Bayesian computations $\theta$ is a random variable, so the model density $f(x;\theta)$ is
+now honestly a \emph{conditional} density and is written $f(x\mid\theta)$---the same
+numbers, upgraded punctuation (cf.\ \xrefL{1.6.2}).} The \emph{posterior distribution} of
+$\theta$ given the observed data $X=x$ is the conditional distribution of $\theta$ given
+$X=x$, with density
+\[ \pi(\theta\mid x) \;=\;
+   \frac{\pi(\theta)\, f(x\mid\theta)}{\displaystyle\int_{\Theta}
+   \pi(t)\, f(x\mid t)\,dt} . \]
+\end{Obj}
+
+\begin{ObjL}{Remark}{2.9.2}{Reading the posterior}
+The numerator is \emph{prior times likelihood}: the data enter the update through
+$\mathrm{lik}(\theta)=f(x\mid\theta)$ and through nothing else---\xref{2.4.1}'s object turns
+out to be the entire interface between data and belief. The denominator does not involve
+$\theta$: it is one number, the normalizer that makes the slice a probability distribution
+(\xrefL{1.4.14} again), which is why working Bayesians write
+$\pi(\theta\mid x)\propto\pi(\theta)\,f(x\mid\theta)$ and match kernels, as every example
+below will. And the posterior is the honest owner of sentences the likelihood could not
+license (\xref{2.4.2}): given a prior, ``$\theta$ is probably near $0.4$'' is now a
+statement with a probability attached---computed from $\pi(\cdot\mid x)$.
+\end{ObjL}
+
+\begin{Obj}{Theorem}{2.9.3}{The posterior mean minimizes the Bayes risk}
+Under squared-error loss, and provided the prior gives $\theta$ a finite second moment
+($\E\{\theta^2\}<\infty$), among all estimators $\delta(X)$ the Bayes risk (\xrefL{1.6.2})
+\[ r(\delta) \;=\; \E\big\{ \big(\delta(X)-\theta\big)^2 \big\}
+   \qquad\text{($\theta$ and $X$ jointly distributed: prior, then model)} \]
+is minimized by the \emph{posterior mean},
+\[ \delta(x) \;=\; \E\{\theta\mid X=x\} . \]
+\end{Obj}
+\begin{Prf}{2.9.3}{Proof of the Posterior-Mean Rule by Recognizing the Same Structure.}{Uses \xrefL{1.4.16}, \xref{2.8.1}, \xref{2.8.2}.}
+\item Under the joint distribution of $(\theta,X)$---prior for $\theta$, model for $X$ given
+      $\theta$---the Bayes risk of a rule $\delta$ is exactly a mean squared
+      \emph{prediction} error: the quantity being guessed, $\theta$, is a random variable,
+      and the guess, $\delta(X)$, is a function of the observed one. This is the deck's
+      ``same structure'': \xref{2.8.2} with $(X,Y)$ played by $(X,\theta)$.
+\item Apply \xref{2.8.2}'s argument. Iterate the expectation through the data
+      (\xrefL{1.4.16}):
+      \[ r(\delta) \;=\; \E\Big[\, \E\big\{ (\delta(X)-\theta)^2 \bigm| X \big\} \,\Big] . \]
+\item Fix the slice $X=x$: inside it $\delta(x)$ is a constant, and the conditional
+      distribution of $\theta$ given $X=x$ is the \emph{posterior} (\xref{2.9.1}). By
+      \xref{2.8.1} applied to that distribution, the inner expectation
+      \[ \E\big\{ (\theta-\delta(x))^2 \bigm| X=x \big\}
+         \;=\; \Var(\theta\mid X=x) + \big(\E\{\theta\mid X=x\}-\delta(x)\big)^2 \]
+      is minimized, slice by slice, at $\delta(x)=\E\{\theta\mid X=x\}$.
+\item Minimizing inside every slice minimizes the average over slices, so the posterior mean
+      minimizes $r$---the argument that ran once, in miniature and for the uniform prior, in
+      \xrefL{1.A.5}(5).
+\end{Prf}
+
+\medskip
+So the Bayes estimate is: \emph{update, then average}. What remains is to see the update in
+closed form, and the deck names the three classical cases---``Normal, normal; Binomial,
+Beta; Poisson, Gamma''---each a \emph{conjugate} pair, in which the posterior lands back in
+the prior's own family and the posterior mean is a weighted compromise.
+
+\begin{ObjL}{Example}{2.9.4}{Normal--normal}
+Prior $\theta\sim N(m,\tau^2)$; one observation $X\mid\theta\sim N(\theta,\sigma^2)$ with
+$\sigma^2$ known (a sample of size $n$ enters as $\bar X$ with $\sigma^2/n$ in place of
+$\sigma^2$). Matching kernels---the full completing-the-square, every step, is
+\appref{2.A.4}---the posterior is again normal,
+\[ \theta \mid X=x \;\sim\; N\big( m^{*},\, v \big), \qquad
+   \frac{1}{v} \;=\; \frac{1}{\tau^2}+\frac{1}{\sigma^2} , \qquad
+   m^{*} \;=\; v\left( \frac{m}{\tau^2} + \frac{x}{\sigma^2} \right)
+   \;=\; \frac{\sigma^2\, m + \tau^2\, x}{\sigma^2+\tau^2} . \]
+Read it in \emph{precisions} (inverse variances, the information's units,
+\xrefL{1.9.8}): precisions add, and the posterior mean weighs prior guess and data by their
+precisions. Equivalently, the Bayes estimate
+\[ \E\{\theta\mid X=x\} \;=\; m + \frac{\tau^2}{\sigma^2+\tau^2}\,(x-m) \]
+moves from the prior mean toward the data, covering only the fraction
+$\tau^2/(\sigma^2+\tau^2)$ of the distance: it \emph{shrinks} the observation toward $m$.
+Vague prior ($\tau^2\to\infty$): the estimate is $x$, the data win. Precise prior
+($\tau^2\to0$): the estimate is $m$, the data are ignored. Everything in between is a
+negotiation at rates set by the two variances.
+\end{ObjL}
+
+\begin{ObjL}{Example}{2.9.5}{Binomial--beta}
+Prior $\theta\sim$ Beta$(\alpha,\beta)$ (\xrefL{1.8.5}); data $X\mid\theta\sim$
+Binomial$(n,\theta)$. Match kernels in $\theta$:
+\[ \pi(\theta\mid x) \;\propto\;
+   \underbrace{\theta^{\alpha-1}(1-\theta)^{\beta-1}}_{\text{prior}}\;\cdot\;
+   \underbrace{\theta^{x}(1-\theta)^{n-x}}_{\text{likelihood}}
+   \;=\; \theta^{(\alpha+x)-1}\,(1-\theta)^{(\beta+n-x)-1} , \]
+the Beta$(\alpha+x,\;\beta+n-x)$ kernel: successes reinforce $\alpha$, failures reinforce
+$\beta$. By the Beta mean formula (\xrefL{1.8.5}), the Bayes estimate is
+\[ \E\{\theta\mid X=x\} \;=\; \frac{\alpha+x}{\alpha+\beta+n}
+   \;=\; \frac{(\alpha+\beta)\cdot\dfrac{\alpha}{\alpha+\beta} \;+\; n\cdot\dfrac{x}{n}}
+   {(\alpha+\beta)+n} : \]
+a weighted average of the prior mean $\alpha/(\alpha+\beta)$ and the observed rate $x/n$,
+with weights $\alpha+\beta$ and $n$---\emph{the prior is worth $\alpha+\beta$
+observations}. And with $\alpha=\beta=1$ (the uniform prior), the estimate is
+$(1+x)/(2+n)$: Unit 1's shaded estimator, whose origin \xrefL{1.A.5}(4) computed ad hoc, now
+a two-line corollary of the general theorem---the promise ``where $(1+X)/(2+n)$ comes
+from,'' kept and generalized.
+\end{ObjL}
+
+\begin{ObjL}{Example}{2.9.6}{Poisson--gamma}
+Prior $\theta\sim$ Gamma$(a,b)$, density proportional to $\theta^{a-1}e^{-b\theta}$ on
+$(0,\infty)$ (mean $a/b$); data $X_1,\dots,X_n\mid\theta$ iid Poisson$(\theta)$, likelihood
+proportional to $\theta^{\sum_i x_i} e^{-n\theta}$. The product is the
+Gamma$\big(a+\sum_i x_i,\; b+n\big)$ kernel, so
+\[ \E\Big\{\theta \Bigm| \textstyle\sum_i X_i = s\Big\} \;=\; \frac{a+s}{b+n}
+   \;=\; \frac{b\cdot\dfrac{a}{b} + n\cdot\bar x}{b+n} : \]
+prior mean weighted $b$, sample mean weighted $n$. The prior acts like $b$ phantom
+observations totaling $a$ events.
+\end{ObjL}
+
+\begin{ObjL}{Remark}{2.9.7}{One anatomy, three posteriors}
+All three estimates are the same sentence:
+\[ \text{posterior mean} \;=\;
+   \frac{(\text{prior worth})\times(\text{prior guess})
+   \;+\; (\text{data worth})\times(\text{data guess})}
+   {(\text{prior worth}) + (\text{data worth})} , \]
+with ``worth'' measured in observation-equivalents (or precisions, \xref{2.9.4}). As data
+accumulate the data's worth grows without bound and the Bayes estimate slides toward the
+data's guess; with little data the prior holds it back. That systematic holding-back has a
+name, and the deck's next slide says it.
+\end{ObjL}
+
+% ============================================================
+\sub{2.10}{Shrinkage and Penalization}
+
+``By the way,'' the seventeenth slide begins---and then quietly names the modern half of the
+subject.
+
+\begin{ObjL}{Concept}{2.10.1}{Bayes as penalized likelihood, Bayes as shrinkage}
+``Notice how Bayes methods are sort of like penalized likelihood methods; `shrinkage'
+estimators.'' Both readings are visible in objects already on the table. \emph{Penalty}: by
+\xref{2.9.1}, maximizing the posterior means maximizing
+\[ \log \pi(\theta\mid x) \;=\; \ell(\theta) + \log\pi(\theta) + \text{const} : \]
+the log-likelihood \emph{plus a penalty term} that docks points for straying where the prior
+is thin. A normal prior contributes $\log\pi(\theta)=-(\theta-m)^2/(2\tau^2)+\text{const}$,
+a quadratic penalty on distance from $m$---the ridge-regression form, with $1/\tau^2$ as
+the tuning knob. \emph{Shrinkage}: the posterior-mean formulas of \S\,\xref{2.9} do not
+merely resemble shrinking---they \emph{are} affine maps pulling the data's guess partway
+toward the prior's, by factors like $\tau^2/(\sigma^2+\tau^2)$ and $n/(\alpha+\beta+n)$.
+The deck's hedge (``sort of like'') is apt: the posterior \emph{mean} and the posterior
+\emph{maximizer} are different summaries of the same posterior---they coincide in the
+normal--normal case and differ in general---but the family resemblance among Bayes,
+penalization, and shrinkage is structural, not cosmetic.
+\end{ObjL}
+
+\begin{ObjL}{Remark}{2.10.2}{The deck's big-data point}
+The slide closes: ``At the heart of first-order big data: you cannot use the data to know
+what to shrink towards; but you can use the data to know how much to shrink towards it.''
+Unpacked: the shrinkage \emph{target} ($m$; the prior mean) plays the role of outside
+knowledge---estimating it from the same data that will then be shrunk toward it is
+circular, at least to first order. But the shrinkage \emph{amount}---the weight
+$\tau^2/(\sigma^2+\tau^2)$---is a different kind of quantity: with many parallel problems
+(many arms, many genes, many small areas), the spread of the observed estimates around the
+target reveals $\tau^2$, and the data can tune their own shrinkage. Estimating the prior's
+parameters from the ensemble is called \emph{empirical Bayes}, and the discovery that such
+procedures can beat the obvious unbiased one at its own game (Stein's phenomenon) is one of
+the subject's genuine surprises---here, only a signpost at the edge of the course.
+\end{ObjL}
+
+% ============================================================
+\sub{2.11}{Looking Ahead: Sufficiency}
+
+\begin{ObjL}{Concept}{2.11.1}{``If we are done by Thursday''}
+The deck's final slide is a conditional promise, and a map of the next idea: \emph{sufficient
+statistics}---summaries of the data that lose nothing about the parameter (note how every
+example this week funneled the whole sample through $\bar X$ or a total; Fisher's ``reduction
+of data,'' the epigraph, is this program); \emph{conditioning on sufficient statistics},
+whose payoffs the slide indexes only as ``Unbiasedness'' and ``Relationship to
+variance''---the mathematics to come: conditioning preserves unbiasedness and never
+increases variance, so any unbiased estimator can be upgraded by averaging it over the
+sufficient summary; and \emph{complete} sufficient statistics, whose ``implications for uniqueness''
+deliver the unique uniformly optimal unbiased estimator that \xref{2.1.7} advertised. The
+deck defers the mathematics, and so do these notes: the objects above are next week's, named
+here so the week's arc---floor, constructor, precision, prior---is visible as one story.
+\end{ObjL}
+
+% ============================================================
+\lectureappendix
+
+The deck names its computations and leaves them to the board and to us; the longer ones are
+worked here, every step shown, each keyed to the object it supports. \appref{2.A.1} settles
+the sample variance's bias (\xref{2.1.6}, \xref{2.6.3}); \appref{2.A.2} prices nuisance
+parameters (\xref{2.2.5}); \appref{2.A.3} computes the exponential rate's bias and the
+variance of its repair (\xref{2.5.4}); \appref{2.A.4} completes the square behind the
+normal--normal posterior (\xref{2.9.4}); and \appref{2.A.5} runs Fieller's quadratic through
+its cases (\xref{2.7.7}).
+
+\begin{ObjL}{Supplement}{2.A.1}{The sample variance's bias, and Bessel's correction}
+For $X_1,\dots,X_n$ iid with mean $\mu$ and variance $\sigma^2$,
+\[ \E\Big\{ \frac1n \sum_{i=1}^n (X_i-\bar X)^2 \Big\} \;=\; \frac{n-1}{n}\,\sigma^2 ,
+   \qquad\text{so}\qquad
+   \E\Big\{ \frac{1}{n-1} \sum_{i=1}^n (X_i-\bar X)^2 \Big\} \;=\; \sigma^2 . \]
+\end{ObjL}
+\begin{Prf}{2.A.1}{Proof of Bessel's Correction by Adding and Subtracting the True Mean.}{}
+\item Route each deviation through $\mu$: $X_i-\bar X=(X_i-\mu)-(\bar X-\mu)$, square, and
+      sum:
+      \[ \sum_i (X_i-\bar X)^2 \;=\; \sum_i (X_i-\mu)^2
+         \;-\; 2(\bar X-\mu)\sum_i (X_i-\mu) \;+\; n(\bar X-\mu)^2 . \]
+\item The middle sum telescopes into the average: $\sum_i (X_i-\mu)=n(\bar X-\mu)$, so the
+      middle term is $-2n(\bar X-\mu)^2$ and
+      \[ \sum_i (X_i-\bar X)^2 \;=\; \sum_i (X_i-\mu)^2 \;-\; n(\bar X-\mu)^2 . \]
+      (Measuring from the sample's own center \emph{always} removes exactly
+      $n(\bar X-\mu)^2$ worth of scatter---the algebraic content of ``$\bar X$ has chased
+      the data,'' \xref{2.1.6}(c).)
+\item Take expectations: $\E\{(X_i-\mu)^2\}=\sigma^2$ for each $i$, and
+      $\E\{(\bar X-\mu)^2\}=\Var(\bar X)=\sigma^2/n$, so
+      \[ \E\Big\{\sum_i (X_i-\bar X)^2\Big\} \;=\; n\sigma^2 - n\cdot\frac{\sigma^2}{n}
+         \;=\; (n-1)\,\sigma^2 . \]
+\item Divide by $n$ for the plug-in's expectation, $(n-1)\sigma^2/n$; divide by $n-1$
+      instead and the expectation is exactly $\sigma^2$.
+\end{Prf}
+
+\begin{ObjL}{Supplement}{2.A.2}{Nuisance parameters cost information: the $2\times2$ case}
+Let $I=\begin{pmatrix} I_{11} & I_{12}\\ I_{12} & I_{22}\end{pmatrix}$ be an information
+matrix (symmetric, positive definite). Then
+\[ \big(I^{-1}\big)_{11} \;=\; \frac{I_{22}}{I_{11}I_{22}-I_{12}^2}
+   \;\ge\; \frac{1}{I_{11}} ,
+   \qquad\text{with equality if and only if } I_{12}=0 . \]
+\end{ObjL}
+\begin{Prf}{2.A.2}{Proof of the Nuisance Cost by the Explicit Inverse.}{}
+\item The $2\times2$ inverse: with $\det I=I_{11}I_{22}-I_{12}^2>0$ (positive
+      definiteness),
+      \[ I^{-1} \;=\; \frac{1}{I_{11}I_{22}-I_{12}^2}
+         \begin{pmatrix} I_{22} & -I_{12}\\ -I_{12} & I_{11} \end{pmatrix} ,
+         \qquad\text{so}\qquad
+         \big(I^{-1}\big)_{11} \;=\; \frac{I_{22}}{I_{11}I_{22}-I_{12}^2} . \]
+\item Compare with $1/I_{11}$ by subtracting, over the common positive denominator:
+      \[ \big(I^{-1}\big)_{11} - \frac{1}{I_{11}}
+         \;=\; \frac{I_{11}I_{22} - \big(I_{11}I_{22}-I_{12}^2\big)}
+         {I_{11}\big(I_{11}I_{22}-I_{12}^2\big)}
+         \;=\; \frac{I_{12}^2}{I_{11}\big(I_{11}I_{22}-I_{12}^2\big)} \;\ge\; 0 , \]
+      every factor in the denominator positive.
+\item The difference vanishes exactly when $I_{12}=0$: the orthogonal case. Correlated
+      scores mean the nuisance coordinate's uncertainty leaks into yours; the leak is the
+      ratio displayed.
+\end{Prf}
+
+\begin{ObjL}{Supplement}{2.A.3}{The exponential rate: bias of $1/\bar X$, and the repaired estimator's variance}
+Let $X_1,\dots,X_n$ be iid Exponential with rate $\lambda$ and let $S=\sum_i X_i$. Then for
+$n\ge2$,
+\[ \E^{\lambda}\Big\{\frac{n}{S}\Big\} \;=\; \frac{n\lambda}{n-1} , \]
+so the MLE $\hat\lambda=1/\bar X=n/S$ is biased upward; and the unbiased repair
+$(n-1)/S$ has, for $n\ge3$,
+\[ \Var^{\lambda}\Big(\frac{n-1}{S}\Big) \;=\; \frac{\lambda^2}{n-2}
+   \;>\; \frac{\lambda^2}{n} \;=\; \frac{1}{I_n(\lambda)} . \]
+\end{ObjL}
+\begin{Prf}{2.A.3}{Proof of the Bias and the Repaired Variance via the Gamma Integral.}{Uses \xref{2.5.4}.}
+\item The total of $n$ iid Exponential$(\lambda)$ variables has the Gamma$(n,\lambda)$
+      density $f_S(s)=\lambda^n s^{\,n-1} e^{-\lambda s}/\Gamma(n)$, $s>0$ (a standard
+      fact; it can be built by induction on $n$).
+\item Negative first moment, by matching the integrand back to a Gamma density of lower
+      order:
+      \[ \E\Big\{\frac1S\Big\}
+         \;=\; \int_0^{\infty} \frac1s\cdot\frac{\lambda^n s^{\,n-1}e^{-\lambda s}}
+         {\Gamma(n)}\,ds
+         \;=\; \frac{\lambda^n}{\Gamma(n)} \int_0^{\infty} s^{\,n-2}e^{-\lambda s}\,ds , \]
+      and the surviving integral is the Gamma integral one order down,
+      $\Gamma(n-1)/\lambda^{\,n-1}$, so
+      \[ \E\Big\{\frac1S\Big\}
+         \;=\; \frac{\lambda^n}{\Gamma(n)}\cdot\frac{\Gamma(n-1)}{\lambda^{\,n-1}}
+         \;=\; \frac{\lambda}{n-1} , \]
+      using $\Gamma(n)=(n-1)\Gamma(n-1)$ and requiring $n\ge2$ for the integral to
+      converge. Multiply by $n$: $\E\{n/S\}=n\lambda/(n-1)$.
+\item Negative second moment, the same maneuver one order down:
+      \[ \E\Big\{\frac{1}{S^2}\Big\}
+         \;=\; \frac{\lambda^n}{\Gamma(n)}\cdot\frac{\Gamma(n-2)}{\lambda^{\,n-2}}
+         \;=\; \frac{\lambda^2}{(n-1)(n-2)} \qquad (n\ge3) . \]
+\item Hence for the estimator $(n-1)/S$ (unbiased by step (2), since
+      $\E\{(n-1)/S\}=(n-1)\cdot\lambda/(n-1)=\lambda$):
+      \[ \Var\Big(\frac{n-1}{S}\Big)
+         \;=\; (n-1)^2\left[ \frac{\lambda^2}{(n-1)(n-2)}
+         - \frac{\lambda^2}{(n-1)^2} \right]
+         \;=\; \lambda^2\left[ \frac{n-1}{n-2} - 1 \right]
+         \;=\; \frac{\lambda^2}{n-2} , \]
+      strictly above the floor $\lambda^2/n$: in this parameterization no estimator in
+      sight attains the bound---``a not sharp bound'' indeed (\xrefL{1.9.14}).
+\end{Prf}
+
+\begin{ObjL}{Supplement}{2.A.4}{The normal--normal posterior, every step}
+With prior $\theta\sim N(m,\tau^2)$ and one observation $X\mid\theta\sim N(\theta,\sigma^2)$,
+the posterior is $N(m^*,v)$ with
+\[ v=\Big(\tfrac{1}{\tau^2}+\tfrac{1}{\sigma^2}\Big)^{-1} , \qquad
+   m^{*}=v\Big(\tfrac{m}{\tau^2}+\tfrac{x}{\sigma^2}\Big)
+   =\tfrac{\sigma^2 m+\tau^2 x}{\sigma^2+\tau^2} . \]
+\end{ObjL}
+\begin{Prf}{2.A.4}{Proof of the Posterior by Completing the Square in $\theta$.}{Uses \xref{2.9.1}.}
+\item Multiply prior and likelihood and keep only $\theta$-dependent factors:
+      \[ \pi(\theta\mid x) \;\propto\;
+         \exp\!\left( -\frac{(\theta-m)^2}{2\tau^2} \right)
+         \exp\!\left( -\frac{(x-\theta)^2}{2\sigma^2} \right) , \]
+      so, combining the exponents,
+      \[ \pi(\theta\mid x) \;\propto\;
+         \exp\!\left( -\frac12\left[ \frac{(\theta-m)^2}{\tau^2}
+         + \frac{(\theta-x)^2}{\sigma^2} \right] \right) . \]
+\item Expand the bracket and collect powers of $\theta$:
+      \[ \frac{(\theta-m)^2}{\tau^2}+\frac{(\theta-x)^2}{\sigma^2}
+         \;=\; \theta^2\Big(\frac{1}{\tau^2}+\frac{1}{\sigma^2}\Big)
+         - 2\theta\Big(\frac{m}{\tau^2}+\frac{x}{\sigma^2}\Big)
+         + \Big(\frac{m^2}{\tau^2}+\frac{x^2}{\sigma^2}\Big) . \]
+\item Write $\frac1v=\frac{1}{\tau^2}+\frac{1}{\sigma^2}$ and
+      $m^*=v\big(\frac{m}{\tau^2}+\frac{x}{\sigma^2}\big)$, and complete the square:
+      \[ \theta^2\cdot\frac1v - 2\theta\cdot\frac{m^*}{v}
+         \;=\; \frac{\theta^2 - 2\theta\, m^*}{v}
+         \;=\; \frac{(\theta-m^*)^2}{v} - \frac{(m^*)^2}{v} , \]
+      and the terms free of $\theta$ join the normalizer.
+\item The $\theta$-dependence is exactly $\exp\{-(\theta-m^*)^2/(2v)\}$: the $N(m^*,v)$
+      kernel. Since the posterior is a probability distribution (\xref{2.9.1}), it \emph{is}
+      $N(m^*,v)$. Clearing $v$ from $m^*$'s definition---multiply numerator and denominator
+      by $\sigma^2\tau^2$:
+      \[ m^* \;=\; \frac{\dfrac{m}{\tau^2}+\dfrac{x}{\sigma^2}}
+         {\dfrac{1}{\tau^2}+\dfrac{1}{\sigma^2}}
+         \;=\; \frac{\sigma^2 m+\tau^2 x}{\sigma^2+\tau^2} . \]
+\end{Prf}
+
+\begin{ObjL}{Supplement}{2.A.5}{Fieller's quadratic, case by case}
+The set of \xref{2.7.7} is $S=\{\rho: g(\rho)\le 0\}$ where, writing
+$c=z_{\alpha/2}^2\sigma^2$,
+\[ g(\rho) \;=\; \Big(\bar Y^2-\frac{c}{m}\Big)\rho^2 \;-\; 2\bar X\bar Y\,\rho
+   \;+\; \Big(\bar X^2-\frac{c}{n}\Big) , \]
+and its shape is decided by the leading coefficient and the roots.
+\end{ObjL}
+\begin{Prf}{2.A.5}{Proof of the Case Analysis by Expanding the Inversion Inequality.}{Uses \xref{2.7.7}.}
+\item Square out the defining inequality
+      $(\bar X-\rho\bar Y)^2 \le c\,\big(\frac1n+\frac{\rho^2}{m}\big)$ and move everything
+      to the left:
+      \[ \bar X^2 - 2\bar X\bar Y \rho + \bar Y^2\rho^2 - \frac{c}{n}
+         - \frac{c}{m}\rho^2 \;\le\; 0 , \]
+      which is $g(\rho)\le0$ with $g$ as displayed.
+\item The discriminant of $g$, after expanding and cancelling the $\bar X^2\bar Y^2$
+      terms:
+      \[ 4\bar X^2\bar Y^2 - 4\Big(\bar Y^2-\frac{c}{m}\Big)\Big(\bar X^2-\frac{c}{n}\Big)
+         \;=\; 4c\left( \frac{\bar Y^2}{n} + \frac{\bar X^2}{m} - \frac{c}{nm} \right) . \]
+\item In the case of a positive leading coefficient ($\bar Y^2>c/m$: the denominator mean
+      is convincingly nonzero), the parabola opens upward and the discriminant is strictly
+      positive: since $\bar Y^2>c/m$, its parenthesis strictly exceeds
+      $\frac{c/m}{n}+\frac{\bar X^2}{m}-\frac{c}{nm}=\frac{\bar X^2}{m}\ge0$. Two real
+      roots; $S$ is the genuine interval between them.
+\item In the case of a negative leading coefficient ($\bar Y^2<c/m$: the data cannot rule
+      out $\mu_2=0$), the parabola opens downward. If the discriminant is positive, $g\le0$
+      outside the roots: $S$ is two half-lines running to $\pm\infty$. If it is negative,
+      $g<0$ everywhere: $S=\mathbb{R}$---the data place no restriction on the ratio at all.
+\item Coverage is untouched by the case analysis: whatever its shape, $S$ contains the true
+      $\rho$ exactly when $|Z(\rho)|\le z_{\alpha/2}$, an event of probability $1-\alpha$
+      (\xref{2.7.4}). When the denominator might be zero the ratio is genuinely
+      ill-determined, and an honest $1-\alpha$ report says so by refusing to be an
+      interval.
+\end{Prf}
+
+\ifSubfilesClassLoaded{\clearpage\objindex}{}
+
+\end{document}
