@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Homework 6 · Interactive — STAT S4204</title>
+<meta name="description" content="Interactive companion to Homework 6: maximum likelihood in four models — the likelihood equation, the sampling distribution of the MLE, and the slope-matching picture.">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="icon" href="favicon.ico" sizes="32x32">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<link rel="stylesheet" href="assets/hw.css">
+</head>
+<body>
+  <div class="band"><div class="in">
+    <div class="topnav"><a href="./">← Notes in Statistical Inference</a></div>
+    <p class="course">STAT&nbsp;S4204 · Summer&nbsp;2026 · Problem Sets</p>
+    <h1>Homework 6 — Interactive Companion</h1>
+    <p class="sub">Maximum likelihood in four models: the likelihood equation, the estimator's spread, and the bound</p>
+  </div></div>
+  <div class="wrap">
+
+    <p class="lead">Assignment 6 takes Assignment 5's four models and asks for the maximum
+    likelihood estimator, its variance, and the comparison to the bound. The answer is the
+    same three times over and then a fourth: the MLE is the sample mean, its variance is
+    exact, and it sits on the bound. The three pieces below show the likelihood equation
+    picking out \(\bar y\), the estimator's sampling distribution against the bound, and
+    the slope-matching picture behind Problem 4.</p>
+    <div class="pdfbar">
+      <a class="btn" href="homework-06.pdf">Read the write-up (PDF)</a>
+      <a class="btn ghost" href="./">All notes</a>
+    </div>
+
+    <!-- ============ Widget 1: likelihood equation ============ -->
+    <div class="widget" id="w1">
+      <h2>Problems 1–3 · The likelihood equation</h2>
+      <h3>The peak is at the sample mean</h3>
+      <p>Draw a Poisson sample and look at its log likelihood. The peak lands on \(\bar y\)
+      every time—that is the likelihood equation \( s/\theta - n = 0 \) doing its work—and
+      more data make the peak sharper around the true value.</p>
+      <div class="controls">
+        <span class="ctl"><label>true θ</label>
+          <input type="range" min="0.5" max="8" step="0.1" value="3" id="w1t" data-out="w1tv" data-dec="1">
+          <span class="val" id="w1tv"></span></span>
+        <span class="ctl"><label>n</label>
+          <input type="range" min="2" max="80" step="1" value="10" id="w1n" data-out="w1nv" data-fmt="int">
+          <span class="val" id="w1nv"></span></span>
+        <span class="ctl"><button id="w1draw">Draw a new sample</button></span>
+      </div>
+      <div class="charts">
+        <div class="chartwrap" style="max-width:620px" id="w1c"></div>
+      </div>
+      <div class="legend">
+        <span class="chip"><span class="sw" style="border-color:var(--s1)"></span>\( \ell(\theta)-\ell(\hat\theta) \) for the drawn sample</span>
+        <span class="chip"><span class="sw dot" style="background:var(--s2)"></span>peak at \(\hat\theta=\bar y\)</span>
+        <span class="chip"><span class="sw" style="border-color:#9aa1a9;border-top-style:dotted"></span>true θ</span>
+      </div>
+      <div class="readout" id="w1read"></div>
+      <p class="note">The dot is the estimator; the dotted line is the truth. They differ
+      sample to sample, and the gap between them is what the next widget measures.</p>
+    </div>
+
+    <!-- ============ Widget 2: sampling distribution vs bound ============ -->
+    <div class="widget" id="w2">
+      <h2>Problems 1–3 · Variance against the bound</h2>
+      <h3>The estimator's spread is the bound</h3>
+      <p>Replicate the experiment: exponential samples with mean \(\theta\), each producing
+      one \(\hat\theta=\bar Y\). The histogram of replications piles up around \(\theta\)
+      with variance \( \theta^2/n \)—which is exactly \( 1/I_n(\theta) \). The running
+      variance readout converges onto the bound as replications accumulate.</p>
+      <div class="controls">
+        <span class="ctl"><label>θ</label>
+          <input type="range" min="0.5" max="4" step="0.1" value="1.5" id="w2t" data-out="w2tv" data-dec="1">
+          <span class="val" id="w2tv"></span></span>
+        <span class="ctl"><label>n</label>
+          <input type="range" min="3" max="80" step="1" value="12" id="w2n" data-out="w2nv" data-fmt="int">
+          <span class="val" id="w2nv"></span></span>
+        <span class="ctl"><button id="w2draw">Run 400 replications</button></span>
+        <span class="ctl"><button id="w2reset">Reset</button></span>
+      </div>
+      <div class="charts">
+        <div class="chartwrap" style="max-width:620px" id="w2c"></div>
+      </div>
+      <div class="legend">
+        <span class="chip"><span class="sw" style="border-color:var(--s2)"></span>histogram of \(\hat\theta\) across replications</span>
+        <span class="chip"><span class="sw" style="border-color:var(--s1)"></span>normal curve with variance \(1/I_n(\theta)=\theta^2/n\)</span>
+      </div>
+      <div class="readout" id="w2read"></div>
+      <p class="note">In these models the match is exact at every \(n\), not just in the
+      limit. That is unusual: in general the reciprocal information describes the MLE's
+      variance only asymptotically.</p>
+    </div>
+
+    <!-- ============ Widget 3: slope matching ============ -->
+    <div class="widget" id="w3">
+      <h2>Problem 4 · The mean parameterization</h2>
+      <h3>Match the slope of ψ to the sample mean</h3>
+      <p>In the exponential family \( f(y)\exp[\xi y-\psi(\xi)] \) the likelihood equation
+      says \( \psi'(\hat\xi)=\bar y \): find the point on \(\psi\) whose <em>slope</em> is
+      the sample mean. With \(\theta=\psi'(\xi)\) as the parameter, that point <em>is</em>
+      the estimate, \( \hat\theta=\bar y \). Drawn here for the Poisson case,
+      \(\psi(\xi)=e^{\xi}\). Slide \(\bar y\) and watch the tangency move.</p>
+      <div class="controls">
+        <span class="ctl"><label>sample mean ȳ</label>
+          <input type="range" min="0.3" max="6" step="0.05" value="2" id="w3y" data-out="w3yv" data-dec="2">
+          <span class="val" id="w3yv"></span></span>
+      </div>
+      <div class="charts">
+        <div class="chartwrap" style="max-width:620px" id="w3c"></div>
+      </div>
+      <div class="legend">
+        <span class="chip"><span class="sw" style="border-color:var(--s1)"></span>\(\psi(\xi)=e^{\xi}\)</span>
+        <span class="chip"><span class="sw dash" style="border-color:var(--s2)"></span>tangent with slope \(\bar y\)</span>
+        <span class="chip"><span class="sw dot" style="background:var(--s2)"></span>\(\hat\xi=\log\bar y\), where \(\psi'=\bar y\)</span>
+      </div>
+      <div class="readout" id="w3read"></div>
+      <p class="note">The curvature of \(\psi\) at the tangency is \(\psi''(\hat\xi)\), the
+      one-observation variance—flat stretches of \(\psi\) mean precise estimates of \(\xi\)
+      but imprecise means, and steep curvature the reverse. Assignment 5 found the
+      information \(n\psi''\) in \(\xi\); this assignment finds \(n/\psi''\) in
+      \(\theta\).</p>
+    </div>
+
+    <footer>
+      Interactive companion to the Homework&nbsp;6 write-up; the PDF is the submitted
+      document. Any errors are my own.
+      <div class="ln"><a href="homework-06.pdf">homework-06.pdf</a> ·
+        <a href="./">all notes</a> ·
+        <a href="mailto:tyler.sotomayor@columbia.edu">errata</a></div>
+    </footer>
+  </div>
+  <div class="footerband"><div class="in"><img src="assets/summer-logo.svg" alt="Columbia University Summer Session"></div></div>
+
+<script src="assets/hw.js"></script>
+<script>
+"use strict";
+/* ---------- shared Poisson sampler ---------- */
+let rngA = mulberry32(21);
+function poissonA(lam, rnd){
+  if (lam > 30){
+    const z = Math.sqrt(-2*Math.log(Math.max(rnd(),1e-12)))*Math.cos(2*Math.PI*rnd());
+    return Math.max(0, Math.round(lam + Math.sqrt(lam)*z));
+  }
+  let L = Math.exp(-lam), k = 0, p = 1;
+  do { k++; p *= rnd(); } while (p > L);
+  return k - 1;
+}
+
+/* ---------- Widget 1: likelihood equation ---------- */
+const w1host = document.getElementById("w1c");
+let w1sample = null;
+function w1drawSample(){
+  const th = +document.getElementById("w1t").value;
+  const n = +document.getElementById("w1n").value;
+  let S = 0;
+  for (let i=0; i<n; i++) S += poissonA(th, rngA);
+  w1sample = {S, n, th};
+}
+function w1redraw(){
+  const th = +document.getElementById("w1t").value;
+  const n = +document.getElementById("w1n").value;
+  if (!w1sample || w1sample.n !== n || w1sample.th !== th) w1drawSample();
+  const {S} = w1sample;
+  const ybar = S/n;
+  // ell(t) - ell(that) = S log(t/ybar) - n(t - ybar)   (ybar>0; if S=0, ell = -n t)
+  const f = S > 0 ? (t => S*Math.log(t/ybar) - n*(t - ybar)) : (t => -n*t);
+  const lo = 0.05, hi = Math.max(8.4, ybar*1.9);
+  w1host.querySelectorAll("svg").forEach(s=>s.remove());
+  w1host.querySelectorAll(".tip").forEach(s=>s.remove());
+  const ch = makeChart(w1host, {w:620, h:330, xdom:[lo,hi], ydom:[-14,1.4],
+    xticks:[{v:th,l:fmt(th,1)},{v:S>0?ybar:lo, l:"ȳ="+fmt(ybar,2)}],
+    yticks:[{v:0,l:"0"},{v:-7,l:"−7"}],
+    xlab:"θ", ylab:"ℓ(θ) − ℓ(θ̂)", aria:"poisson log likelihood"});
+  vline(ch, th);
+  line(ch, fnPath(ch, f, lo, hi, 321), S1);
+  if (S > 0) dot(ch, ybar, 0, S2, 5);
+  attachHover(w1host, ch, [{name:"ℓ − ℓ(θ̂)", color:S1, f}],
+    x => "θ = " + fmt(x,2), y => fmt(y,3));
+  document.getElementById("w1read").innerHTML =
+    `<span><span class="k">θ̂ = ȳ</span> <b>= ${fmt(ybar,3)}</b></span>` +
+    `<span><span class="k">true θ</span> <b>= ${fmt(th,1)}</b></span>` +
+    `<span><span class="k">ℓ″(θ̂) = −n/θ̂</span> <b>= ${S>0?fmt(-n/ybar,2):"—"}</b></span>`;
+}
+document.getElementById("w1draw").onclick = () => { w1drawSample(); w1redraw(); };
+document.getElementById("w1t").addEventListener("input", () => { w1sample = null; });
+document.getElementById("w1n").addEventListener("input", () => { w1sample = null; });
+bindControls(document.getElementById("w1"), w1redraw);
+w1redraw();
+
+/* ---------- Widget 2: sampling distribution vs bound ---------- */
+const w2host = document.getElementById("w2c");
+let w2rng = mulberry32(33), w2vals = [];
+function expDraw(th){ return -th*Math.log(Math.max(w2rng(),1e-12)); }
+function w2redraw(){
+  const th = +document.getElementById("w2t").value;
+  const n = +document.getElementById("w2n").value;
+  const sd = th/Math.sqrt(n);
+  const lo = Math.max(0, th-4.2*sd), hi = th+4.2*sd;
+  const B = 36, bw = (hi-lo)/B;
+  const counts = new Array(B).fill(0);
+  w2vals.forEach(v => { const b = Math.floor((v-lo)/bw); if (b>=0 && b<B) counts[b]++; });
+  const dens = counts.map(c => w2vals.length ? c/(w2vals.length*bw) : 0);
+  const ymax = Math.max(normPdf(th,th,sd)*1.25, Math.max(...dens)*1.15, 0.1);
+  w2host.querySelectorAll("svg").forEach(s=>s.remove());
+  w2host.querySelectorAll(".tip").forEach(s=>s.remove());
+  const ch = makeChart(w2host, {w:620, h:330, xdom:[lo,hi], ydom:[0,ymax],
+    xticks:[{v:th,l:"θ="+fmt(th,1)}], yticks:[],
+    xlab:"θ̂ = Ȳ", ylab:"density", aria:"sampling distribution of the mle"});
+  dens.forEach((d,b) => {
+    if (!d) return;
+    el("rect", {x:ch.sx(lo+b*bw)+1, y:ch.sy(d), width:Math.max(ch.sx(lo+bw)-ch.sx(lo)-2,1),
+      height:ch.sy(0)-ch.sy(d), fill:S2, "fill-opacity":0.45}, ch.plot);
+  });
+  line(ch, fnPath(ch, x => normPdf(x,th,sd), lo, hi, 241), S1);
+  vline(ch, th, "crossline");
+  let mvar = NaN;
+  if (w2vals.length > 1){
+    const m = w2vals.reduce((a,b)=>a+b,0)/w2vals.length;
+    mvar = w2vals.reduce((a,b)=>a+(b-m)*(b-m),0)/w2vals.length;
+  }
+  document.getElementById("w2read").innerHTML =
+    `<span><span class="k">replications</span> <b>= ${w2vals.length}</b></span>` +
+    `<span><span class="k">variance of θ̂ (MC)</span> <b>= ${w2vals.length>1?fmt(mvar,4):"—"}</b></span>` +
+    `<span><span class="k">bound θ²/n = 1/Iₙ</span> <b>= ${fmt(th*th/n,4)}</b></span>`;
+}
+document.getElementById("w2draw").onclick = () => {
+  const th = +document.getElementById("w2t").value;
+  const n = +document.getElementById("w2n").value;
+  for (let r=0; r<400; r++){
+    let s = 0;
+    for (let i=0; i<n; i++) s += expDraw(th);
+    w2vals.push(s/n);
+  }
+  w2redraw();
+};
+document.getElementById("w2reset").onclick = () => { w2vals = []; w2rng = mulberry32(33); w2redraw(); };
+document.getElementById("w2t").addEventListener("input", () => { w2vals = []; });
+document.getElementById("w2n").addEventListener("input", () => { w2vals = []; });
+bindControls(document.getElementById("w2"), w2redraw);
+w2redraw();
+
+/* ---------- Widget 3: slope matching on psi ---------- */
+const w3host = document.getElementById("w3c");
+function drawW3(){
+  const yb = +document.getElementById("w3y").value;
+  const xihat = Math.log(yb);
+  w3host.querySelectorAll("svg").forEach(s=>s.remove());
+  w3host.querySelectorAll(".tip").forEach(s=>s.remove());
+  const ch = makeChart(w3host, {w:620, h:340, xdom:[-1.6,2.0], ydom:[0,7.6],
+    xticks:[{v:xihat,l:"ξ̂="+fmt(xihat,2)},{v:0,l:"0"}],
+    yticks:[{v:yb,l:"ψ′=ȳ"}],
+    xlab:"ξ", ylab:"ψ(ξ)", aria:"slope matching on psi"});
+  line(ch, fnPath(ch, x => Math.exp(x), -1.6, 2.0, 241), S1);
+  // tangent at xihat: psi(xihat) + yb (x - xihat)
+  line(ch, fnPath(ch, x => yb + yb*(x - xihat), -1.6, 2.0, 2), S2, "7 5");
+  dot(ch, xihat, yb, S2, 5);
+  vline(ch, xihat, "crossline");
+  attachHover(w3host, ch, [{name:"ψ", color:S1, f:x=>Math.exp(x)}],
+    x => "ξ = " + fmt(x,2), y => fmt(y,3));
+  document.getElementById("w3read").innerHTML =
+    `<span><span class="k">θ̂ = ψ′(ξ̂) = ȳ</span> <b>= ${fmt(yb,2)}</b></span>` +
+    `<span><span class="k">ξ̂ = log ȳ</span> <b>= ${fmt(xihat,3)}</b></span>` +
+    `<span><span class="k">ψ″(ξ̂) (curvature at tangency)</span> <b>= ${fmt(yb,2)}</b></span>`;
+}
+bindControls(document.getElementById("w3"), drawW3);
+drawW3();
+
+/* KaTeX */
+document.addEventListener("DOMContentLoaded", () => {
+  if (window.renderMathInElement) renderMathInElement(document.body, {
+    delimiters:[{left:"\\(",right:"\\)",display:false},{left:"$$",right:"$$",display:true}],
+    macros:{"\\E":"\\mathrm{E}"}
+  });
+});
+</script>
+</body>
+</html>
