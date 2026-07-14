@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Homework 5 · Interactive — STAT S4204</title>
+<meta name="description" content="Interactive companion to Homework 5: Fisher information as curvature, observed versus expected information, and when the variance bound is attained.">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="icon" href="favicon.ico" sizes="32x32">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<link rel="stylesheet" href="assets/hw.css">
+</head>
+<body>
+  <div class="band"><div class="in">
+    <div class="topnav"><a href="./">← Notes in Statistical Inference</a></div>
+    <p class="course">STAT&nbsp;S4204 · Summer&nbsp;2026 · Problem Sets</p>
+    <h1>Homework 5 — Interactive Companion</h1>
+    <p class="sub">Fisher information: curvature, the identity between its two forms, and when the bound is attained</p>
+  </div></div>
+  <div class="wrap">
+
+    <p class="lead">Assignment 5 computes seven likelihood quantities—likelihood through the
+    expected second derivative—in four models, and every setting lands on the same pair of
+    identities: the derivative of the log likelihood has mean zero, and its variance equals
+    the negative expected second derivative, the Fisher information
+    \( I_n(\theta) \). The write-up carries the derivations; the three laboratories below
+    let you see the information as curvature, watch the random curvature average into the
+    expected one, and find out where the variance bound is and is not attained.</p>
+    <div class="pdfbar">
+      <a class="btn" href="homework-05.pdf">Read the write-up (PDF)</a>
+      <a class="btn ghost" href="./">All notes</a>
+    </div>
+
+    <!-- ============ Widget 1: curvature lab ============ -->
+    <div class="widget" id="w1">
+      <h2>Problem 1 · Normal, known variance</h2>
+      <h3>Information is curvature</h3>
+      <p>For \(n\) i.i.d.\ \(N(\theta,\sigma^2)\) observations the log likelihood is an exact
+      parabola, \( \ell(\theta)-\ell(\bar y) = -\tfrac12 I_n (\theta-\bar y)^2 \) with
+      \( I_n = n/\sigma^2 \): the second derivative is not random, and information is
+      literally the sharpness of the peak. Steer \(n\) and \(\sigma^2\) on a fixed frame.</p>
+      <div class="controls">
+        <span class="ctl"><label>n</label>
+          <input type="range" min="1" max="50" step="1" value="5" id="w1n" data-out="w1nv" data-fmt="int">
+          <span class="val" id="w1nv"></span></span>
+        <span class="ctl"><label>σ²</label>
+          <input type="range" min="0.5" max="8" step="0.25" value="4" id="w1s" data-out="w1sv" data-dec="2">
+          <span class="val" id="w1sv"></span></span>
+      </div>
+      <div class="charts">
+        <div class="chartwrap" style="max-width:560px" id="w1c"></div>
+      </div>
+      <div class="legend">
+        <span class="chip"><span class="sw" style="border-color:var(--s1)"></span>\( \ell(\theta)-\ell(\bar y) \) at the sliders</span>
+        <span class="chip"><span class="sw" style="border-color:#c3c8ce"></span>reference: \(I_n=1\)</span>
+      </div>
+      <div class="readout" id="w1read"></div>
+      <p class="note">More data or less noise sharpen the parabola—the data argue harder
+      against values away from \(\bar y\)—and the two sliders act only through the one number
+      \(n/\sigma^2\): double \(n\) and double \(\sigma^2\) and nothing moves, which is the
+      point. The bound \(1/I_n=\sigma^2/n\) is the variance of \(\bar Y\): attained.</p>
+    </div>
+
+    <!-- ============ Widget 2: observed vs expected ============ -->
+    <div class="widget" id="w2">
+      <h2>Problems 2–3 · Poisson</h2>
+      <h3>Observed curvature, expected information</h3>
+      <p>In the Poisson model the second derivative is random:
+      \( -\ell''(\theta) = S/\theta^2 \) changes with the sample, and only its expectation is
+      the information \( I_n(\theta) = n/\theta \). Draw samples and watch the observed
+      informations scatter around the expected one—and their running mean settle onto it.</p>
+      <div class="controls">
+        <span class="ctl"><label>θ</label>
+          <input type="range" min="0.5" max="8" step="0.1" value="2" id="w2t" data-out="w2tv" data-dec="1">
+          <span class="val" id="w2tv"></span></span>
+        <span class="ctl"><label>n</label>
+          <input type="range" min="2" max="50" step="1" value="8" id="w2n" data-out="w2nv" data-fmt="int">
+          <span class="val" id="w2nv"></span></span>
+        <span class="ctl"><button id="w2draw">Draw 30 samples</button></span>
+        <span class="ctl"><button id="w2reset">Reset</button></span>
+      </div>
+      <div class="charts">
+        <div class="chartwrap" style="max-width:640px" id="w2c"></div>
+      </div>
+      <div class="legend">
+        <span class="chip"><span class="sw dot" style="background:var(--s2)"></span>observed information \(S/\theta^2\), one dot per sample</span>
+        <span class="chip"><span class="sw" style="border-color:var(--s1)"></span>expected: \(I_n(\theta)=n/\theta\)</span>
+        <span class="chip"><span class="sw dash" style="border-color:var(--s3)"></span>running mean of the draws</span>
+      </div>
+      <div class="readout" id="w2read"></div>
+      <p class="note">This is the content of the identity
+      \( \operatorname{Var}\{\ell'(\theta)\} = -\mathrm{E}\{\ell''(\theta)\} \): each sample
+      carries its own curvature, and the information is what curvature averages to. In the
+      normal and exponential-family settings of Problems 1 and 4 the dots would all land
+      exactly on the line—there the curvature is a constant.</p>
+    </div>
+
+    <!-- ============ Widget 3: attainment ============ -->
+    <div class="widget" id="w3">
+      <h2>Problem 3 · The struck-through comparison</h2>
+      <h3>Attained for the mean, unattained for the rate</h3>
+      <p>One exponential model, two parameterizations, two verdicts. Estimating the
+      <em>mean</em> \(\theta\), the sample mean attains the bound at every \(n\):
+      \( \operatorname{Var}(\bar Y)/\text{bound} \equiv 1 \). Estimating the <em>rate</em>
+      \(\beta=1/\theta\), the best unbiased estimator \((n-1)/S\) has variance
+      \( \beta^2/(n-2) \) against the bound \( \beta^2/n \): a ratio of
+      \( n/(n-2) \), above one at every finite \(n\) and closing only asymptotically. Both
+      ratios are free of the parameter—the chart is the whole story. Hover to read it.</p>
+      <div class="charts">
+        <div class="chartwrap" style="max-width:640px" id="w3c"></div>
+      </div>
+      <div class="legend">
+        <span class="chip"><span class="sw" style="border-color:var(--s1)"></span>mean parameterization: \(\bar Y\), ratio \(=1\)</span>
+        <span class="chip"><span class="sw dash" style="border-color:var(--s2)"></span>rate parameterization: \((n-1)/S\), ratio \(n/(n-2)\)</span>
+      </div>
+      <div class="readout" id="w3read"></div>
+      <p class="note">The bound is attained exactly when the estimator is a linear function
+      of \(\ell'(\theta)\)—for the mean, \( \bar Y-\theta = (\theta^2/n)\,\ell'(\theta) \);
+      for the rate, \((n-1)/S\) is not linear in the score, and no unbiased estimator of
+      \(\beta\) is. Which quantity you estimate decides whether the bound is a target or
+      only a floor.</p>
+    </div>
+
+    <footer>
+      Interactive companion to the Homework&nbsp;5 write-up; the PDF is the submitted
+      document. Any errors are my own.
+      <div class="ln"><a href="homework-05.pdf">homework-05.pdf</a> ·
+        <a href="./">all notes</a> ·
+        <a href="mailto:tyler.sotomayor@columbia.edu">errata</a></div>
+    </footer>
+  </div>
+  <div class="footerband"><div class="in"><img src="assets/summer-logo.svg" alt="Columbia University Summer Session"></div></div>
+
+<script src="assets/hw.js"></script>
+<script>
+"use strict";
+/* ---------- Widget 1: curvature lab ---------- */
+const w1host = document.getElementById("w1c");
+function drawW1(){
+  const n = +document.getElementById("w1n").value;
+  const s2 = +document.getElementById("w1s").value;
+  const I = n/s2;
+  w1host.querySelectorAll("svg").forEach(s=>s.remove());
+  w1host.querySelectorAll(".tip").forEach(s=>s.remove());
+  const ch = makeChart(w1host, {w:560, h:330, xdom:[-2.2,2.2], ydom:[-6,0.5],
+    xticks:[{v:0,l:"ȳ"}], yticks:[{v:0,l:"0"},{v:-3,l:"−3"}],
+    xlab:"θ", ylab:"ℓ(θ) − ℓ(ȳ)", aria:"log likelihood parabola"});
+  vline(ch, 0, "crossline");
+  line(ch, fnPath(ch, x => -0.5*x*x, -2.2, 2.2), "#c3c8ce");
+  line(ch, fnPath(ch, x => -0.5*I*x*x, -2.2, 2.2), S1);
+  attachHover(w1host, ch, [{name:"ℓ − ℓ(ȳ)", color:S1, f:x=>-0.5*I*x*x}],
+    x => "θ − ȳ = " + fmt(x,2), y => fmt(y,3));
+  document.getElementById("w1read").innerHTML =
+    `<span><span class="k">Iₙ = n/σ²</span> <b>= ${fmt(I,3)}</b></span>` +
+    `<span><span class="k">bound 1/Iₙ = Var(Ȳ)</span> <b>= ${fmt(1/I,3)}</b></span>`;
+}
+bindControls(document.getElementById("w1"), drawW1);
+drawW1();
+
+/* ---------- Widget 2: observed vs expected information ---------- */
+const w2host = document.getElementById("w2c");
+let w2rng = mulberry32(11), w2draws = [];
+function poisson(lam){
+  if (lam > 30){
+    const z = Math.sqrt(-2*Math.log(Math.max(w2rng(),1e-12)))*Math.cos(2*Math.PI*w2rng());
+    return Math.max(0, Math.round(lam + Math.sqrt(lam)*z));
+  }
+  let L = Math.exp(-lam), k = 0, p = 1;
+  do { k++; p *= w2rng(); } while (p > L);
+  return k - 1;
+}
+function w2redraw(){
+  const th = +document.getElementById("w2t").value;
+  const n = +document.getElementById("w2n").value;
+  const I = n/th;
+  const sd = Math.sqrt(n*th)/(th*th);   // sd of S/theta^2
+  const K = 150;
+  w2host.querySelectorAll("svg").forEach(s=>s.remove());
+  w2host.querySelectorAll(".tip").forEach(s=>s.remove());
+  const ch = makeChart(w2host, {w:640, h:330, xdom:[0,K], ydom:[Math.max(0,I-4.2*sd), I+4.2*sd],
+    xticks:[{v:0,l:"0"},{v:75,l:"75"},{v:150,l:"150"}],
+    yticks:[{v:I,l:fmt(I,2)}],
+    xlab:"draw", ylab:"−ℓ″(θ) = S/θ²", aria:"observed information strip"});
+  hline(ch, I, "refline");
+  el("text", {x:ch.sx(K*0.99), y:ch.sy(I)-6, "text-anchor":"end", class:"ticklab"}, ch.fore)
+    .textContent = "Iₙ(θ) = n/θ";
+  let run = 0;
+  const meanPts = [];
+  w2draws.forEach((v, i) => {
+    run += v;
+    meanPts.push([i+1, run/(i+1)]);
+    el("circle", {cx:ch.sx(i+1), cy:ch.sy(v), r:2.8, fill:S2, "fill-opacity":0.6}, ch.plot);
+  });
+  if (meanPts.length > 1)
+    el("path", {d:pathFrom(meanPts, ch), fill:"none", stroke:S3, "stroke-width":2,
+                "stroke-dasharray":"6 4"}, ch.plot);
+  const m = w2draws.length ? run/w2draws.length : NaN;
+  document.getElementById("w2read").innerHTML =
+    `<span><span class="k">draws</span> <b>= ${w2draws.length}</b></span>` +
+    `<span><span class="k">mean of observed info</span> <b>= ${w2draws.length?fmt(m,3):"—"}</b></span>` +
+    `<span><span class="k">expected Iₙ(θ) = n/θ</span> <b>= ${fmt(I,3)}</b></span>`;
+}
+document.getElementById("w2draw").onclick = () => {
+  const th = +document.getElementById("w2t").value;
+  const n = +document.getElementById("w2n").value;
+  for (let i=0; i<30 && w2draws.length<150; i++){
+    let S = 0;
+    for (let j=0; j<n; j++) S += poisson(th);
+    w2draws.push(S/(th*th));
+  }
+  w2redraw();
+};
+document.getElementById("w2reset").onclick = () => { w2draws = []; w2rng = mulberry32(11); w2redraw(); };
+document.getElementById("w2t").addEventListener("input", () => { w2draws = []; });
+document.getElementById("w2n").addEventListener("input", () => { w2draws = []; });
+bindControls(document.getElementById("w2"), w2redraw);
+w2redraw();
+
+/* ---------- Widget 3: attainment ratios ---------- */
+const w3host = document.getElementById("w3c");
+(function(){
+  const ch = makeChart(w3host, {w:640, h:330, xdom:[3,300], xlog:true, ydom:[0.9,3.05],
+    xticks:[{v:3,l:"3"},{v:10,l:"10"},{v:30,l:"30"},{v:100,l:"100"},{v:300,l:"300"}],
+    yticks:[{v:1,l:"1"},{v:2,l:"2"},{v:3,l:"3"}],
+    xlab:"n (log scale)", ylab:"variance ÷ bound", aria:"attainment ratios"});
+  hline(ch, 1, "refline");
+  line(ch, fnPath(ch, () => 1, 3, 300, 2), S1);
+  const pts = [];
+  for (let i=0; i<=200; i++){
+    const m = 3*Math.pow(100, i/200);
+    pts.push([m, m/(m-2)]);
+  }
+  el("path", {d:pathFrom(pts, ch), fill:"none", stroke:S2, "stroke-width":2,
+              "stroke-dasharray":"7 5"}, ch.plot);
+  attachHover(w3host, ch,
+    [{name:"mean: ratio", color:S1, f:()=>1},
+     {name:"rate: n/(n−2)", color:S2, f:m=>m/(m-2)}],
+    x => "n = " + Math.round(x), y => fmt(y,4));
+  document.getElementById("w3read").innerHTML =
+    `<span><span class="k">mean parameterization</span> <b>attained at every n</b></span>` +
+    `<span><span class="k">rate parameterization</span> <b>never attained; ratio → 1</b></span>`;
+})();
+
+/* KaTeX */
+document.addEventListener("DOMContentLoaded", () => {
+  if (window.renderMathInElement) renderMathInElement(document.body, {
+    delimiters:[{left:"\\(",right:"\\)",display:false},{left:"$$",right:"$$",display:true}],
+    macros:{"\\E":"\\mathrm{E}"}
+  });
+});
+</script>
+</body>
+</html>
