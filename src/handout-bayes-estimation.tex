@@ -1,0 +1,989 @@
+%% ============================================================
+%%  Companion Handout -- Bayesian Estimation from First Principles
+%%  Standalone teaching document (NOT part of the book's Part I).
+%%  Written by the student as a from-zero introduction to the
+%%  material of Lecture 2, SS2.8-2.9; self-contained, no statistics
+%%  background assumed. Compile standalone: pdflatex handout-bayes-estimation.
+%% ============================================================
+\documentclass[main.tex]{subfiles}
+
+\begin{document}
+
+\beginunit{Handout~\textendash~Bayesian Estimation}{COMPANION HANDOUT}%
+  {Written for the course notes \textperiodcentered\ Summer 2026}%
+  {Bayesian Estimation from First Principles}
+
+\epigraph{Probability theory is nothing but common sense reduced to calculation.}%
+{Pierre-Simon Laplace, \emph{Essai philosophique sur les probabilit\'es} (1814)}
+
+\begin{lecturecontents}{Contents of this handout}
+  \item \hyperlink{B.1}{B.1\quad The Problem: Guessing a Number You Cannot See}
+  \item \hyperlink{B.2}{B.2\quad The Probability Toolkit, from Zero}
+  \item \hyperlink{B.3}{B.3\quad Estimation as a Decision, and Why It Gets Stuck}
+  \item \hyperlink{B.4}{B.4\quad The Prior, the Posterior, and Bayes' Theorem}
+  \item \hyperlink{B.5}{B.5\quad The Best Guess Under Squared Error}
+  \item \hyperlink{B.6}{B.6\quad A Toolkit Distribution: the Beta Family}
+  \item \hyperlink{B.7}{B.7\quad The Cure Rate, Start to Finish}
+  \item \hyperlink{B.8}{B.8\quad A Second Instrument: the Normal--Normal Pair}
+  \item \hyperlink{B.9}{B.9\quad What to Make of the Prior}
+  \item \hyperlink{B.10}{B.10\quad The Vocabulary, and Where to Go Next}
+\end{lecturecontents}
+
+\bigskip
+\noindent\textbf{About this handout.} This is a student-written companion to the course
+notes---not an instructor document. It rebuilds, from nothing, the mathematics behind one
+sentence from Lecture~2: \emph{under squared-error loss, the best estimator is the posterior
+mean}. Every term is defined before it is used, every derivation shows every algebraic step,
+and every step says why it is being taken. No statistics background is assumed; the only
+prerequisites are single-variable calculus (derivatives, integrals, integration by parts) and
+patience. Cross-references like \xrefL{2.9.3} point at numbered objects in the course notes
+(lecture~2, section~9, object~3); references like \xref{B.5.1} point within this handout.
+A web edition lives on the course site, identical in content, with the figures replaced by
+live laboratories---the normal--normal update of \S\,\xref{B.8} as the centerpiece---so the
+machinery can be steered by hand while reading.
+
+\clearpage
+% ============================================================
+\sub{B.1}{The Problem: Guessing a Number You Cannot See}
+
+\begin{ObjL}{Concept}{B.1.1}{The estimation problem}
+A new treatment cures some fraction of the patients who receive it. Call that fraction
+$\theta$: if $\theta=0.7$, then in the long run $70\%$ of treated patients are cured. Nobody
+knows $\theta$. It is not random---it is a fixed fact about the treatment---but it is
+\emph{hidden}: the only way to learn about it is to treat patients and watch what happens.
+Suppose we treat $n=10$ patients and $x=7$ of them are cured. What number should we now
+report as our best guess of $\theta$? That question---turn data into a single defensible
+guess at a hidden number---is called \emph{estimation}, and this handout builds one complete,
+principled answer to it.
+\end{ObjL}
+
+\begin{ObjL}{Concept}{B.1.2}{Two sources of information}
+The obvious answer is the observed cure rate, $7/10=0.7$. It is a good answer, and by the end
+of the handout you will know exactly in what sense. But notice that the data are not the only
+thing you know. Perhaps treatments of this kind have historically cured between $30\%$ and
+$60\%$ of patients; perhaps the biology says a cure rate near $1$ is implausible. Ten
+patients is not many, and it seems wasteful to ignore everything except those ten outcomes.
+The \emph{Bayesian} approach--- the subject of this handout---is defined by one move: it
+expresses \emph{both} sources of information, the data and the background knowledge, in the
+same language, the language of probability. Once both speak that language, a single theorem
+combines them optimally.
+\end{ObjL}
+
+\begin{ObjL}{Remark}{B.1.3}{The route}
+The handout runs in a straight line, and it helps to see the whole road first.
+\S\,\xref{B.2} builds the probability vocabulary (random variables, distributions,
+expectation, conditional distributions)---the language everything else is written in.
+\S\,\xref{B.3} makes ``estimation'' precise and shows why, without background knowledge, the
+problem gets \emph{stuck}: candidate guessing rules cannot be ranked. \S\,\xref{B.4}
+introduces the Bayesian move---treat the hidden number as random, with a distribution
+expressing what you believe about it---and derives \emph{Bayes' theorem}, the rule for
+updating that belief with data. \S\,\xref{B.5} proves the punchline: once beliefs are
+updated, the best single-number guess under the natural error measure is the \emph{average
+of the updated belief}. \S\S\,\xref{B.6}--\xref{B.8} then work two complete examples with
+real numbers, including the ten-patient trial above, and \S\,\xref{B.9} asks the honest
+question---where did the prior belief come from?---before \S\,\xref{B.10} hands you the
+standard vocabulary for further reading.
+\end{ObjL}
+
+% ============================================================
+\sub{B.2}{The Probability Toolkit, from Zero}
+
+Probability is the mathematics of quantities whose values you cannot predict. This section
+defines the six ideas the rest of the handout uses---random variable, distribution,
+expectation, variance, conditional distribution, conditional expectation---each with a small
+computation so the definition is not just words. Readers who have met these before can skim,
+but should slow down at \xref{B.2.7} and \xref{B.2.9}, which carry the whole later argument.
+
+\begin{Obj}{Definition}{B.2.1}{Random variable; realization}
+A \emph{random variable} is a numerical quantity whose value is determined by the outcome of
+something uncertain---a measurement not yet made. The number of cures among ten patients,
+before the trial runs, is a random variable; so is tomorrow's temperature. Random variables
+are written with capital letters ($X$, $Y$); once the uncertainty resolves and a value is
+observed, that observed number---written in lowercase ($x$, $y$)---is called the
+\emph{realization}. ``$X=7$'' is an event that had some probability in advance; ``$x=7$'' is
+what actually happened.
+\end{Obj}
+
+\begin{Obj}{Definition}{B.2.2}{Distribution; pmf; density}
+The \emph{distribution} of a random variable is the complete advance description of how
+likely it is to fall anywhere: the assignment of a probability to every statement of the
+form ``$X$ lands in the set $A$.'' For a \emph{discrete} random variable (one taking
+isolated values, like a count) the distribution is carried by the \emph{probability mass
+function} (pmf)
+\[ p(x) \;=\; P(X = x) , \]
+the probability of each individual value; probabilities of sets are found by adding:
+$P(X\in A)=\sum_{x\in A}p(x)$. For a \emph{continuous} random variable (one taking values in
+a continuum, like a fraction in $[0,1]$) individual points all have probability zero, and
+the distribution is instead carried by a \emph{density} $f(x)\ge0$, with probabilities found
+by integrating:
+\[ P(X\in A) \;=\; \int_A f(x)\,dx .\note{A density is not a probability but a probability
+\emph{rate}: probability per unit length, so that $f(x)\,dx\approx P(x\le X\le x+dx)$ for
+small $dx$. Consequently a density can exceed $1$ (the uniform density on $[0,\frac12]$ is
+$2$ there) and $f(x)$ is emphatically not $P(X=x)$, which is $0$. Sums against a pmf and
+integrals against a density are the same idea with the same rules; the handout states things
+once and trusts the reader to swap $\sum\leftrightarrow\int$.} \]
+In both cases the total is $1$: $\sum_x p(x)=1$, $\int f(x)\,dx=1$---\emph{something} must
+happen.
+\end{Obj}
+
+\begin{Obj}{Definition}{B.2.3}{Expectation}
+The \emph{expectation} (or \emph{mean}) of a random variable $X$ is its
+probability-weighted average value,
+\[ \E\{X\} \;=\; \sum_x x\, p(x) \qquad\text{(discrete)}, \qquad\qquad
+   \E\{X\} \;=\; \int x\, f(x)\, dx \qquad\text{(continuous)} : \]
+each possible value, weighted by how likely it is. Geometrically it is the \emph{balancing
+point} of the distribution: if the pmf or density were a physical distribution of weight
+along a rod, $\E\{X\}$ is where the rod balances. It is the single number that best
+summarizes ``where the distribution sits''---a claim \S\,\xref{B.5} will turn from slogan
+into theorem.
+\end{Obj}
+
+\begin{ObjL}{Example}{B.2.4}{Two expectations, fully computed}
+(a) A random variable $Z$ takes the value $1$ with probability $\theta$ and $0$ with
+probability $1-\theta$ (one patient: cured or not; such a $Z$ is called a
+\emph{Bernoulli($\theta$)} variable). Its expectation, straight from the definition:
+\[ \E\{Z\} \;=\; 1\cdot P(Z=1) + 0\cdot P(Z=0) \;=\; 1\cdot\theta + 0\cdot(1-\theta)
+   \;=\; \theta . \]
+The mean of a $0$-or-$1$ variable \emph{is} its probability of being $1$---the bridge
+between ``probability'' and ``long-run fraction.''
+(b) A random variable $W$ takes values $1, 2, 6$ with probabilities
+$\tfrac12, \tfrac13, \tfrac16$. Then
+\[ \E\{W\} \;=\; 1\cdot\tfrac12 + 2\cdot\tfrac13 + 6\cdot\tfrac16
+   \;=\; \tfrac12 + \tfrac23 + 1 \;=\; \tfrac{3+4+6}{6} \;=\; \tfrac{13}{6}
+   \;\approx\; 2.17 . \]
+Note the balancing-point reading: $2.17$ is not a possible value of $W$; it is where the
+weights balance. Expectation also respects sums and constant multiples---%
+$\E\{aX+bY\}=a\,\E\{X\}+b\,\E\{Y\}$, always, with no assumptions about how $X$ and $Y$ are
+related---a property called \emph{linearity} that we will use constantly.\note{Why linearity
+is free: in $\E\{aX+bY\}=\sum (ax+by)\,p(x,y)$ the sum splits into
+$a\sum x\,p(x,y)+b\sum y\,p(x,y)$ by ordinary algebra, and the two pieces are $a\,\E\{X\}$
+and $b\,\E\{Y\}$. Nothing about the relationship between $X$ and $Y$ was used---only that
+both means exist.}
+\end{ObjL}
+
+\begin{Obj}{Definition}{B.2.5}{Variance; standard deviation}
+The \emph{variance} of $X$ measures its spread: the expected squared distance from its own
+mean,
+\[ \Var(X) \;=\; \E\big\{ (X - \E\{X\})^2 \big\} . \]
+Squaring makes deviations positive (so left- and right-misses cannot cancel) and charges
+large deviations disproportionately. Its square root, the \emph{standard deviation}, is the
+spread in the original units. A useful equivalent form, obtained by expanding the square and
+using linearity:
+\[ \Var(X) \;=\; \E\big\{X^2 - 2X\,\E\{X\} + \E\{X\}^2\big\}
+   \;=\; \E\{X^2\} - 2\,\E\{X\}\,\E\{X\} + \E\{X\}^2 , \]
+that is,
+\[ \Var(X) \;=\; \E\{X^2\} - \E\{X\}^2 . \]
+For the Bernoulli variable of \xref{B.2.4}(a): $Z^2=Z$ (since $0^2=0$, $1^2=1$), so
+$\E\{Z^2\}=\theta$ and
+\[ \Var(Z) \;=\; \theta - \theta^2 \;=\; \theta(1-\theta) , \]
+largest at $\theta=\tfrac12$ (a fair coin is the most unpredictable coin) and zero at
+$\theta=0$ or $1$ (no uncertainty at all).
+\end{Obj}
+
+\begin{Obj}{Definition}{B.2.6}{Joint, marginal, and conditional distributions}
+For a \emph{pair} of random variables $(X,Y)$, the \emph{joint distribution} assigns a
+probability to every combination: in the discrete case, $p(x,y)=P(X=x,\,Y=y)$. From it, the
+distribution of each variable alone---the \emph{marginal}---is recovered by summing out the
+other:
+\[ p_X(x) \;=\; \sum_y p(x,y) . \]
+And the \emph{conditional distribution} of $X$ given that $Y$ has been observed to equal $y$
+is the joint, restricted to that observation and rescaled to total $1$:
+\[ p(x \mid y) \;=\; \frac{p(x,y)}{p_Y(y)} \qquad (p_Y(y)>0) . \]
+Read the formula as a two-step act: \emph{take the slice} of the joint where $Y=y$ (the
+numerator), then \emph{renormalize} it into a genuine probability distribution by dividing
+by the slice's total mass (the denominator). For continuous variables the same formulas hold
+with densities and integrals.
+\end{Obj}
+
+\begin{ObjL}{Example}{B.2.7}{A worked table---and, secretly, the whole handout}
+A disease affects $10\%$ of a population. A screening test comes back positive for $90\%$ of
+the sick and (falsely) for $20\%$ of the healthy. Let $D=1$ mean sick, $T=1$ mean the test is
+positive. The joint distribution, built by multiplying each group's size by its test
+behavior:
+\[ \begin{array}{c|cc|c}
+     & T=1 & T=0 & \text{row total}\\ \hline
+   D=1 & 0.10\times0.90 = 0.09 & 0.10\times0.10 = 0.01 & 0.10\\
+   D=0 & 0.90\times0.20 = 0.18 & 0.90\times0.80 = 0.72 & 0.90\\ \hline
+   \text{column total} & 0.27 & 0.73 & 1.00
+   \end{array} \]
+The four cells total $1$, the row totals are the marginal of $D$, the column totals the
+marginal of $T$. Now suppose your test comes back positive. What is the probability you are
+sick? Apply \xref{B.2.6}: slice the $T=1$ column, then renormalize by its total $0.27$:
+\[ P(D=1 \mid T=1) \;=\; \frac{p(1,1)}{p_T(1)} \;=\; \frac{0.09}{0.27} \;=\; \frac13 . \]
+Pause on what just happened. \emph{Before} the test, your probability of being sick was
+$0.10$. You received data (a positive test), and your probability \emph{updated} to
+$0.33$---higher, but nowhere near certainty, because false positives are common and the
+disease is rare. This little table is the entire Bayesian method in miniature: a belief, a
+data-generating mechanism, an observation, an updated belief. \S\,\xref{B.4} will redo this
+computation with a continuous unknown in place of $D$ and give its parts their proper names.
+\end{ObjL}
+
+\begin{Obj}{Definition}{B.2.8}{Conditional expectation}
+The \emph{conditional expectation} of $X$ given $Y=y$ is the mean of the conditional
+distribution:
+\[ \E\{X \mid Y=y\} \;=\; \sum_x x\, p(x\mid y) \]
+(integral against the conditional density in the continuous case). It is the balancing point
+of the \emph{slice}: your updated best summary of $X$ after seeing $Y=y$. Note that it is a
+number for each $y$---so, before $Y$ is observed, the recipe $y\mapsto\E\{X\mid Y=y\}$ is
+itself a random quantity, written $\E\{X\mid Y\}$.
+\end{Obj}
+
+\begin{Obj}{Theorem}{B.2.9}{Iterated expectations}
+For jointly distributed $(X,Y)$ with $\E\{|X|\}<\infty$,
+\[ \E\{X\} \;=\; \E\big\{\, \E\{X \mid Y\} \,\big\} : \]
+the overall mean is the probability-weighted average, over what $Y$ might be, of the
+slice-by-slice means.
+\end{Obj}
+\begin{Prf}{B.2.9}{Proof of Iterated Expectations by Regrouping a Double Sum.}{Uses \xref{B.2.6}, \xref{B.2.8}.}
+\item Write out the right side from the definitions. The outer expectation averages the
+      function $y\mapsto\E\{X\mid Y=y\}$ against the marginal of $Y$:
+      \[ \E\big\{ \E\{X\mid Y\} \big\}
+         \;=\; \sum_y \E\{X \mid Y=y\}\; p_Y(y)
+         \;=\; \sum_y \Big( \sum_x x\, p(x\mid y) \Big) p_Y(y) . \]
+\item Substitute the definition of the conditional pmf,
+      $p(x\mid y)=p(x,y)/p_Y(y)$:
+      \[ \sum_y \sum_x x\,\frac{p(x,y)}{p_Y(y)}\; p_Y(y)
+         \;=\; \sum_y \sum_x x\, p(x,y) , \]
+      the marginal $p_Y(y)$ cancelling exactly---this cancellation is the whole proof.
+\item Regroup the double sum by $x$ (legal because the sum converges absolutely):
+      \[ \sum_x x \sum_y p(x,y) \;=\; \sum_x x\, p_X(x) \;=\; \E\{X\} , \]
+      the inner sum being the marginal of $X$ by \xref{B.2.6}.
+\end{Prf}
+
+\medskip
+Why this theorem matters here: it lets you compute a complicated overall average by
+\emph{conditioning}---break the world into slices where things are simple, average within
+each slice, then average the slice-answers. The main theorem of \S\,\xref{B.5} is exactly
+one application of this maneuver.
+
+% ============================================================
+\sub{B.3}{Estimation as a Decision, and Why It Gets Stuck}
+
+The toolkit is assembled; now aim it at the trial of \xref{B.1.1}. This section makes four
+ideas precise---model, estimator, loss, risk---and then demonstrates the problem that
+motivates everything after: without background knowledge, competing estimators
+\emph{cannot be ranked}.
+
+\begin{Obj}{Definition}{B.3.1}{The statistical model, and the trial's}
+A \emph{statistical model} is a family of candidate distributions for the data, indexed by
+the unknown quantity: for each possible value of $\theta$, a statement of how the data would
+then behave. The unknown $\theta$ is called the \emph{parameter}; the set $\Theta$ of its
+possible values, the \emph{parameter space}. For the trial: each of $n$ patients is
+independently cured with probability $\theta$, and $X$ counts the cures. A particular
+sequence with $x$ specified cures and $n-x$ specified failures has probability
+$\theta^x(1-\theta)^{n-x}$ (independence multiplies the per-patient probabilities), and
+there are $\binom{n}{x}$ ways to choose \emph{which} $x$ patients are the cured ones, so
+\[ f(x \mid \theta) \;=\; P(X = x \mid \theta)
+   \;=\; \binom{n}{x}\,\theta^{x}(1-\theta)^{\,n-x} ,
+   \qquad x = 0, 1, \dots, n , \]
+with $\Theta=[0,1]$. This family is the \emph{binomial} model, written
+$X\sim\text{Binomial}(n,\theta)$.\note{The notation $f(x\mid\theta)$---``the pmf of the data
+\emph{given} the parameter''---is chosen deliberately: from \S\,\xref{B.4} on, $\theta$ will
+be treated as a random variable and this really will be a conditional distribution in the
+sense of \xref{B.2.6}. The course notes write $f(x;\theta)$ when $\theta$ is being treated
+as a fixed unknown; the two notations name the same function.}
+\end{Obj}
+
+\begin{Obj}{Definition}{B.3.2}{Estimator}
+An \emph{estimator} is a rule---a function $a(\cdot)$, committed to before the data
+arrive---that turns any possible data set into a guess: observe $X=x$, report $a(x)$. The
+\emph{estimator} is the recipe; the \emph{estimate} is the number the recipe produces on your
+data. Candidate recipes for the trial are cheap to write down: report the observed rate
+$a_1(x)=x/n$; ignore the data and always report $a_2(x)=\tfrac12$; split the difference,
+$a_3(x)=(x+1)/(n+2)$. Each produces \emph{an} answer on every data set, so producing answers
+cannot be what makes an estimator good. We need a way to score them.
+\end{Obj}
+
+\begin{Obj}{Definition}{B.3.3}{Loss function; squared-error loss}
+A \emph{loss function} $L(\theta,a)$ prices the consequence of reporting the guess $a$ when
+the truth is $\theta$: bigger loss, worse outcome. It is chosen by \emph{us}, when we pose
+the problem, as the definition of what counts as a miss. This handout uses the standard
+choice for estimating a number, \emph{squared-error loss}:
+\[ L(\theta, a) \;=\; (\theta - a)^2 . \]
+Why this and not, say, $|\theta-a|$? Three reasons, in increasing order of importance:
+squaring is symmetric (over- and under-estimation are punished alike); it charges large
+misses disproportionately (missing by $0.2$ costs four times missing by $0.1$), which
+matches how bad decisions usually scale; and---the deep reason, proved in
+\S\,\xref{B.5}---it is the loss under which \emph{averages} are the optimal guesses, making
+the whole theory computable. Different losses lead to different optimal summaries; squared
+error leads to means.\note{For instance, under absolute-error loss $|\theta-a|$ the optimal
+guess turns out to be the \emph{median} of one's distribution rather than the mean. The loss
+function is not a law of nature; it is the posed question, and it selects the answer.}
+\end{Obj}
+
+\begin{Obj}{Definition}{B.3.4}{Risk}
+Fix a candidate truth $\theta$ and an estimator $a(\cdot)$. Because the data are random, the
+loss you will suffer is random too; its expectation, computed under the model at that
+$\theta$, is the \emph{risk}:
+\[ R(\theta) \;=\; \E\big\{ L(\theta, a(X)) \big\}
+   \;=\; \E\big\{ (\theta - a(X))^2 \big\}
+   \qquad\text{($X$ distributed per $f(\cdot\mid\theta)$)} . \]
+The risk answers: \emph{if the truth were $\theta$, how badly would this recipe do on
+average?} Note carefully that it is a \emph{function} of $\theta$---one number per candidate
+truth---because the truth is exactly what we do not know.
+\end{Obj}
+
+\begin{ObjL}{Example}{B.3.5}{The risk of the observed rate, computed in full}
+Take $a_1(X)=X/n$, the observed rate, under the binomial model. First its mean. Writing
+$X=Z_1+\cdots+Z_n$ as the sum of the $n$ per-patient Bernoulli indicators and using
+linearity (\xref{B.2.4}):
+\[ \E\{X\} \;=\; \E\{Z_1\} + \cdots + \E\{Z_n\} \;=\; \underbrace{\theta+\cdots+\theta}_{n}
+   \;=\; n\theta ,
+   \qquad\text{so}\qquad
+   \E\Big\{\frac{X}{n}\Big\} \;=\; \frac{n\theta}{n} \;=\; \theta . \]
+The rate is centered on the truth at \emph{every} $\theta$ (such an estimator is called
+\emph{unbiased}). Its risk is therefore its variance:
+\[ R_1(\theta) \;=\; \E\Big\{ \Big(\frac{X}{n}-\theta\Big)^{\!2} \Big\}
+   \;=\; \E\Big\{ \Big(\frac{X}{n}-\E\Big\{\frac{X}{n}\Big\}\Big)^{\!2} \Big\}
+   \;=\; \Var\Big(\frac{X}{n}\Big) , \]
+by the definition of variance (\xref{B.2.5}) with the mean $\theta$ substituted. Variances
+of independent summands add,\note{Why: for independent $U,V$ with means $\mu_U,\mu_V$, the
+cross term in $\E\{((U-\mu_U)+(V-\mu_V))^2\}$ is $2\,\E\{(U-\mu_U)(V-\mu_V)\}
+=2\,\E\{U-\mu_U\}\E\{V-\mu_V\}=0$---independence lets the expectation of a product factor
+into a product of expectations, and each factor is zero.} and each Bernoulli indicator has
+variance $\theta(1-\theta)$ (\xref{B.2.5}), so
+\[ \Var(X) \;=\; n\,\theta(1-\theta)
+   \qquad\Longrightarrow\qquad
+   R_1(\theta) \;=\; \Var\Big(\frac{X}{n}\Big) \;=\; \frac{\Var(X)}{n^2}
+   \;=\; \frac{\theta(1-\theta)}{n} . \]
+\end{ObjL}
+
+\begin{ObjL}{Example}{B.3.6}{The stuck comparison}
+Now score the data-ignoring rule $a_2\equiv\tfrac12$. Its loss is not random at all---it
+reports $\tfrac12$ no matter what---so its risk is just
+\[ R_2(\theta) \;=\; \big(\theta - \tfrac12\big)^2 . \]
+Compare the two at $n=10$. At $\theta=\tfrac12$:
+\[ R_1\big(\tfrac12\big) \;=\; \frac{\tfrac12\cdot\tfrac12}{10} \;=\; 0.025 ,
+   \qquad
+   R_2\big(\tfrac12\big) \;=\; 0 : \]
+the stubborn rule is \emph{unbeatable}---it happens to be guessing the truth exactly. But at
+$\theta=0.9$:
+\[ R_1(0.9) \;=\; \frac{0.9\times0.1}{10} \;=\; 0.009 ,
+   \qquad
+   R_2(0.9) \;=\; (0.9-0.5)^2 \;=\; 0.16 : \]
+now the stubborn rule is nearly eighteen times worse. Neither estimator wins at every
+$\theta$; their risk curves \emph{cross}. And this is the general situation, not a quirk of
+a silly example: reasonable estimators trade performance in one region of $\Theta$ for
+performance in another, and ``minimize the risk'' is not an instruction anyone can follow,
+because there is no single risk number to minimize---there is a curve, and curves are not
+ordered. The problem is stuck. To get unstuck we must be willing to say \emph{which values
+of $\theta$ we care about more}---to put weights on the candidate truths. Doing that with a
+probability distribution is the Bayesian move, and it is the next section.
+\end{ObjL}
+
+% ============================================================
+\sub{B.4}{The Prior, the Posterior, and Bayes' Theorem}
+
+\begin{Obj}{Definition}{B.4.1}{Prior distribution}
+A \emph{prior distribution} is a probability distribution $\pi(\theta)$ placed on the
+parameter itself, expressing what is believed about $\theta$ \emph{before} the data are
+seen: regions of $\Theta$ where $\pi$ is large are values considered plausible, regions
+where $\pi$ is small, implausible. Formally this is a change of status: $\theta$ is now
+treated as a \emph{random variable} with density (or pmf) $\pi$, so that all of
+\S\,\xref{B.2}'s machinery---joints, slices, conditional expectations---applies to it. The
+prior is an \emph{input}, chosen by the analyst as a model of background knowledge, exactly
+as the binomial model was chosen as a model of the data mechanism. It is not derived from
+the data and it is not the thing we will optimize; it is a premise.\note{Two readings
+coexist. If $\theta$ was literally produced by a random mechanism (a factory turns out
+batches whose defect rates vary), the prior is that mechanism's distribution, an ordinary
+frequency statement. More commonly nothing generated $\theta$---the cure rate simply
+\emph{is}---and the prior is a quantified statement of evidence and judgment: ``I regard
+values near $0.4$ as twice as plausible as values near $0.7$.'' The mathematics downstream
+is identical under either reading; the interpretation debate is real and is taken up in
+\S\,\xref{B.9}.}
+\end{Obj}
+
+\begin{Obj}{Definition}{B.4.2}{The joint distribution of parameter and data}
+Once $\theta$ is random, the pair $(\theta, X)$ has a joint distribution, and it is built
+from the two models already on the table, prior first, data mechanism second:
+\[ \text{joint}(\theta, x) \;=\; \pi(\theta)\; f(x \mid \theta) . \]
+Read it generatively: nature draws a truth $\theta$ from $\pi$, then the experiment draws
+data $x$ from the model at that truth. (This is the same construction as the table of
+\xref{B.2.7}: row weights $0.1/0.9$ were the prior over $D$; the within-row test behavior
+was the model; cells were prior $\times$ model.)
+\end{Obj}
+
+\begin{Obj}{Definition}{B.4.3}{The marginal distribution of the data}
+Summing (or integrating) the joint over $\theta$ gives the \emph{marginal} distribution of
+the data,
+\[ m(x) \;=\; \int_{\Theta} \pi(\theta)\, f(x\mid\theta)\, d\theta : \]
+how probable the data set $x$ is \emph{overall}, averaged over what the truth might be. In
+the table it was the column totals. It involves no unknown---$\theta$ has been integrated
+away---and its role in what follows is purely that of a normalizing constant.
+\end{Obj}
+
+\begin{Obj}{Theorem}{B.4.4}{Bayes' theorem}
+The conditional distribution of the parameter given the observed data---the
+\emph{posterior distribution}---is
+\[ \pi(\theta \mid x) \;=\; \frac{\pi(\theta)\, f(x\mid\theta)}{m(x)}
+   \;=\; \frac{\pi(\theta)\, f(x\mid\theta)}
+   {\displaystyle\int_{\Theta} \pi(t)\, f(x\mid t)\, dt} . \]
+\end{Obj}
+\begin{Prf}{B.4.4}{Proof of Bayes' Theorem by Slicing the Joint.}{Uses \xref{B.2.6}, \xref{B.4.2}, \xref{B.4.3}.}
+\item By the definition of a conditional distribution (\xref{B.2.6}), applied to the pair
+      $(\theta, X)$ with the roles ``condition on the second coordinate'': the conditional
+      of $\theta$ given $X=x$ is the joint divided by the marginal of the conditioning
+      variable,
+      \[ \pi(\theta\mid x) \;=\; \frac{\text{joint}(\theta,x)}{m(x)} . \]
+\item Substitute the joint's factorization $\pi(\theta)f(x\mid\theta)$ (\xref{B.4.2}) in
+      the numerator and the integral form of $m(x)$ (\xref{B.4.3}) in the denominator.
+      (The dummy variable in the denominator is renamed $t$ so it cannot be confused with
+      the free $\theta$ in the numerator.)
+\end{Prf}
+
+\begin{ObjL}{Remark}{B.4.5}{Reading Bayes' theorem}
+Three observations, each load-bearing.
+First, the structure is \emph{slice and renormalize}, nothing more: observing $x$ freezes
+one slice of the joint; dividing by the slice's total mass $m(x)$ makes it a probability
+distribution over $\theta$ again. The theorem is \xref{B.2.6} wearing new labels.
+Second, look at how the data enter: only through the factor $f(x\mid\theta)$, read as a
+function of $\theta$ with the observed $x$ plugged in. That function has a name---the
+\emph{likelihood}---and it scores each candidate truth by how well it explains what was
+actually seen. Posterior $\propto$ prior $\times$ likelihood: updated belief is old belief
+reweighted by explanatory success.
+Third, the denominator does not involve $\theta$ at all. So to identify the posterior it is
+enough to know the numerator's \emph{shape} in $\theta$; the constant is whatever makes the
+total $1$. In practice one therefore writes
+\[ \pi(\theta\mid x) \;\propto\; \pi(\theta)\, f(x\mid\theta) , \]
+drops every factor not involving $\theta$, and tries to \emph{recognize} the resulting
+shape as a known family. \S\,\xref{B.7} runs exactly this play, and the integral in the
+denominator never gets computed.
+\end{ObjL}
+
+\begin{ObjL}{Example}{B.4.6}{The table of \xref{B.2.7}, renamed}
+You have already done a full Bayesian update. In \xref{B.2.7}: the prior was
+$\pi(1)=P(D=1)=0.10$; the model was the test's behavior given the disease state,
+$f(1\mid D=1)=0.9$ and $f(1\mid D=0)=0.2$; the observed data was $T=1$; the marginal was
+$m(1)=0.10\times0.9+0.90\times0.2=0.27$; and Bayes' theorem gave the posterior
+\[ \pi(1\mid 1) \;=\; \frac{\pi(1)\,f(1\mid1)}{m(1)}
+   \;=\; \frac{0.10\times0.90}{0.27} \;=\; \frac{0.09}{0.27} \;=\; \frac13 . \]
+Belief $0.10$, data, belief $\tfrac13$. Everything from here on is this computation with a
+continuous unknown---and then one further question the table never asked: once you have the
+posterior, \emph{what single number should you report?}
+\end{ObjL}
+
+% ============================================================
+\sub{B.5}{The Best Guess Under Squared Error}
+
+The posterior is a whole distribution over $\theta$---a full account of what is now
+believed. Often that is the honest thing to report. But estimation demands one number, and
+now the loss function chooses it. This section proves the two results on which everything
+rests: with no data, the best single-number guess of a random quantity is its \emph{mean};
+with data, the best guess is the mean of the \emph{posterior}. The first result is the
+engine; the second is one application of iterated expectations to it.
+
+\begin{Obj}{Theorem}{B.5.1}{The best constant guess is the mean}
+Let $\theta$ be a random variable with $\E\{\theta^2\}<\infty$. Among all constants $a$,
+the expected squared error
+\[ \E\big\{ (\theta - a)^2 \big\} \;=\; \Var(\theta) + \big( \E\{\theta\} - a \big)^2 \]
+is minimized at exactly one point: $a = \E\{\theta\}$, where it equals $\Var(\theta)$.
+\end{Obj}
+\begin{Prf}{B.5.1}{Proof of the Best Constant by Adding and Subtracting the Mean.}{Uses \xref{B.2.3}, \xref{B.2.4}, \xref{B.2.5}.}
+\item Write $\mu=\E\{\theta\}$ for brevity, and route the error through $\mu$ by adding and
+      subtracting it---the step that makes the square split cleanly:
+      \[ \theta - a \;=\; (\theta - \mu) + (\mu - a) . \]
+\item Square the two-term sum using $(u+v)^2=u^2+2uv+v^2$:
+      \[ (\theta-a)^2 \;=\; (\theta-\mu)^2 \;+\; 2(\theta-\mu)(\mu-a) \;+\; (\mu-a)^2 . \]
+\item Take expectations term by term (linearity, \xref{B.2.4}). The first term gives
+      $\E\{(\theta-\mu)^2\}=\Var(\theta)$ by definition. In the middle term, $\mu-a$ is a
+      constant and factors out:
+      \[ \E\big\{2(\theta-\mu)(\mu-a)\big\} \;=\; 2(\mu-a)\,\E\{\theta-\mu\}
+         \;=\; 2(\mu-a)\big(\E\{\theta\}-\mu\big) \;=\; 2(\mu-a)\cdot 0 \;=\; 0 : \]
+      deviations from one's own mean average to zero, so the cross term dies. The last term
+      is the constant $(\mu-a)^2$, its own expectation.
+\item What remains is the display:
+      $\E\{(\theta-a)^2\} = \Var(\theta) + (\mu-a)^2$. The first piece does not involve
+      $a$ at all; the second is a square, so it is $\ge 0$ always, $=0$ exactly at
+      $a=\mu$, and $>0$ elsewhere. The minimizer is $a=\mu$, uniquely.
+\end{Prf}
+
+\begin{ObjL}{Remark}{B.5.2}{What the identity says}
+The proof delivered more than a minimizer; it delivered an exact accounting. Guessing a
+random quantity with a constant costs you $\Var(\theta)$ \emph{no matter what}---the
+irreducible price of the quantity's own randomness---plus a penalty $(\E\{\theta\}-a)^2$
+for centering your guess anywhere but the mean. This is why ``balancing point'' was the
+right picture for the expectation in \xref{B.2.3}: under squared error, the balancing point
+is provably the best single summary. And note the theorem's scope: \emph{any} random
+$\theta$, any distribution with a finite second moment. In particular it will apply
+verbatim to $\theta$ under its posterior distribution---which is the next theorem.
+\end{ObjL}
+
+\begin{Obj}{Definition}{B.5.3}{Bayes risk}
+Let $a(\cdot)$ be an estimator. Its \emph{Bayes risk} is its expected squared error when
+\emph{both} sources of randomness run: the truth $\theta$ drawn from the prior, the data
+$X$ drawn from the model given that truth---that is, $(\theta,X)$ carrying the joint
+distribution of \xref{B.4.2}:
+\[ r(a) \;=\; \E\big\{ \big( a(X) - \theta \big)^2 \big\} . \]
+Compare \xref{B.3.4}: the risk froze $\theta$ and averaged over data only, producing a
+curve; the Bayes risk averages over $\theta$ as well---the prior supplies precisely the
+weights over candidate truths that \xref{B.3.6} found missing---and produces a \emph{single
+number} per estimator. Numbers, unlike curves, can be minimized. The estimator with the
+smallest Bayes risk is called the \emph{Bayes estimator}, and the next theorem identifies
+it.
+\end{Obj}
+
+\begin{Obj}{Theorem}{B.5.4}{The Bayes estimator is the posterior mean}
+Assume $\E\{\theta^2\}<\infty$. Among all estimators $a(\cdot)$, the Bayes risk $r(a)$ is
+minimized by reporting, for each possible data set $x$, the mean of the posterior
+distribution:
+\[ a^{*}(x) \;=\; \E\{\theta \mid X = x\}
+   \;=\; \int_{\Theta} \theta\; \pi(\theta\mid x)\, d\theta . \]
+\end{Obj}
+\begin{Prf}{B.5.4}{Proof of the Posterior-Mean Rule by Conditioning on the Data.}{Uses \xref{B.2.9}, \xref{B.4.4}, \xref{B.5.1}.}
+\item Iterate the Bayes risk through the data, using iterated expectations (\xref{B.2.9})
+      with the conditioning variable $X$:
+      \[ r(a) \;=\; \E\big\{ (a(X)-\theta)^2 \big\}
+         \;=\; \E\Big[\, \E\big\{ (a(X)-\theta)^2 \bigm| X \big\} \,\Big] : \]
+      the overall average equals the average, over data sets, of the within-data-set
+      averages.
+\item Freeze one slice $X=x$ and look at the inner expectation. Inside the slice, $a(x)$ is
+      a fixed \emph{constant}---the recipe's output on that data set---while $\theta$
+      remains random, distributed according to the conditional distribution of $\theta$
+      given $X=x$. And that conditional distribution is, by \xref{B.4.4}, exactly the
+      posterior $\pi(\cdot\mid x)$. So the inner expectation is the expected squared error
+      of a \emph{constant} guess at a random quantity:
+      \[ \E\big\{ (a(x) - \theta)^2 \bigm| X=x \big\}
+         \;=\; \E\big\{ (\theta - c)^2 \big\}\Big|_{c=a(x)}
+         \quad\text{with $\theta$ carrying the posterior.} \]
+\item Apply \xref{B.5.1} \emph{to the posterior distribution}---the theorem holds for any
+      distribution, so in particular this one. Within the slice, the inner expectation is
+      minimized, uniquely, by the constant equal to that distribution's mean:
+      \[ c \;=\; \E\{\theta \mid X = x\} , \]
+      and no other choice of $a(x)$ does as well in this slice.
+\item The rule $a^{*}(x)=\E\{\theta\mid X=x\}$ therefore minimizes the inner expectation
+      \emph{simultaneously at every} $x$. Averaging over slices (step (1)) preserves the
+      domination: for any competitor $a$, each of $a$'s slice-averages is at least
+      $a^{*}$'s, so the overall average is too. Hence $r(a^{*})\le r(a)$ for every
+      estimator $a$, which is the claim.
+\end{Prf}
+
+\begin{ObjL}{Remark}{B.5.5}{The recipe, in words}
+The theorem compresses the whole method into two verbs: \textbf{update, then average}.
+\begin{enumerate}[leftmargin=2.2em,itemsep=2pt,topsep=2pt]
+  \item Model the data mechanism ($f(x\mid\theta)$) and state your prior ($\pi$).
+  \item Observe $x$; form the posterior $\pi(\theta\mid x)\propto\pi(\theta)f(x\mid\theta)$
+        (\xref{B.4.4}), the updated belief.
+  \item Report the posterior's mean. That single number minimizes expected squared error
+        among \emph{all} possible estimators, given the premises.
+\end{enumerate}
+Notice what is chosen and what is given: the prior and the loss are premises, posed with the
+problem; the theorem then leaves \emph{nothing} to choose---the optimal estimator is
+determined. The remaining work in any particular problem is computational: actually finding
+the posterior and its mean. The next three sections do that work twice, in the two settings
+where it is fully explicit.
+\end{ObjL}
+
+% ============================================================
+\sub{B.6}{A Toolkit Distribution: the Beta Family}
+
+To run the recipe on the trial we need a family of prior distributions for a
+\emph{fraction}---a random quantity living in $[0,1]$---rich enough to express real beliefs
+and tame enough to compute with. The standard choice is the Beta family. Its normalizing
+constant involves the Gamma function, so that comes first; both objects repay the ten
+minutes they take to set up.
+
+\begin{Obj}{Definition}{B.6.1}{The Gamma function}
+For $s>0$,
+\[ \Gamma(s) \;=\; \int_0^{\infty} t^{\,s-1}\, e^{-t}\, dt . \]
+Two facts are all we need. First, the recursion $\Gamma(s+1)=s\,\Gamma(s)$: integrate by
+parts with $u=t^{s}$ (so $du=s\,t^{s-1}dt$) and $dv=e^{-t}dt$ (so $v=-e^{-t}$):
+\[ \Gamma(s+1) \;=\; \int_0^{\infty} t^{s} e^{-t}\, dt
+   \;=\; \Big[ -t^{s} e^{-t} \Big]_0^{\infty} + s\int_0^{\infty} t^{\,s-1} e^{-t}\, dt
+   \;=\; 0 + s\,\Gamma(s) , \]
+the boundary term vanishing at both ends ($t^s e^{-t}\to0$ as $t\to\infty$ because the
+exponential beats any power; at $t=0$, $t^s=0$ for $s>0$). Second, the anchor
+$\Gamma(1)=\int_0^\infty e^{-t}dt=1$. Together they give, for whole numbers,
+$\Gamma(n) = (n-1)\,\Gamma(n-1) = \cdots = (n-1)!$\,: the Gamma function is the factorial,
+shifted by one and extended to non-integers.
+\end{Obj}
+
+\begin{Obj}{Definition}{B.6.2}{The Beta distribution}
+For parameters $\alpha>0$, $\beta>0$, the \emph{Beta$(\alpha,\beta)$ distribution} is the
+continuous distribution on $[0,1]$ with density
+\[ \pi(\theta) \;=\; \frac{\theta^{\,\alpha-1}(1-\theta)^{\,\beta-1}}{\mathrm{B}(\alpha,\beta)} ,
+   \qquad
+   \mathrm{B}(\alpha,\beta) \;=\; \frac{\Gamma(\alpha)\,\Gamma(\beta)}{\Gamma(\alpha+\beta)} , \]
+the constant $\mathrm{B}(\alpha,\beta)$ being exactly what makes the density integrate to
+$1$. The exponents steer the shape: mass shifts toward $1$ as $\alpha$ grows and toward $0$
+as $\beta$ grows, so $(\alpha,\beta)$ behave like counts of imagined prior successes and
+failures---a reading \xref{B.7.3} will make exact. One member deserves special mention:
+$\alpha=\beta=1$ gives $\pi(\theta)=\theta^{0}(1-\theta)^{0}/\mathrm{B}(1,1)$, and since
+$\mathrm{B}(1,1)=\Gamma(1)\Gamma(1)/\Gamma(2)=1\cdot1/1=1$, this is $\pi(\theta)\equiv1$:
+the \emph{uniform} distribution, the flat prior that treats every fraction as equally
+plausible.
+\end{Obj}
+
+\begin{Obj}{Theorem}{B.6.3}{The mean of a Beta distribution}
+If $\theta\sim$ Beta$(\alpha,\beta)$, then
+\[ \E\{\theta\} \;=\; \frac{\alpha}{\alpha+\beta} . \]
+\end{Obj}
+\begin{Prf}{B.6.3}{Proof of the Beta Mean by the Kernel Trick.}{Uses \xref{B.2.3}, \xref{B.6.1}, \xref{B.6.2}.}
+\item From the definition of expectation, multiplying the density by $\theta$ merges the
+      extra $\theta$ into the exponent:
+      \[ \E\{\theta\} \;=\; \int_0^1 \theta\cdot
+         \frac{\theta^{\,\alpha-1}(1-\theta)^{\,\beta-1}}{\mathrm{B}(\alpha,\beta)}\,d\theta
+         \;=\; \frac{1}{\mathrm{B}(\alpha,\beta)}
+         \int_0^1 \theta^{\,(\alpha+1)-1}(1-\theta)^{\,\beta-1}\,d\theta . \]
+\item Recognize the remaining integrand as the \emph{un}normalized Beta$(\alpha+1,\beta)$
+      density. Its integral must therefore be that family's normalizing constant:
+      \[ \int_0^1 \theta^{\,(\alpha+1)-1}(1-\theta)^{\,\beta-1}\,d\theta
+         \;=\; \mathrm{B}(\alpha+1,\beta) . \]
+      (This maneuver---evaluate an integral by recognizing a known density's shape---is the
+      \emph{kernel trick}, and it is the workhorse of every Bayesian computation to come.)
+\item So $\E\{\theta\}=\mathrm{B}(\alpha+1,\beta)/\mathrm{B}(\alpha,\beta)$. Expand both
+      via \xref{B.6.2} and cancel:
+      \[ \E\{\theta\}
+         \;=\; \frac{\Gamma(\alpha+1)\,\Gamma(\beta)}{\Gamma(\alpha+\beta+1)}\cdot
+               \frac{\Gamma(\alpha+\beta)}{\Gamma(\alpha)\,\Gamma(\beta)}
+         \;=\; \frac{\Gamma(\alpha+1)}{\Gamma(\alpha)}\cdot
+               \frac{\Gamma(\alpha+\beta)}{\Gamma(\alpha+\beta+1)} . \]
+\item Apply the recursion $\Gamma(s+1)=s\,\Gamma(s)$ (\xref{B.6.1}) to each ratio:
+      $\Gamma(\alpha+1)/\Gamma(\alpha)=\alpha$ and
+      $\Gamma(\alpha+\beta)/\Gamma(\alpha+\beta+1)=1/(\alpha+\beta)$. Hence
+      $\E\{\theta\}=\alpha/(\alpha+\beta)$.
+\end{Prf}
+
+% ============================================================
+\sub{B.7}{The Cure Rate, Start to Finish}
+
+Everything is on the table. Model: $X\sim$ Binomial$(n,\theta)$ (\xref{B.3.1}). Prior: to
+begin, the flat Beta$(1,1)$---``before the trial, no fraction is privileged over any
+other.'' Loss: squared error. Data: $x=7$ cures among $n=10$ patients. The recipe of
+\xref{B.5.5} says: form the posterior, report its mean.
+
+\begin{ObjL}{Example}{B.7.1}{The posterior, by kernel-matching}
+Bayes' theorem in its proportional form (\xref{B.4.5}), for a general $x$ and $n$ under the
+flat prior:
+\[ \pi(\theta \mid x) \;\propto\; \pi(\theta)\, f(x\mid\theta)
+   \;=\; 1 \cdot \binom{n}{x}\,\theta^{x}(1-\theta)^{\,n-x}
+   \;\propto\; \theta^{x}(1-\theta)^{\,n-x} , \]
+the binomial coefficient dropping because it does not involve $\theta$---it is data-only,
+hence absorbed into the normalizing constant. Now \emph{match the kernel}: rewrite the
+exponents in Beta form,
+\[ \theta^{x}(1-\theta)^{\,n-x} \;=\; \theta^{\,(x+1)-1}\,(1-\theta)^{\,(n-x+1)-1} , \]
+which is precisely the shape of a Beta$(x+1,\; n-x+1)$ density (\xref{B.6.2}). A density's
+shape determines it (the constant is forced by total mass $1$), so
+\[ \theta \mid X = x \;\sim\; \text{Beta}\big(x+1,\; n-x+1\big) , \]
+and the normalizing integral $m(x)$ of \xref{B.4.3} was never touched. By \xref{B.6.3}, the
+Bayes estimate---the posterior mean---is
+\[ a^{*}(x) \;=\; \E\{\theta\mid X=x\} \;=\; \frac{x+1}{(x+1)+(n-x+1)}
+   \;=\; \frac{x+1}{n+2} . \]
+\end{ObjL}
+
+\begin{ObjL}{Example}{B.7.2}{The trial's numbers}
+With $n=10$ and $x=7$: the posterior is Beta$(8,4)$, and the Bayes estimate is
+\[ a^{*}(7) \;=\; \frac{7+1}{10+2} \;=\; \frac{8}{12} \;=\; \frac{2}{3} \;\approx\; 0.667 , \]
+against the raw rate's $x/n=0.700$. The posterior also prices its own uncertainty: the
+Beta$(\alpha,\beta)$ variance is
+$\alpha\beta/\big((\alpha+\beta)^2(\alpha+\beta+1)\big)$,\note{Derived by the same kernel
+trick as the mean: $\E\{\theta^2\}=\mathrm{B}(\alpha+2,\beta)/\mathrm{B}(\alpha,\beta)
+=\frac{(\alpha+1)\alpha}{(\alpha+\beta+1)(\alpha+\beta)}$ (two applications of the
+recursion), then $\Var=\E\{\theta^2\}-\E\{\theta\}^2$ with common denominator
+$(\alpha+\beta)^2(\alpha+\beta+1)$.} here
+\[ \Var(\theta\mid X=7) \;=\; \frac{8\cdot4}{12^2\cdot13} \;=\; \frac{32}{1872}
+   \;=\; \frac{2}{117} \;\approx\; 0.0171 ,
+   \qquad \text{sd} \;\approx\; 0.131 . \]
+So the full Bayesian report is: \emph{the cure rate is around $0.67$, give or take about
+$0.13$}---an estimate and an honest width, both read off one distribution.
+\end{ObjL}
+
+\begin{ObjL}{Remark}{B.7.3}{The anatomy of $(x+1)/(n+2)$: a weighted average}
+Rewrite the Bayes estimate to expose its structure:
+\[ \frac{x+1}{n+2}
+   \;=\; \frac{2\cdot\tfrac12 \;+\; n\cdot\dfrac{x}{n}}{2+n} . \]
+(Check: the numerator is $1+x$ and the denominator $2+n$, as before.) Read it as a weighted
+average of two guesses: the \emph{prior mean} $\tfrac12$, carrying weight $2$, and the
+\emph{data's rate} $x/n$, carrying weight $n$. The flat prior behaves exactly like
+\emph{two phantom patients, one cured and one not}, mixed into the sample. The same algebra
+runs for any Beta$(\alpha,\beta)$ prior: the posterior is
+Beta$(\alpha+x,\,\beta+n-x)$---observed successes reinforce $\alpha$, failures reinforce
+$\beta$---and its mean is
+\[ \frac{\alpha+x}{\alpha+\beta+n}
+   \;=\; \frac{(\alpha+\beta)\cdot\dfrac{\alpha}{\alpha+\beta} \;+\; n\cdot\dfrac{x}{n}}
+   {(\alpha+\beta)+n} : \]
+prior mean weighted by $\alpha+\beta$ (\emph{the prior is worth $\alpha+\beta$
+observations}), data rate weighted by $n$. This is the general shape of Bayesian
+estimates: a compromise between what you believed and what you saw, at exchange rates set
+by how much each side knows.
+\end{ObjL}
+
+\begin{Fig}{B.7.4}{The update, drawn}{The flat prior (dashed) and the posterior
+Beta$(8,4)$ after observing $7$ cures in $10$ patients. The posterior's \emph{peak} sits at
+exactly the raw rate $x/n=0.7$ (the data's best single explanation), but its \emph{mean}---%
+the Bayes estimate under squared error, marked in green---sits at $2/3\approx0.667$, pulled
+toward the middle by the distribution's left tail. The whole curve, not just one number, is
+the updated state of knowledge; the loss function then selects which one number to report
+(\xref{B.5.1}).}
+\begin{tikzpicture}[x=7cm,y=0.85cm, every node/.style={font=\small}]
+  % axis
+  \draw[black!60] (-0.02,0) -- (1.04,0);
+  \foreach \t/\l in {0/0, 0.25/0.25, 0.5/0.5, 0.75/0.75, 1/1}{
+    \draw[black!60] (\t,0) -- (\t,-0.12);
+    \node[black!70, font=\footnotesize, below] at (\t,-0.10) {$\l$};
+  }
+  \node[black!70, font=\footnotesize, below] at (1.065,-0.08) {$\theta$};
+  % flat prior
+  \draw[black!55, densely dashed, thick] (0,1) -- (1,1);
+  \node[black!55, font=\footnotesize, above] at (0.13,1.02) {prior Beta$(1,1)$};
+  % posterior Beta(8,4): f = 1320 t^7 (1-t)^3
+  \draw[figTerm, very thick, domain=0.18:0.995, smooth, samples=120]
+    plot (\x, {1320*(\x)^7*(1-\x)^3});
+  \node[figTerm, font=\footnotesize, above left] at (0.56,2.15) {posterior Beta$(8,4)$};
+  % posterior mean 2/3
+  \draw[figLim, densely dashed, thick] (0.6667,0) -- (0.6667,{1320*0.6667^7*0.3333^3});
+  \node[figLim!80!black, font=\footnotesize, below] at (0.645,-0.55)
+    {$\E\{\theta\mid x\}=\tfrac23$};
+  % mode = raw rate 0.7
+  \fill[figTerm] (0.7,{1320*0.7^7*0.3^3}) circle (1.4pt);
+  \node[figTerm, font=\footnotesize, above] at (0.79,{1320*0.7^7*0.3^3+0.06})
+    {mode $=x/n=0.7$};
+\end{tikzpicture}
+\end{Fig}
+
+\begin{ObjL}{Remark}{B.7.5}{Two sanity checks}
+\emph{No data.} Set $n=x=0$: the estimate is $(0+1)/(0+2)=\tfrac12$, the prior mean---with
+nothing observed, the recipe reports what you believed. \emph{All cures.} Set $x=n$: the
+estimate is $(n+1)/(n+2)$, which is large but strictly less than $1$: ten out of ten cures
+should not convince anyone that failure is \emph{impossible}. (The raw rate $x/n=1$ would
+assert exactly that.) This estimator for the all-successes case is old and famous---it is
+\emph{Laplace's rule of succession}, his answer to ``what probability that the sun rises
+tomorrow, given that it always has?''---and it falls out of the machinery here as a routine
+special case.
+\end{ObjL}
+
+% ============================================================
+\sub{B.8}{A Second Instrument: the Normal--Normal Pair}
+
+The Beta--binomial pair handled a fraction. The other workhorse setting is a
+\emph{measurement}: a quantity on the whole line, observed through noise. One new
+distribution is needed.
+
+\begin{Obj}{Definition}{B.8.1}{The normal distribution}
+The \emph{normal} (or Gaussian) distribution $N(\mu,\sigma^2)$ is the continuous
+distribution with density
+\[ f(y) \;=\; \frac{1}{\sigma\sqrt{2\pi}}\,
+   \exp\!\left( -\frac{(y-\mu)^2}{2\sigma^2} \right) , \qquad y\in\mathbb{R} : \]
+the bell curve, centered at its mean $\mu$, with spread set by its standard deviation
+$\sigma$ (about $68\%$ of the probability lies within one $\sigma$ of $\mu$, about $95\%$
+within two). Its ubiquity has a theorem behind it (sums of many small independent effects
+are approximately normal---the central limit theorem, not needed here) and a practical
+reason: as a function of the variable in the exponent, the density is
+$e^{-\text{quadratic}}$, and quadratics are closed under addition. That closure is exactly
+what the next example exploits.
+\end{Obj}
+
+\begin{ObjL}{Example}{B.8.2}{Normal prior, normal measurement: the posterior in full}
+\emph{Setup.} A quantity $\theta$ (an aptitude score, a physical constant, a true weight)
+has prior $\theta\sim N(m,\tau^2)$: best prior guess $m$, prior uncertainty $\tau$. An
+instrument measures it once with known noise level $\sigma$: given the truth,
+$X\mid\theta\sim N(\theta,\sigma^2)$. Observe $X=x$. What is the posterior?
+\emph{Multiply prior by likelihood} (\xref{B.4.5}), keeping only factors involving
+$\theta$---the two normalizing constants $1/(\tau\sqrt{2\pi})$ and $1/(\sigma\sqrt{2\pi})$
+drop:
+\[ \pi(\theta\mid x) \;\propto\;
+   \exp\!\left( -\frac{(\theta-m)^2}{2\tau^2} \right)\cdot
+   \exp\!\left( -\frac{(x-\theta)^2}{2\sigma^2} \right)
+   \;=\; \exp\!\left( -\frac12\left[ \frac{(\theta-m)^2}{\tau^2}
+   + \frac{(\theta-x)^2}{\sigma^2} \right] \right) . \]
+\emph{Expand the bracket and collect powers of $\theta$.} Expanding each square,
+\[ \frac{\theta^2 - 2m\theta + m^2}{\tau^2} + \frac{\theta^2 - 2x\theta + x^2}{\sigma^2}
+   \;=\; \theta^2\Big( \frac{1}{\tau^2}+\frac{1}{\sigma^2} \Big)
+   \;-\; 2\theta\Big( \frac{m}{\tau^2}+\frac{x}{\sigma^2} \Big)
+   \;+\; \Big( \frac{m^2}{\tau^2}+\frac{x^2}{\sigma^2} \Big) , \]
+and the last group is free of $\theta$---bound for the normalizing constant.
+\emph{Complete the square.} Abbreviate
+\[ \frac1v \;=\; \frac{1}{\tau^2}+\frac{1}{\sigma^2} , \qquad
+   \frac{m^{*}}{v} \;=\; \frac{m}{\tau^2}+\frac{x}{\sigma^2}
+   \quad\text{(defining $v$ and $m^*$)} , \]
+so the $\theta$-dependent part is
+\[ \frac{\theta^2 - 2 m^{*}\theta}{v}
+   \;=\; \frac{(\theta - m^{*})^2 - (m^{*})^2}{v} , \]
+by adding and subtracting $(m^*)^2$ inside---and $(m^*)^2/v$, constant in $\theta$, also
+departs for the normalizer. What remains is
+\[ \pi(\theta\mid x) \;\propto\; \exp\!\left( -\frac{(\theta-m^{*})^2}{2v} \right) : \]
+the kernel of a normal density (\xref{B.8.1}). Matching shapes,
+\[ \theta \mid X=x \;\sim\; N\big( m^{*},\, v \big) , \qquad
+   m^{*} \;=\; v\Big( \frac{m}{\tau^2}+\frac{x}{\sigma^2} \Big)
+   \;=\; \frac{\sigma^2\, m + \tau^2\, x}{\sigma^2+\tau^2} , \]
+the last simplification by multiplying numerator and denominator by $\sigma^2\tau^2$:
+\[ v\Big(\frac{m}{\tau^2}+\frac{x}{\sigma^2}\Big)
+   = \frac{\frac{m}{\tau^2}+\frac{x}{\sigma^2}}{\frac{1}{\tau^2}+\frac{1}{\sigma^2}}
+   = \frac{\sigma^2 m + \tau^2 x}{\sigma^2 + \tau^2} . \]
+By \xref{B.5.4} the Bayes estimate is $m^{*}$, and the posterior variance $v$ prices the
+remaining uncertainty.
+\end{ObjL}
+
+\begin{ObjL}{Example}{B.8.3}{Numbers: one loud measurement}
+Prior: $\theta\sim N(100, 15^2)$ (say, an aptitude score known to average $100$ with
+spread $15$ in the population the subject comes from). Instrument: $\sigma=10$. Observation:
+$x=130$---a strikingly high reading. Posterior, by \xref{B.8.2}, in exact fractions:
+\[ \frac1v \;=\; \frac{1}{225}+\frac{1}{100} \;=\; \frac{4}{900}+\frac{9}{900}
+   \;=\; \frac{13}{900}
+   \qquad\Longrightarrow\qquad v \;=\; \frac{900}{13} \;\approx\; 69.2 ,
+   \quad \sqrt{v} \;=\; \frac{30}{\sqrt{13}} \;\approx\; 8.3 ; \]
+\[ m^{*} \;=\; v\Big( \frac{100}{225} + \frac{130}{100} \Big)
+   \;=\; \frac{900}{13}\Big( \frac{4}{9} + \frac{13}{10} \Big)
+   \;=\; \frac{900}{13}\cdot\frac{40 + 117}{90}
+   \;=\; \frac{10\cdot 157}{13}
+   \;=\; \frac{1570}{13} \;\approx\; 120.8 . \]
+The Bayes estimate is about $120.8$: well above the prior's $100$ (the measurement was loud
+and the instrument decent), but pulled down meaningfully from the raw reading $130$ (a
+single reading, from a population where $130$ is rare, is partly signal and partly luck).
+The posterior spread $8.3$ is smaller than \emph{both} the prior's $15$ and the
+instrument's $10$: two imperfect sources of information, combined, know more than either
+alone.
+\end{ObjL}
+
+\begin{Fig}{B.8.4}{Prior, likelihood, posterior}{The update of \xref{B.8.3}: prior
+$N(100,15^2)$ (dashed), the likelihood of the observation $x=130$ (blue, a normal shape in
+$\theta$ centered at the reading), and the posterior $N(120.8,\,8.3^2)$ (green). The
+posterior sits between its two parents, closer to the likelihood because the instrument
+($\sigma=10$) is more precise than the prior ($\tau=15$)---and it is narrower than either,
+because precisions add (\xref{B.8.5}). Curves drawn to a common vertical scale.}
+\begin{tikzpicture}[x=0.075cm,y=1cm, every node/.style={font=\small}]
+  % axis
+  \draw[black!60] (60,0) -- (162,0);
+  \foreach \t in {70, 100, 130}{
+    \draw[black!60] (\t,0) -- (\t,-0.10);
+    \node[black!70, font=\footnotesize, below] at (\t,-0.08) {$\t$};
+  }
+  \node[black!70, font=\footnotesize, below] at (165,-0.06) {$\theta$};
+  % prior N(100,15^2): 2.394*exp(-(x-100)^2/450)
+  \draw[black!55, densely dashed, thick, domain=62:140, smooth, samples=90]
+    plot (\x, {2.394*exp(-(\x-100)^2/450)});
+  \node[black!55, font=\footnotesize] at (80,2.62) {prior};
+  % likelihood N(130,10^2): 3.590*exp(-(x-130)^2/200)
+  \draw[figTerm, thick, domain=100:160, smooth, samples=90]
+    plot (\x, {3.590*exp(-(\x-130)^2/200)});
+  \node[figTerm, font=\footnotesize] at (146,3.45) {likelihood};
+  % posterior N(120.77, 69.23): 4.315*exp(-(x-120.77)^2/138.46)
+  \draw[figLim, very thick, domain=95:147, smooth, samples=90]
+    plot (\x, {4.315*exp(-(\x-120.77)^2/138.46)});
+  \node[figLim!85!black, font=\footnotesize] at (110.5,4.35) {posterior};
+  % posterior mean tick
+  \draw[figLim, densely dashed] (120.77,0) -- (120.77,4.315);
+  \node[figLim!80!black, font=\footnotesize, below] at (120.77,-0.08) {$120.8$};
+\end{tikzpicture}
+\end{Fig}
+
+\begin{ObjL}{Remark}{B.8.5}{The precision reading, and shrinkage}
+State \xref{B.8.2}'s formulas in terms of \emph{precision} $=$ $1/\text{variance}$ (how
+much a source of information knows):
+\[ \underbrace{\frac1v}_{\text{posterior precision}}
+   \;=\; \underbrace{\frac{1}{\tau^2}}_{\text{prior precision}}
+   + \underbrace{\frac{1}{\sigma^2}}_{\text{data precision}} ,
+   \qquad
+   m^{*} \;=\; \frac{\frac{1}{\tau^2}}{\frac{1}{\tau^2}+\frac{1}{\sigma^2}}\; m
+   \;+\; \frac{\frac{1}{\sigma^2}}{\frac{1}{\tau^2}+\frac{1}{\sigma^2}}\; x : \]
+\emph{precisions add}, and the posterior mean weighs each guess by its share of the total
+precision---the continuous twin of \xref{B.7.3}'s observation-counting. In the numbers of
+\xref{B.8.3} the weights are $\frac{4}{13}$ on the prior and $\frac{9}{13}$ on the data:
+$m^*=\frac{4}{13}\cdot100+\frac{9}{13}\cdot130=\frac{400+1170}{13}=\frac{1570}{13}$, as
+before. Equivalently,
+\[ m^{*} \;=\; m + \frac{\tau^2}{\sigma^2+\tau^2}\,(x - m)
+   \;=\; 100 + \frac{225}{325}\,(130-100) \;=\; 100 + \frac{9}{13}\cdot30 \;\approx\;
+   120.8 : \]
+the estimate starts at the prior mean and covers only the fraction
+$\tau^2/(\sigma^2+\tau^2)$ of the distance to the data. Bayesian estimates \emph{shrink}
+noisy observations toward what was already believed---gently when the data are precise,
+firmly when they are not. This one word, \emph{shrinkage}, is the modern doorway from this
+handout into a large part of contemporary statistics and machine learning.
+\end{ObjL}
+
+% ============================================================
+\sub{B.9}{What to Make of the Prior}
+
+\begin{ObjL}{Remark}{B.9.1}{The estimate depends on the prior---as it must}
+Rerun the trial of \xref{B.7.2} under a different premise. Suppose historical experience
+with similar treatments made low cure rates plausible---say a Beta$(2,6)$ prior, mean
+$2/8=0.25$, worth $\alpha+\beta=8$ phantom observations. By \xref{B.7.3} the posterior
+after $7$ cures in $10$ is Beta$(2+7,\,6+3)=$ Beta$(9,9)$, with mean
+\[ \frac{2+7}{2+6+10} \;=\; \frac{9}{18} \;=\; 0.500 , \]
+against $0.667$ under the flat prior and $0.700$ raw. Ten patients cannot overrule eight
+phantoms. This is not a defect; it is the premise doing exactly what it claimed: with
+little data, background knowledge \emph{should} matter, and the machinery is transparent
+about how much. But it lays an obligation on the analyst---the prior is part of the
+argument, must be stated, and must be defensible on grounds \emph{outside} the data being
+analyzed. Estimating the prior's location from the same data it will then shrink is
+circular, and the circle does not close.\note{The course deck's aphorism, quoted in the
+notes at \xrefL{2.10.2}: ``you cannot use the data to know what to shrink towards; but you
+can use the data to know how much to shrink towards it''---the \emph{amount} of shrinkage,
+unlike the \emph{target}, is learnable when many parallel problems share one prior.}
+\end{ObjL}
+
+\begin{ObjL}{Remark}{B.9.2}{The data win in the end}
+The dependence on the prior is a small-sample phenomenon. Compare the Bayes estimate with
+the observed rate at stage $n$ by putting them over a common denominator:
+\[ \frac{\alpha+x}{\alpha+\beta+n} - \frac{x}{n}
+   \;=\; \frac{n(\alpha+x) - x(\alpha+\beta+n)}{n\,(\alpha+\beta+n)}
+   \;=\; \frac{\alpha n - x(\alpha+\beta)}{n\,(\alpha+\beta+n)}
+   \;=\; \frac{\alpha - (\alpha+\beta)\,\frac{x}{n}}{\alpha+\beta+n} , \]
+the middle step cancelling the $xn$ terms. Since the rate $x/n$ lies in $[0,1]$, the
+numerator can be no larger in size than $\max(\alpha,\beta)$---a fixed number---while the
+denominator grows without bound. So the gap between the Bayes estimate and the observed
+rate shrinks to zero as data accumulate, \emph{whatever} the data do: every fixed Beta
+prior's estimate is eventually indistinguishable from the raw rate---the phantoms are
+outvoted. Priors differing in judgment but agreed on possibilities are eventually
+reconciled by evidence; where the prior genuinely matters is exactly where matters are
+genuinely uncertain: small samples.
+\end{ObjL}
+
+\begin{ObjL}{Remark}{B.9.3}{Two schools, one course}
+A statistician who declines to put a distribution on $\theta$---who insists the cure rate
+is a fixed fact, not a random variable---works instead with the risk \emph{curves} of
+\xref{B.3.4} and principles for comparing them (ruling out estimators beaten everywhere;
+guarding the worst case). That is the \emph{frequentist} school, and it is where the course
+notes spend \S\,\xrefL{1.5}. The Bayesian school, this handout's subject, buys a complete
+and unique answer at the price of a prior. The two are not enemies so much as different
+contracts with the reader about what may be assumed---and they meet constantly: the
+course's Lecture~1 appendix shows a Bayesian-derived rule, $(x+1)/(n+2)$, holding its own
+in a purely frequentist risk comparison (\xrefL{1.A.4}, \xrefL{1.A.5}). A working
+statistician reads both languages.
+\end{ObjL}
+
+% ============================================================
+\sub{B.10}{The Vocabulary, and Where to Go Next}
+
+\begin{ObjL}{Concept}{B.10.1}{The names of everything you just did}
+For searching, reading, and talking to statisticians---the standard names, each pointing at
+its object in this handout:
+\begin{itemize}[leftmargin=1.8em,itemsep=2pt,topsep=2pt]
+  \item \emph{Prior distribution} (\xref{B.4.1}); \emph{likelihood} (\xref{B.4.5});
+        \emph{posterior distribution} (\xref{B.4.4}); \emph{Bayes' theorem} (\xref{B.4.4});
+        \emph{Bayesian updating} (the whole \S\,\xref{B.4} pipeline).
+  \item \emph{Bayes risk} (\xref{B.5.3}); \emph{Bayes estimator} or \emph{Bayes rule}
+        (\xref{B.5.4})---beware that ``Bayes' rule'' also names the updating theorem;
+        context decides. The posterior-mean result is often quoted as ``the Bayes estimator
+        under squared-error (quadratic) loss is the posterior mean.''
+  \item \emph{Conjugate prior}: a family, like Beta for the binomial (\S\,\xref{B.7}) or
+        normal for the normal (\S\,\xref{B.8}), whose posteriors stay in the family---the
+        kernel trick succeeds by design. \emph{Shrinkage} (\xref{B.8.5});
+        \emph{Laplace's rule of succession} (\xref{B.7.5}).
+  \item In engineering literature the \S\,\xref{B.5} mathematics runs under \emph{minimum
+        mean squared error (MMSE) estimation}: the conditional expectation as the MMSE
+        predictor.
+  \item One report this handout did not build: an \emph{interval} from the posterior (e.g.,
+        the central $95\%$ of Beta$(8,4)$), called a \emph{credible interval}---the
+        Bayesian counterpart of the confidence sets in the course notes,
+        \S\,\xrefL{2.7}.
+\end{itemize}
+\end{ObjL}
+
+\begin{ObjL}{Concept}{B.10.2}{Where to go next}
+In the course notes: \S\,\xrefL{2.8} proves the two prediction lemmas in their general form,
+\S\,\xrefL{2.9} is this handout's material at course pace (with the Poisson--gamma pair as
+a third conjugate example), and \xrefL{1.A.5} runs the trial's computation inside the
+decision-theory frame of Lecture~1. In the texts: Hoel--Port--Stone treat Bayesian methods
+in \S 2.8 (their Theorem~2 is \xref{B.5.4}); DeGroot \& Schervish devote Chapter~7
+(\S\S 7.2--7.4) to priors, posteriors, and Bayes estimators at a gentle pace with many
+worked examples; Blitzstein \& Hwang's Chapters 7--9 are the friendliest place to firm up
+the conditional-probability foundations of \S\,\xref{B.2}. And carry out one exercise by
+hand before reading further: redo \S\,\xref{B.7} with your own prior---pick $\alpha$ and
+$\beta$ to express something you actually believe about some fraction in your life, invent
+data, and push it through \xref{B.7.3}. The method fits on an index card; the point of the
+theory was to earn it.
+\end{ObjL}
+
+\ifSubfilesClassLoaded{\clearpage\objindex}{}
+
+\end{document}

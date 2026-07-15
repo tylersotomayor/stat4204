@@ -1,0 +1,1877 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bayesian Estimation from First Principles — STAT S4204</title>
+<meta name="description" content="Web edition of the companion handout: Bayesian estimation built from zero — every term defined, every step shown — with live laboratories embedded where the print edition has figures, the normal–normal update as the centerpiece.">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="icon" href="favicon.ico" sizes="32x32">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<link rel="stylesheet" href="assets/hw.css">
+<style>
+/* ---- handout document layer: mirrors the typeset PDF ---- */
+.doc{max-width:790px}
+.doc p{margin:0 0 0; text-align:justify; hyphens:auto}
+.doc p + p{text-indent:1.5em}
+.doc .noindent{text-indent:0}
+.kicker{font-family:"Inter",sans-serif;font-size:12px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--muted);font-weight:600;margin:26px 0 2px}
+.epigraph{margin:22px 0 26px;display:flex;justify-content:flex-end}
+.epigraph .inqt{max-width:66%;font-style:italic;font-size:15.5px}
+.epigraph .attr{font-style:normal;font-variant:small-caps;letter-spacing:.02em;
+  font-size:13px;text-align:right;margin-top:6px;color:var(--ink)}
+.contents{border-top:1.5px solid var(--ink);border-bottom:1.5px solid var(--ink);
+  padding:12px 4px 14px;margin:8px 0 26px}
+.contents .chead{font-variant:small-caps;letter-spacing:.06em;font-size:14.5px;margin:0 0 8px}
+.contents ol{margin:0;padding-left:2.4em;font-size:15px}
+.contents li{margin:1.5px 0}
+.contents a{color:var(--ink);text-decoration:none}
+.contents a:hover{color:var(--navy);text-decoration:underline}
+.doc h2.sec{font-size:24px;font-weight:700;line-height:1.22;margin:44px 0 12px;text-align:left}
+.doc h2.sec .n{margin-right:.6em}
+.obj{margin:20px 0 18px}
+.obj .okind{font-weight:700;font-size:16.5px}
+.obj .ottl{font-style:italic;font-size:17px;margin:1px 0 6px}
+.obj .obody{margin-left:1.55em}
+.obj .obody p{text-indent:0}
+.obj .obody p + p{text-indent:1.5em}
+.prf{margin:14px 0 20px}
+.prf .pkind{font-weight:700;font-size:15.5px}
+.prf .pttl{font-style:italic;font-size:16px;margin:1px 0 7px}
+.prf ol.steps{border-left:2px solid #c9ced4;margin:6px 0 6px 1.1em;padding:2px 0 2px 2em}
+.prf ol.steps li{margin:7px 0;text-align:justify}
+.prf .uses{font-family:"Inter",sans-serif;font-size:11.5px;color:var(--muted);margin-left:1.35em}
+.doc .fnref{font-size:.72em;vertical-align:super;line-height:0}
+.doc .fnref a{color:var(--navy);text-decoration:none}
+.endnotes{margin-top:40px;border-top:1px solid var(--rule);padding-top:14px}
+.endnotes .ehead{font-variant:small-caps;letter-spacing:.05em;font-size:14px;margin-bottom:8px}
+.endnotes ol{font-size:14px;color:var(--prevink);padding-left:1.5em}
+.endnotes li{margin:7px 0;text-align:justify}
+.endnotes a.back{font-family:"Inter",sans-serif;font-size:11px;text-decoration:none;color:var(--navy)}
+.xr{color:inherit;text-decoration:none;border-bottom:1px dotted #9fb4d4}
+.xr:hover{color:var(--navy);border-bottom-style:solid}
+.widget h2 .inprint{color:#9aa1a9;font-weight:500;letter-spacing:.02em;text-transform:none}
+.widget.centerpiece{border-width:2px;border-color:var(--navy)}
+.stepper{font-family:"Inter",sans-serif;margin:12px 0 4px}
+.stepper .sbtns{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.stepper button{font-family:"Inter",sans-serif;font-size:12.5px;font-weight:600;color:var(--navy-dk);
+  background:#fff;border:1.5px solid var(--rule);border-radius:4px;padding:6px 11px;cursor:pointer}
+.stepper button[aria-pressed="true"]{border-color:var(--navy);background:var(--navy);color:#fff}
+.dstep{border:1px solid var(--rule);border-radius:5px;padding:9px 13px;margin:6px 0;
+  font-size:13px;color:var(--muted);background:#fbfcfd}
+.dstep.active{border-color:var(--navy);background:#f4f8fd;color:var(--ink)}
+.dstep .dnum{font-weight:600;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--navy)}
+.dstep .dmath{font-variant-numeric:tabular-nums;font-size:13.5px;margin:3px 0}
+.dstep .dwhy{font-family:"Spectral",serif;font-style:italic;font-size:14px;display:none;margin-top:3px}
+.dstep.active .dwhy{display:block}
+@media (max-width:640px){ .epigraph .inqt{max-width:88%} }
+</style>
+</head>
+<body>
+  <div class="band"><div class="in">
+    <div class="topnav"><a href="./">← Notes in Statistical Inference</a></div>
+    <p class="course">STAT&nbsp;S4204 · Summer&nbsp;2026 · Supplementary Material</p>
+    <h1>Bayesian Estimation from First Principles</h1>
+    <p class="sub">Companion handout · web edition, with the laboratories live</p>
+  </div></div>
+  <div class="wrap">
+  <div class="doc">
+
+    <div class="epigraph"><div class="inqt">Probability theory is nothing but common sense
+      reduced to calculation.
+      <div class="attr">Pierre-Simon Laplace, <em>Essai philosophique sur les
+      probabilités</em> (1814)</div></div></div>
+
+    <div class="contents">
+      <div class="chead">Contents of this handout</div>
+      <ol style="list-style:none">
+        <li><a href="#sB1">B.1&emsp;The Problem: Guessing a Number You Cannot See</a></li>
+        <li><a href="#sB2">B.2&emsp;The Probability Toolkit, from Zero</a></li>
+        <li><a href="#sB3">B.3&emsp;Estimation as a Decision, and Why It Gets Stuck</a></li>
+        <li><a href="#sB4">B.4&emsp;The Prior, the Posterior, and Bayes' Theorem</a></li>
+        <li><a href="#sB5">B.5&emsp;The Best Guess Under Squared Error</a></li>
+        <li><a href="#sB6">B.6&emsp;A Toolkit Distribution: the Beta Family</a></li>
+        <li><a href="#sB7">B.7&emsp;The Cure Rate, Start to Finish</a></li>
+        <li><a href="#sB8">B.8&emsp;A Second Instrument: the Normal–Normal Pair</a></li>
+        <li><a href="#sB9">B.9&emsp;What to Make of the Prior</a></li>
+        <li><a href="#sB10">B.10&emsp;The Vocabulary, and Where to Go Next</a></li>
+      </ol>
+    </div>
+
+    <p class="noindent"><b>About this handout.</b> This is a student-written companion to the
+    course notes—not an instructor document. It rebuilds, from nothing, the mathematics
+    behind one sentence from Lecture&nbsp;2: <em>under squared-error loss, the best estimator
+    is the posterior mean</em>. Every term is defined before it is used, every derivation
+    shows every algebraic step, and every step says why it is being taken. No statistics
+    background is assumed; the only prerequisites are single-variable calculus (derivatives,
+    integrals, integration by parts) and patience. Cross-references like 2.9.3 name numbered
+    objects in the course notes (lecture&nbsp;2, section&nbsp;9, object&nbsp;3); references
+    like <a class="xr" href="#B.5.1">B.5.1</a> link within this handout. This web edition is
+    identical in content to the typeset PDF, with one upgrade: where the print edition has
+    static figures, this page has <em>laboratories</em>—the machinery live under your hands,
+    the normal–normal update of §<a class="xr" href="#sB8">B.8</a> as the centerpiece.</p>
+    <div class="pdfbar">
+      <a class="btn" href="handout-bayes-estimation.pdf">Typeset edition (PDF)</a>
+      <a class="btn ghost" href="./">All notes</a>
+    </div>
+
+    <!-- ============================================================ -->
+    <h2 class="sec" id="sB1"><span class="n">B.1</span>The Problem: Guessing a Number You Cannot See</h2>
+
+    <div class="obj" id="B.1.1">
+      <div class="okind">Concept B.1.1</div>
+      <div class="ottl">The estimation problem</div>
+      <div class="obody"><p>A new treatment cures some fraction of the patients who receive
+      it. Call that fraction \(\theta\): if \(\theta=0.7\), then in the long run \(70\%\) of
+      treated patients are cured. Nobody knows \(\theta\). It is not random—it is a fixed
+      fact about the treatment—but it is <em>hidden</em>: the only way to learn about it is
+      to treat patients and watch what happens. Suppose we treat \(n=10\) patients and
+      \(x=7\) of them are cured. What number should we now report as our best guess of
+      \(\theta\)? That question—turn data into a single defensible guess at a hidden
+      number—is called <em>estimation</em>, and this handout builds one complete, principled
+      answer to it.</p></div>
+    </div>
+
+    <div class="obj" id="B.1.2">
+      <div class="okind">Concept B.1.2</div>
+      <div class="ottl">Two sources of information</div>
+      <div class="obody"><p>The obvious answer is the observed cure rate, \(7/10=0.7\). It
+      is a good answer, and by the end of the handout you will know exactly in what sense.
+      But notice that the data are not the only thing you know. Perhaps treatments of this
+      kind have historically cured between \(30\%\) and \(60\%\) of patients; perhaps the
+      biology says a cure rate near \(1\) is implausible. Ten patients is not many, and it
+      seems wasteful to ignore everything except those ten outcomes. The <em>Bayesian</em>
+      approach—the subject of this handout—is defined by one move: it expresses
+      <em>both</em> sources of information, the data and the background knowledge, in the
+      same language, the language of probability. Once both speak that language, a single
+      theorem combines them optimally.</p></div>
+    </div>
+
+    <div class="obj" id="B.1.3">
+      <div class="okind">Remark B.1.3</div>
+      <div class="ottl">The route</div>
+      <div class="obody"><p>The handout runs in a straight line, and it helps to see the
+      whole road first. §<a class="xr" href="#sB2">B.2</a> builds the probability vocabulary
+      (random variables, distributions, expectation, conditional distributions)—the language
+      everything else is written in. §<a class="xr" href="#sB3">B.3</a> makes “estimation”
+      precise and shows why, without background knowledge, the problem gets <em>stuck</em>:
+      candidate guessing rules cannot be ranked. §<a class="xr" href="#sB4">B.4</a>
+      introduces the Bayesian move—treat the hidden number as random, with a distribution
+      expressing what you believe about it—and derives <em>Bayes' theorem</em>, the rule for
+      updating that belief with data. §<a class="xr" href="#sB5">B.5</a> proves the
+      punchline: once beliefs are updated, the best single-number guess under the natural
+      error measure is the <em>average of the updated belief</em>.
+      §§<a class="xr" href="#sB6">B.6</a>–<a class="xr" href="#sB8">B.8</a> then work two
+      complete examples with real numbers, including the ten-patient trial above, and
+      §<a class="xr" href="#sB9">B.9</a> asks the honest question—where did the prior belief
+      come from?—before §<a class="xr" href="#sB10">B.10</a> hands you the standard
+      vocabulary for further reading.</p></div>
+    </div>
+
+    <!-- ============================================================ -->
+    <h2 class="sec" id="sB2"><span class="n">B.2</span>The Probability Toolkit, from Zero</h2>
+
+    <p class="noindent">Probability is the mathematics of quantities whose values you cannot
+    predict. This section defines the six ideas the rest of the handout uses—random
+    variable, distribution, expectation, variance, conditional distribution, conditional
+    expectation—each with a small computation so the definition is not just words. Readers
+    who have met these before can skim, but should slow down at
+    <a class="xr" href="#B.2.7">B.2.7</a> and <a class="xr" href="#B.2.9">B.2.9</a>, which
+    carry the whole later argument.</p>
+
+    <div class="obj" id="B.2.1">
+      <div class="okind">Definition B.2.1</div>
+      <div class="ottl">Random variable; realization</div>
+      <div class="obody"><p>A <em>random variable</em> is a numerical quantity whose value
+      is determined by the outcome of something uncertain—a measurement not yet made. The
+      number of cures among ten patients, before the trial runs, is a random variable; so is
+      tomorrow's temperature. Random variables are written with capital letters (\(X\),
+      \(Y\)); once the uncertainty resolves and a value is observed, that observed
+      number—written in lowercase (\(x\), \(y\))—is called the <em>realization</em>.
+      “\(X=7\)” is an event that had some probability in advance; “\(x=7\)” is what actually
+      happened.</p></div>
+    </div>
+
+    <div class="obj" id="B.2.2">
+      <div class="okind">Definition B.2.2</div>
+      <div class="ottl">Distribution; pmf; density</div>
+      <div class="obody"><p>The <em>distribution</em> of a random variable is the complete
+      advance description of how likely it is to fall anywhere: the assignment of a
+      probability to every statement of the form “\(X\) lands in the set \(A\).” For a
+      <em>discrete</em> random variable (one taking isolated values, like a count) the
+      distribution is carried by the <em>probability mass function</em> (pmf)
+      $$ p(x) \;=\; P(X = x), $$
+      the probability of each individual value; probabilities of sets are found by adding:
+      \( P(X\in A)=\sum_{x\in A}p(x) \). For a <em>continuous</em> random variable (one
+      taking values in a continuum, like a fraction in \([0,1]\)) individual points all have
+      probability zero, and the distribution is instead carried by a <em>density</em>
+      \(f(x)\ge0\), with probabilities found by
+      integrating:<span class="fnref"><a href="#fn1" id="r1">1</a></span>
+      $$ P(X\in A) \;=\; \int_A f(x)\,dx. $$
+      In both cases the total is \(1\): \(\sum_x p(x)=1\), \(\int f(x)\,dx=1\)—<em>something</em>
+      must happen.</p></div>
+    </div>
+
+    <div class="obj" id="B.2.3">
+      <div class="okind">Definition B.2.3</div>
+      <div class="ottl">Expectation</div>
+      <div class="obody"><p>The <em>expectation</em> (or <em>mean</em>) of a random variable
+      \(X\) is its probability-weighted average value,
+      $$ \E\{X\} \;=\; \sum_x x\, p(x) \quad\text{(discrete)}, \qquad
+      \E\{X\} \;=\; \int x\, f(x)\, dx \quad\text{(continuous)}: $$
+      each possible value, weighted by how likely it is. Geometrically it is the
+      <em>balancing point</em> of the distribution: if the pmf or density were a physical
+      distribution of weight along a rod, \(\E\{X\}\) is where the rod balances. It is the
+      single number that best summarizes “where the distribution sits”—a claim
+      §<a class="xr" href="#sB5">B.5</a> will turn from slogan into theorem.</p></div>
+    </div>
+
+    <div class="obj" id="B.2.4">
+      <div class="okind">Example B.2.4</div>
+      <div class="ottl">Two expectations, fully computed</div>
+      <div class="obody"><p>(a) A random variable \(Z\) takes the value \(1\) with
+      probability \(\theta\) and \(0\) with probability \(1-\theta\) (one patient: cured or
+      not; such a \(Z\) is called a <em>Bernoulli(\(\theta\))</em> variable). Its
+      expectation, straight from the definition:
+      $$ \E\{Z\} \;=\; 1\cdot P(Z=1) + 0\cdot P(Z=0) \;=\; 1\cdot\theta + 0\cdot(1-\theta)
+      \;=\; \theta. $$
+      The mean of a \(0\)-or-\(1\) variable <em>is</em> its probability of being \(1\)—the
+      bridge between “probability” and “long-run fraction.”</p>
+      <p>(b) A random variable \(W\) takes values \(1, 2, 6\) with probabilities
+      \(\tfrac12, \tfrac13, \tfrac16\). Then
+      $$ \E\{W\} \;=\; 1\cdot\tfrac12 + 2\cdot\tfrac13 + 6\cdot\tfrac16
+      \;=\; \tfrac12 + \tfrac23 + 1 \;=\; \tfrac{3+4+6}{6} \;=\; \tfrac{13}{6}
+      \;\approx\; 2.17. $$
+      Note the balancing-point reading: \(2.17\) is not a possible value of \(W\); it is
+      where the weights balance. Expectation also respects sums and constant
+      multiples—\( \E\{aX+bY\}=a\,\E\{X\}+b\,\E\{Y\} \), always, with no assumptions about
+      how \(X\) and \(Y\) are related—a property called <em>linearity</em> that we will use
+      constantly.<span class="fnref"><a href="#fn2" id="r2">2</a></span></p></div>
+    </div>
+
+    <div class="obj" id="B.2.5">
+      <div class="okind">Definition B.2.5</div>
+      <div class="ottl">Variance; standard deviation</div>
+      <div class="obody"><p>The <em>variance</em> of \(X\) measures its spread: the expected
+      squared distance from its own mean,
+      $$ \Var(X) \;=\; \E\big\{ (X - \E\{X\})^2 \big\}. $$
+      Squaring makes deviations positive (so left- and right-misses cannot cancel) and
+      charges large deviations disproportionately. Its square root, the <em>standard
+      deviation</em>, is the spread in the original units. A useful equivalent form,
+      obtained by expanding the square and using linearity:
+      $$ \Var(X) \;=\; \E\big\{X^2 - 2X\,\E\{X\} + \E\{X\}^2\big\}
+      \;=\; \E\{X^2\} - 2\,\E\{X\}\,\E\{X\} + \E\{X\}^2, $$
+      that is,
+      $$ \Var(X) \;=\; \E\{X^2\} - \E\{X\}^2. $$
+      For the Bernoulli variable of <a class="xr" href="#B.2.4">B.2.4</a>(a): \(Z^2=Z\)
+      (since \(0^2=0\), \(1^2=1\)), so \(\E\{Z^2\}=\theta\) and
+      $$ \Var(Z) \;=\; \theta - \theta^2 \;=\; \theta(1-\theta), $$
+      largest at \(\theta=\tfrac12\) (a fair coin is the most unpredictable coin) and zero
+      at \(\theta=0\) or \(1\) (no uncertainty at all).</p></div>
+    </div>
+
+    <div class="obj" id="B.2.6">
+      <div class="okind">Definition B.2.6</div>
+      <div class="ottl">Joint, marginal, and conditional distributions</div>
+      <div class="obody"><p>For a <em>pair</em> of random variables \((X,Y)\), the
+      <em>joint distribution</em> assigns a probability to every combination: in the
+      discrete case, \(p(x,y)=P(X=x,\,Y=y)\). From it, the distribution of each variable
+      alone—the <em>marginal</em>—is recovered by summing out the other:
+      $$ p_X(x) \;=\; \sum_y p(x,y). $$
+      And the <em>conditional distribution</em> of \(X\) given that \(Y\) has been observed
+      to equal \(y\) is the joint, restricted to that observation and rescaled to total 1:
+      $$ p(x \mid y) \;=\; \frac{p(x,y)}{p_Y(y)} \qquad (p_Y(y)>0). $$
+      Read the formula as a two-step act: <em>take the slice</em> of the joint where
+      \(Y=y\) (the numerator), then <em>renormalize</em> it into a genuine probability
+      distribution by dividing by the slice's total mass (the denominator). For continuous
+      variables the same formulas hold with densities and integrals.</p></div>
+    </div>
+
+    <div class="obj" id="B.2.7">
+      <div class="okind">Example B.2.7</div>
+      <div class="ottl">A worked table—and, secretly, the whole handout</div>
+      <div class="obody"><p>A disease affects \(10\%\) of a population. A screening test
+      comes back positive for \(90\%\) of the sick and (falsely) for \(20\%\) of the
+      healthy. Let \(D=1\) mean sick, \(T=1\) mean the test is positive. The joint
+      distribution, built by multiplying each group's size by its test behavior:
+      $$ \begin{array}{c|cc|c}
+       & T=1 & T=0 & \text{row total}\\ \hline
+      D=1 & 0.10\times0.90 = 0.09 & 0.10\times0.10 = 0.01 & 0.10\\
+      D=0 & 0.90\times0.20 = 0.18 & 0.90\times0.80 = 0.72 & 0.90\\ \hline
+      \text{column total} & 0.27 & 0.73 & 1.00
+      \end{array} $$
+      The four cells total \(1\), the row totals are the marginal of \(D\), the column
+      totals the marginal of \(T\). Now suppose your test comes back positive. What is the
+      probability you are sick? Apply <a class="xr" href="#B.2.6">B.2.6</a>: slice the
+      \(T=1\) column, then renormalize by its total \(0.27\):
+      $$ P(D=1 \mid T=1) \;=\; \frac{p(1,1)}{p_T(1)} \;=\; \frac{0.09}{0.27} \;=\;
+      \frac13. $$
+      Pause on what just happened. <em>Before</em> the test, your probability of being sick
+      was \(0.10\). You received data (a positive test), and your probability
+      <em>updated</em> to \(0.33\)—higher, but nowhere near certainty, because false
+      positives are common and the disease is rare. This little table is the entire Bayesian
+      method in miniature: a belief, a data-generating mechanism, an observation, an updated
+      belief. §<a class="xr" href="#sB4">B.4</a> will redo this computation with a
+      continuous unknown in place of \(D\) and give its parts their proper names.</p></div>
+    </div>
+
+    <div class="obj" id="B.2.8">
+      <div class="okind">Definition B.2.8</div>
+      <div class="ottl">Conditional expectation</div>
+      <div class="obody"><p>The <em>conditional expectation</em> of \(X\) given \(Y=y\) is
+      the mean of the conditional distribution:
+      $$ \E\{X \mid Y=y\} \;=\; \sum_x x\, p(x\mid y) $$
+      (integral against the conditional density in the continuous case). It is the balancing
+      point of the <em>slice</em>: your updated best summary of \(X\) after seeing \(Y=y\).
+      Note that it is a number for each \(y\)—so, before \(Y\) is observed, the recipe
+      \(y\mapsto\E\{X\mid Y=y\}\) is itself a random quantity, written
+      \(\E\{X\mid Y\}\).</p></div>
+    </div>
+
+    <div class="obj" id="B.2.9">
+      <div class="okind">Theorem B.2.9</div>
+      <div class="ottl">Iterated expectations</div>
+      <div class="obody"><p>For jointly distributed \((X,Y)\) with \(\E\{|X|\}<\infty\),
+      $$ \E\{X\} \;=\; \E\big\{\, \E\{X \mid Y\} \,\big\}: $$
+      the overall mean is the probability-weighted average, over what \(Y\) might be, of the
+      slice-by-slice means.</p></div>
+    </div>
+
+    <div class="prf">
+      <div class="pkind">Proof B.2.9</div>
+      <div class="pttl">Proof of Iterated Expectations by Regrouping a Double Sum.</div>
+      <ol class="steps">
+        <li>Write out the right side from the definitions. The outer expectation averages
+        the function \(y\mapsto\E\{X\mid Y=y\}\) against the marginal of \(Y\):
+        $$ \E\big\{ \E\{X\mid Y\} \big\}
+        \;=\; \sum_y \E\{X \mid Y=y\}\; p_Y(y)
+        \;=\; \sum_y \Big( \sum_x x\, p(x\mid y) \Big) p_Y(y). $$</li>
+        <li>Substitute the definition of the conditional pmf,
+        \(p(x\mid y)=p(x,y)/p_Y(y)\):
+        $$ \sum_y \sum_x x\,\frac{p(x,y)}{p_Y(y)}\; p_Y(y)
+        \;=\; \sum_y \sum_x x\, p(x,y), $$
+        the marginal \(p_Y(y)\) cancelling exactly—this cancellation is the whole proof.</li>
+        <li>Regroup the double sum by \(x\) (legal because the sum converges absolutely):
+        $$ \sum_x x \sum_y p(x,y) \;=\; \sum_x x\, p_X(x) \;=\; \E\{X\}, $$
+        the inner sum being the marginal of \(X\) by <a class="xr" href="#B.2.6">B.2.6</a>.</li>
+      </ol>
+      <div class="uses">Uses B.2.6, B.2.8.</div>
+    </div>
+
+    <p>Why this theorem matters here: it lets you compute a complicated overall average by
+    <em>conditioning</em>—break the world into slices where things are simple, average
+    within each slice, then average the slice-answers. The main theorem of
+    §<a class="xr" href="#sB5">B.5</a> is exactly one application of this maneuver.</p>
+
+    <!-- ============================================================ -->
+    <h2 class="sec" id="sB3"><span class="n">B.3</span>Estimation as a Decision, and Why It Gets Stuck</h2>
+
+    <p class="noindent">The toolkit is assembled; now aim it at the trial of
+    <a class="xr" href="#B.1.1">B.1.1</a>. This section makes four ideas precise—model,
+    estimator, loss, risk—and then demonstrates the problem that motivates everything after:
+    without background knowledge, competing estimators <em>cannot be ranked</em>.</p>
+
+    <div class="obj" id="B.3.1">
+      <div class="okind">Definition B.3.1</div>
+      <div class="ottl">The statistical model, and the trial's</div>
+      <div class="obody"><p>A <em>statistical model</em> is a family of candidate
+      distributions for the data, indexed by the unknown quantity: for each possible value
+      of \(\theta\), a statement of how the data would then behave. The unknown \(\theta\)
+      is called the <em>parameter</em>; the set \(\Theta\) of its possible values, the
+      <em>parameter space</em>. For the trial: each of \(n\) patients is independently cured
+      with probability \(\theta\), and \(X\) counts the cures. A particular sequence with
+      \(x\) specified cures and \(n-x\) specified failures has probability
+      \(\theta^x(1-\theta)^{n-x}\) (independence multiplies the per-patient probabilities),
+      and there are \(\binom{n}{x}\) ways to choose <em>which</em> \(x\) patients are the
+      cured ones, so
+      $$ f(x \mid \theta) \;=\; P(X = x \mid \theta)
+      \;=\; \binom{n}{x}\,\theta^{x}(1-\theta)^{\,n-x},
+      \qquad x = 0, 1, \dots, n, $$
+      with \(\Theta=[0,1]\). This family is the <em>binomial</em> model, written
+      \(X\sim\text{Binomial}(n,\theta)\).<span class="fnref"><a href="#fn3" id="r3">3</a></span></p></div>
+    </div>
+
+    <div class="obj" id="B.3.2">
+      <div class="okind">Definition B.3.2</div>
+      <div class="ottl">Estimator</div>
+      <div class="obody"><p>An <em>estimator</em> is a rule—a function \(a(\cdot)\),
+      committed to before the data arrive—that turns any possible data set into a guess:
+      observe \(X=x\), report \(a(x)\). The <em>estimator</em> is the recipe; the
+      <em>estimate</em> is the number the recipe produces on your data. Candidate recipes
+      for the trial are cheap to write down: report the observed rate \(a_1(x)=x/n\); ignore
+      the data and always report \(a_2(x)=\tfrac12\); split the difference,
+      \(a_3(x)=(x+1)/(n+2)\). Each produces <em>an</em> answer on every data set, so
+      producing answers cannot be what makes an estimator good. We need a way to score
+      them.</p></div>
+    </div>
+
+    <div class="obj" id="B.3.3">
+      <div class="okind">Definition B.3.3</div>
+      <div class="ottl">Loss function; squared-error loss</div>
+      <div class="obody"><p>A <em>loss function</em> \(L(\theta,a)\) prices the consequence
+      of reporting the guess \(a\) when the truth is \(\theta\): bigger loss, worse outcome.
+      It is chosen by <em>us</em>, when we pose the problem, as the definition of what
+      counts as a miss. This handout uses the standard choice for estimating a number,
+      <em>squared-error loss</em>:
+      $$ L(\theta, a) \;=\; (\theta - a)^2. $$
+      Why this and not, say, \(|\theta-a|\)? Three reasons, in increasing order of
+      importance: squaring is symmetric (over- and under-estimation are punished alike); it
+      charges large misses disproportionately (missing by \(0.2\) costs four times missing
+      by \(0.1\)), which matches how bad decisions usually scale; and—the deep reason,
+      proved in §<a class="xr" href="#sB5">B.5</a>—it is the loss under which
+      <em>averages</em> are the optimal guesses, making the whole theory computable.
+      Different losses lead to different optimal summaries; squared error leads to
+      means.<span class="fnref"><a href="#fn4" id="r4">4</a></span></p></div>
+    </div>
+
+    <div class="obj" id="B.3.4">
+      <div class="okind">Definition B.3.4</div>
+      <div class="ottl">Risk</div>
+      <div class="obody"><p>Fix a candidate truth \(\theta\) and an estimator \(a(\cdot)\).
+      Because the data are random, the loss you will suffer is random too; its expectation,
+      computed under the model at that \(\theta\), is the <em>risk</em>:
+      $$ R(\theta) \;=\; \E\big\{ L(\theta, a(X)) \big\}
+      \;=\; \E\big\{ (\theta - a(X))^2 \big\}
+      \qquad\text{(\(X\) distributed per \(f(\cdot\mid\theta)\))}. $$
+      The risk answers: <em>if the truth were \(\theta\), how badly would this recipe do on
+      average?</em> Note carefully that it is a <em>function</em> of \(\theta\)—one number
+      per candidate truth—because the truth is exactly what we do not know.</p></div>
+    </div>
+
+    <div class="obj" id="B.3.5">
+      <div class="okind">Example B.3.5</div>
+      <div class="ottl">The risk of the observed rate, computed in full</div>
+      <div class="obody"><p>Take \(a_1(X)=X/n\), the observed rate, under the binomial
+      model. First its mean. Writing \(X=Z_1+\cdots+Z_n\) as the sum of the \(n\)
+      per-patient Bernoulli indicators and using linearity
+      (<a class="xr" href="#B.2.4">B.2.4</a>):
+      $$ \E\{X\} \;=\; \E\{Z_1\} + \cdots + \E\{Z_n\}
+      \;=\; \underbrace{\theta+\cdots+\theta}_{n} \;=\; n\theta,
+      \qquad\text{so}\qquad
+      \E\Big\{\frac{X}{n}\Big\} \;=\; \frac{n\theta}{n} \;=\; \theta. $$
+      The rate is centered on the truth at <em>every</em> \(\theta\) (such an estimator is
+      called <em>unbiased</em>). Its risk is therefore its variance:
+      $$ R_1(\theta) \;=\; \E\Big\{ \Big(\frac{X}{n}-\theta\Big)^{\!2} \Big\}
+      \;=\; \E\Big\{ \Big(\frac{X}{n}-\E\Big\{\frac{X}{n}\Big\}\Big)^{\!2} \Big\}
+      \;=\; \Var\Big(\frac{X}{n}\Big), $$
+      by the definition of variance (<a class="xr" href="#B.2.5">B.2.5</a>) with the mean
+      \(\theta\) substituted. Variances of independent summands
+      add,<span class="fnref"><a href="#fn5" id="r5">5</a></span> and each Bernoulli
+      indicator has variance \(\theta(1-\theta)\)
+      (<a class="xr" href="#B.2.5">B.2.5</a>), so
+      $$ \Var(X) \;=\; n\,\theta(1-\theta)
+      \qquad\Longrightarrow\qquad
+      R_1(\theta) \;=\; \Var\Big(\frac{X}{n}\Big) \;=\; \frac{\Var(X)}{n^2}
+      \;=\; \frac{\theta(1-\theta)}{n}. $$</p></div>
+    </div>
+
+    <div class="obj" id="B.3.6">
+      <div class="okind">Example B.3.6</div>
+      <div class="ottl">The stuck comparison</div>
+      <div class="obody"><p>Now score the data-ignoring rule \(a_2\equiv\tfrac12\). Its loss
+      is not random at all—it reports \(\tfrac12\) no matter what—so its risk is just
+      $$ R_2(\theta) \;=\; \big(\theta - \tfrac12\big)^2. $$
+      Compare the two at \(n=10\). At \(\theta=\tfrac12\):
+      $$ R_1\big(\tfrac12\big) \;=\; \frac{\tfrac12\cdot\tfrac12}{10} \;=\; 0.025,
+      \qquad R_2\big(\tfrac12\big) \;=\; 0: $$
+      the stubborn rule is <em>unbeatable</em>—it happens to be guessing the truth exactly.
+      But at \(\theta=0.9\):
+      $$ R_1(0.9) \;=\; \frac{0.9\times0.1}{10} \;=\; 0.009,
+      \qquad R_2(0.9) \;=\; (0.9-0.5)^2 \;=\; 0.16: $$
+      now the stubborn rule is nearly eighteen times worse. Neither estimator wins at every
+      \(\theta\); their risk curves <em>cross</em>. And this is the general situation, not a
+      quirk of a silly example: reasonable estimators trade performance in one region of
+      \(\Theta\) for performance in another, and “minimize the risk” is not an instruction
+      anyone can follow, because there is no single risk number to minimize—there is a
+      curve, and curves are not ordered. The problem is stuck. To get unstuck we must be
+      willing to say <em>which values of \(\theta\) we care about more</em>—to put weights
+      on the candidate truths. Doing that with a probability distribution is the Bayesian
+      move, and it is the next section.</p></div>
+    </div>
+
+    <!-- ============================================================ -->
+    <h2 class="sec" id="sB4"><span class="n">B.4</span>The Prior, the Posterior, and Bayes' Theorem</h2>
+
+    <div class="obj" id="B.4.1">
+      <div class="okind">Definition B.4.1</div>
+      <div class="ottl">Prior distribution</div>
+      <div class="obody"><p>A <em>prior distribution</em> is a probability distribution
+      \(\pi(\theta)\) placed on the parameter itself, expressing what is believed about
+      \(\theta\) <em>before</em> the data are seen: regions of \(\Theta\) where \(\pi\) is
+      large are values considered plausible, regions where \(\pi\) is small, implausible.
+      Formally this is a change of status: \(\theta\) is now treated as a <em>random
+      variable</em> with density (or pmf) \(\pi\), so that all of
+      §<a class="xr" href="#sB2">B.2</a>'s machinery—joints, slices, conditional
+      expectations—applies to it. The prior is an <em>input</em>, chosen by the analyst as a
+      model of background knowledge, exactly as the binomial model was chosen as a model of
+      the data mechanism. It is not derived from the data and it is not the thing we will
+      optimize; it is a premise.<span class="fnref"><a href="#fn6" id="r6">6</a></span></p></div>
+    </div>
+
+    <div class="obj" id="B.4.2">
+      <div class="okind">Definition B.4.2</div>
+      <div class="ottl">The joint distribution of parameter and data</div>
+      <div class="obody"><p>Once \(\theta\) is random, the pair \((\theta, X)\) has a joint
+      distribution, and it is built from the two models already on the table, prior first,
+      data mechanism second:
+      $$ \text{joint}(\theta, x) \;=\; \pi(\theta)\; f(x \mid \theta). $$
+      Read it generatively: nature draws a truth \(\theta\) from \(\pi\), then the
+      experiment draws data \(x\) from the model at that truth. (This is the same
+      construction as the table of <a class="xr" href="#B.2.7">B.2.7</a>: row weights
+      \(0.1/0.9\) were the prior over \(D\); the within-row test behavior was the model;
+      cells were prior \(\times\) model.)</p></div>
+    </div>
+
+    <div class="obj" id="B.4.3">
+      <div class="okind">Definition B.4.3</div>
+      <div class="ottl">The marginal distribution of the data</div>
+      <div class="obody"><p>Summing (or integrating) the joint over \(\theta\) gives the
+      <em>marginal</em> distribution of the data,
+      $$ m(x) \;=\; \int_{\Theta} \pi(\theta)\, f(x\mid\theta)\, d\theta: $$
+      how probable the data set \(x\) is <em>overall</em>, averaged over what the truth
+      might be. In the table it was the column totals. It involves no unknown—\(\theta\)
+      has been integrated away—and its role in what follows is purely that of a normalizing
+      constant.</p></div>
+    </div>
+
+    <div class="obj" id="B.4.4">
+      <div class="okind">Theorem B.4.4</div>
+      <div class="ottl">Bayes' theorem</div>
+      <div class="obody"><p>The conditional distribution of the parameter given the observed
+      data—the <em>posterior distribution</em>—is
+      $$ \pi(\theta \mid x) \;=\; \frac{\pi(\theta)\, f(x\mid\theta)}{m(x)}
+      \;=\; \frac{\pi(\theta)\, f(x\mid\theta)}
+      {\displaystyle\int_{\Theta} \pi(t)\, f(x\mid t)\, dt}. $$</p></div>
+    </div>
+
+    <div class="prf">
+      <div class="pkind">Proof B.4.4</div>
+      <div class="pttl">Proof of Bayes' Theorem by Slicing the Joint.</div>
+      <ol class="steps">
+        <li>By the definition of a conditional distribution
+        (<a class="xr" href="#B.2.6">B.2.6</a>), applied to the pair \((\theta, X)\) with
+        the roles “condition on the second coordinate”: the conditional of \(\theta\) given
+        \(X=x\) is the joint divided by the marginal of the conditioning variable,
+        $$ \pi(\theta\mid x) \;=\; \frac{\text{joint}(\theta,x)}{m(x)}. $$</li>
+        <li>Substitute the joint's factorization \(\pi(\theta)f(x\mid\theta)\)
+        (<a class="xr" href="#B.4.2">B.4.2</a>) in the numerator and the integral form of
+        \(m(x)\) (<a class="xr" href="#B.4.3">B.4.3</a>) in the denominator. (The dummy
+        variable in the denominator is renamed \(t\) so it cannot be confused with the free
+        \(\theta\) in the numerator.)</li>
+      </ol>
+      <div class="uses">Uses B.2.6, B.4.2, B.4.3.</div>
+    </div>
+
+    <div class="obj" id="B.4.5">
+      <div class="okind">Remark B.4.5</div>
+      <div class="ottl">Reading Bayes' theorem</div>
+      <div class="obody"><p>Three observations, each load-bearing. First, the structure is
+      <em>slice and renormalize</em>, nothing more: observing \(x\) freezes one slice of the
+      joint; dividing by the slice's total mass \(m(x)\) makes it a probability distribution
+      over \(\theta\) again. The theorem is <a class="xr" href="#B.2.6">B.2.6</a> wearing
+      new labels. Second, look at how the data enter: only through the factor
+      \(f(x\mid\theta)\), read as a function of \(\theta\) with the observed \(x\) plugged
+      in. That function has a name—the <em>likelihood</em>—and it scores each candidate
+      truth by how well it explains what was actually seen. Posterior \(\propto\) prior
+      \(\times\) likelihood: updated belief is old belief reweighted by explanatory success.
+      Third, the denominator does not involve \(\theta\) at all. So to identify the
+      posterior it is enough to know the numerator's <em>shape</em> in \(\theta\); the
+      constant is whatever makes the total \(1\). In practice one therefore writes
+      $$ \pi(\theta\mid x) \;\propto\; \pi(\theta)\, f(x\mid\theta), $$
+      drops every factor not involving \(\theta\), and tries to <em>recognize</em> the
+      resulting shape as a known family. §<a class="xr" href="#sB7">B.7</a> runs exactly
+      this play, and the integral in the denominator never gets computed.</p></div>
+    </div>
+
+    <div class="obj" id="B.4.6">
+      <div class="okind">Example B.4.6</div>
+      <div class="ottl">The table of B.2.7, renamed</div>
+      <div class="obody"><p>You have already done a full Bayesian update. In
+      <a class="xr" href="#B.2.7">B.2.7</a>: the prior was \(\pi(1)=P(D=1)=0.10\); the model
+      was the test's behavior given the disease state, \(f(1\mid D{=}1)=0.9\) and
+      \(f(1\mid D{=}0)=0.2\); the observed data was \(T=1\); the marginal was
+      \(m(1)=0.10\times0.9+0.90\times0.2=0.27\); and Bayes' theorem gave the posterior
+      $$ \pi(1\mid 1) \;=\; \frac{\pi(1)\,f(1\mid1)}{m(1)}
+      \;=\; \frac{0.10\times0.90}{0.27} \;=\; \frac{0.09}{0.27} \;=\; \frac13. $$
+      Belief \(0.10\), data, belief \(\tfrac13\). Everything from here on is this
+      computation with a continuous unknown—and then one further question the table never
+      asked: once you have the posterior, <em>what single number should you report?</em></p></div>
+    </div>
+
+    <!-- ============ LAB: Bayes as a picture ============ -->
+    <div class="widget" id="w1">
+      <h2>Laboratory · §B.2.7 &amp; §B.4 <span class="inprint">— live; not in the print edition</span></h2>
+      <h3>Slice the square, then renormalize</h3>
+      <p>The whole update is one picture. The square is all the probability there is: column
+      widths carry the <em>prior</em> (B.4.1), and within each column the vivid top block is
+      the chance the test comes back positive—the <em>model</em>. Width × height tiles the
+      square into the four cells of B.2.7's table. When the test returns positive, the
+      bottom blocks <em>die</em> (faded): you live in the top slice now. The posterior is
+      the sick share of the surviving slice—the bar on the right renormalizes it to total
+      1, which is exactly the division in Bayes' theorem (B.4.4).</p>
+      <div class="controls">
+        <span class="ctl"><label>prior P(sick)</label>
+          <input type="range" min="0.01" max="0.60" step="0.01" value="0.10" id="w1p" data-out="w1pv" data-dec="2">
+          <span class="val" id="w1pv"></span></span>
+        <span class="ctl"><label>P(+ | sick)</label>
+          <input type="range" min="0.50" max="0.99" step="0.01" value="0.90" id="w1sens" data-out="w1sensv" data-dec="2">
+          <span class="val" id="w1sensv"></span></span>
+        <span class="ctl"><label>P(+ | healthy)</label>
+          <input type="range" min="0.01" max="0.60" step="0.01" value="0.20" id="w1fpr" data-out="w1fprv" data-dec="2">
+          <span class="val" id="w1fprv"></span></span>
+      </div>
+      <div class="charts">
+        <div class="chartwrap" style="flex:2 1 400px" id="w1sq"><div class="ct">the joint distribution (area = probability); positive-test slice vivid</div></div>
+        <div class="chartwrap" style="flex:1 1 190px; min-width:180px; max-width:280px" id="w1bar"><div class="ct">the slice, renormalized</div></div>
+      </div>
+      <div class="readout" id="w1read"></div>
+      <p class="note">Two experiments. <em>Base rate:</em> drag the prior down to 0.01 with
+      a good test (0.90 / 0.05)—the posterior stays modest, because the healthy column is so
+      wide that even its thin positive sliver out-areas the sick column. Screening for rare
+      conditions is hard, and the picture says why. <em>Better evidence:</em> hold the prior
+      at 0.10 and push P(+ | healthy) toward 0.01—now a positive test is nearly decisive.
+      The prior sets the columns; only the likelihood (B.4.5) can redistribute belief
+      between them.</p>
+    </div>
+
+    <!-- ============================================================ -->
+    <h2 class="sec" id="sB5"><span class="n">B.5</span>The Best Guess Under Squared Error</h2>
+
+    <p class="noindent">The posterior is a whole distribution over \(\theta\)—a full account
+    of what is now believed. Often that is the honest thing to report. But estimation
+    demands one number, and now the loss function chooses it. This section proves the two
+    results on which everything rests: with no data, the best single-number guess of a
+    random quantity is its <em>mean</em>; with data, the best guess is the mean of the
+    <em>posterior</em>. The first result is the engine; the second is one application of
+    iterated expectations to it.</p>
+
+    <div class="obj" id="B.5.1">
+      <div class="okind">Theorem B.5.1</div>
+      <div class="ottl">The best constant guess is the mean</div>
+      <div class="obody"><p>Let \(\theta\) be a random variable with
+      \(\E\{\theta^2\}<\infty\). Among all constants \(a\), the expected squared error
+      $$ \E\big\{ (\theta - a)^2 \big\} \;=\; \Var(\theta) + \big( \E\{\theta\} - a \big)^2 $$
+      is minimized at exactly one point: \(a = \E\{\theta\}\), where it equals
+      \(\Var(\theta)\).</p></div>
+    </div>
+
+    <div class="prf">
+      <div class="pkind">Proof B.5.1</div>
+      <div class="pttl">Proof of the Best Constant by Adding and Subtracting the Mean.</div>
+      <ol class="steps">
+        <li>Write \(\mu=\E\{\theta\}\) for brevity, and route the error through \(\mu\) by
+        adding and subtracting it—the step that makes the square split cleanly:
+        $$ \theta - a \;=\; (\theta - \mu) + (\mu - a). $$</li>
+        <li>Square the two-term sum using \((u+v)^2=u^2+2uv+v^2\):
+        $$ (\theta-a)^2 \;=\; (\theta-\mu)^2 \;+\; 2(\theta-\mu)(\mu-a) \;+\; (\mu-a)^2. $$</li>
+        <li>Take expectations term by term (linearity,
+        <a class="xr" href="#B.2.4">B.2.4</a>). The first term gives
+        \(\E\{(\theta-\mu)^2\}=\Var(\theta)\) by definition. In the middle term, \(\mu-a\)
+        is a constant and factors out:
+        $$ \E\big\{2(\theta-\mu)(\mu-a)\big\} \;=\; 2(\mu-a)\,\E\{\theta-\mu\}
+        \;=\; 2(\mu-a)\big(\E\{\theta\}-\mu\big) \;=\; 2(\mu-a)\cdot 0 \;=\; 0: $$
+        deviations from one's own mean average to zero, so the cross term dies. The last
+        term is the constant \((\mu-a)^2\), its own expectation.</li>
+        <li>What remains is the display:
+        \(\E\{(\theta-a)^2\} = \Var(\theta) + (\mu-a)^2\). The first piece does not involve
+        \(a\) at all; the second is a square, so it is \(\ge 0\) always, \(=0\) exactly at
+        \(a=\mu\), and \(>0\) elsewhere. The minimizer is \(a=\mu\), uniquely.</li>
+      </ol>
+      <div class="uses">Uses B.2.3, B.2.4, B.2.5.</div>
+    </div>
+
+    <div class="obj" id="B.5.2">
+      <div class="okind">Remark B.5.2</div>
+      <div class="ottl">What the identity says</div>
+      <div class="obody"><p>The proof delivered more than a minimizer; it delivered an exact
+      accounting. Guessing a random quantity with a constant costs you \(\Var(\theta)\)
+      <em>no matter what</em>—the irreducible price of the quantity's own randomness—plus a
+      penalty \((\E\{\theta\}-a)^2\) for centering your guess anywhere but the mean. This is
+      why “balancing point” was the right picture for the expectation in
+      <a class="xr" href="#B.2.3">B.2.3</a>: under squared error, the balancing point is
+      provably the best single summary. And note the theorem's scope: <em>any</em> random
+      \(\theta\), any distribution with a finite second moment. In particular it will apply
+      verbatim to \(\theta\) under its posterior distribution—which is the next theorem.</p></div>
+    </div>
+
+    <div class="obj" id="B.5.3">
+      <div class="okind">Definition B.5.3</div>
+      <div class="ottl">Bayes risk</div>
+      <div class="obody"><p>Let \(a(\cdot)\) be an estimator. Its <em>Bayes risk</em> is its
+      expected squared error when <em>both</em> sources of randomness run: the truth
+      \(\theta\) drawn from the prior, the data \(X\) drawn from the model given that
+      truth—that is, \((\theta,X)\) carrying the joint distribution of
+      <a class="xr" href="#B.4.2">B.4.2</a>:
+      $$ r(a) \;=\; \E\big\{ \big( a(X) - \theta \big)^2 \big\}. $$
+      Compare <a class="xr" href="#B.3.4">B.3.4</a>: the risk froze \(\theta\) and averaged
+      over data only, producing a curve; the Bayes risk averages over \(\theta\) as
+      well—the prior supplies precisely the weights over candidate truths that
+      <a class="xr" href="#B.3.6">B.3.6</a> found missing—and produces a <em>single
+      number</em> per estimator. Numbers, unlike curves, can be minimized. The estimator
+      with the smallest Bayes risk is called the <em>Bayes estimator</em>, and the next
+      theorem identifies it.</p></div>
+    </div>
+
+    <div class="obj" id="B.5.4">
+      <div class="okind">Theorem B.5.4</div>
+      <div class="ottl">The Bayes estimator is the posterior mean</div>
+      <div class="obody"><p>Assume \(\E\{\theta^2\}<\infty\). Among all estimators
+      \(a(\cdot)\), the Bayes risk \(r(a)\) is minimized by reporting, for each possible
+      data set \(x\), the mean of the posterior distribution:
+      $$ a^{*}(x) \;=\; \E\{\theta \mid X = x\}
+      \;=\; \int_{\Theta} \theta\; \pi(\theta\mid x)\, d\theta. $$</p></div>
+    </div>
+
+    <div class="prf">
+      <div class="pkind">Proof B.5.4</div>
+      <div class="pttl">Proof of the Posterior-Mean Rule by Conditioning on the Data.</div>
+      <ol class="steps">
+        <li>Iterate the Bayes risk through the data, using iterated expectations
+        (<a class="xr" href="#B.2.9">B.2.9</a>) with the conditioning variable \(X\):
+        $$ r(a) \;=\; \E\big\{ (a(X)-\theta)^2 \big\}
+        \;=\; \E\Big[\, \E\big\{ (a(X)-\theta)^2 \bigm| X \big\} \,\Big]: $$
+        the overall average equals the average, over data sets, of the within-data-set
+        averages.</li>
+        <li>Freeze one slice \(X=x\) and look at the inner expectation. Inside the slice,
+        \(a(x)\) is a fixed <em>constant</em>—the recipe's output on that data set—while
+        \(\theta\) remains random, distributed according to the conditional distribution of
+        \(\theta\) given \(X=x\). And that conditional distribution is, by
+        <a class="xr" href="#B.4.4">B.4.4</a>, exactly the posterior \(\pi(\cdot\mid x)\).
+        So the inner expectation is the expected squared error of a <em>constant</em> guess
+        at a random quantity:
+        $$ \E\big\{ (a(x) - \theta)^2 \bigm| X=x \big\}
+        \;=\; \E\big\{ (\theta - c)^2 \big\}\Big|_{c=a(x)}
+        \quad\text{with \(\theta\) carrying the posterior.} $$</li>
+        <li>Apply <a class="xr" href="#B.5.1">B.5.1</a> <em>to the posterior
+        distribution</em>—the theorem holds for any distribution, so in particular this
+        one. Within the slice, the inner expectation is minimized, uniquely, by the constant
+        equal to that distribution's mean:
+        $$ c \;=\; \E\{\theta \mid X = x\}, $$
+        and no other choice of \(a(x)\) does as well in this slice.</li>
+        <li>The rule \(a^{*}(x)=\E\{\theta\mid X=x\}\) therefore minimizes the inner
+        expectation <em>simultaneously at every</em> \(x\). Averaging over slices (step 1)
+        preserves the domination: for any competitor \(a\), each of \(a\)'s slice-averages
+        is at least \(a^{*}\)'s, so the overall average is too. Hence
+        \(r(a^{*})\le r(a)\) for every estimator \(a\), which is the claim.</li>
+      </ol>
+      <div class="uses">Uses B.2.9, B.4.4, B.5.1.</div>
+    </div>
+
+    <div class="obj" id="B.5.5">
+      <div class="okind">Remark B.5.5</div>
+      <div class="ottl">The recipe, in words</div>
+      <div class="obody"><p>The theorem compresses the whole method into two verbs:
+      <b>update, then average</b>.</p>
+      <p class="noindent">1.&ensp;Model the data mechanism (\(f(x\mid\theta)\)) and state
+      your prior (\(\pi\)).<br>
+      2.&ensp;Observe \(x\); form the posterior
+      \(\pi(\theta\mid x)\propto\pi(\theta)f(x\mid\theta)\)
+      (<a class="xr" href="#B.4.4">B.4.4</a>), the updated belief.<br>
+      3.&ensp;Report the posterior's mean. That single number minimizes expected squared
+      error among <em>all</em> possible estimators, given the premises.</p>
+      <p>Notice what is chosen and what is given: the prior and the loss are premises, posed
+      with the problem; the theorem then leaves <em>nothing</em> to choose—the optimal
+      estimator is determined. The remaining work in any particular problem is
+      computational: actually finding the posterior and its mean. The next three sections do
+      that work twice, in the two settings where it is fully explicit.</p></div>
+    </div>
+
+    <!-- ============================================================ -->
+    <h2 class="sec" id="sB6"><span class="n">B.6</span>A Toolkit Distribution: the Beta Family</h2>
+
+    <p class="noindent">To run the recipe on the trial we need a family of prior
+    distributions for a <em>fraction</em>—a random quantity living in \([0,1]\)—rich enough
+    to express real beliefs and tame enough to compute with. The standard choice is the Beta
+    family. Its normalizing constant involves the Gamma function, so that comes first; both
+    objects repay the ten minutes they take to set up.</p>
+
+    <div class="obj" id="B.6.1">
+      <div class="okind">Definition B.6.1</div>
+      <div class="ottl">The Gamma function</div>
+      <div class="obody"><p>For \(s>0\),
+      $$ \Gamma(s) \;=\; \int_0^{\infty} t^{\,s-1}\, e^{-t}\, dt. $$
+      Two facts are all we need. First, the recursion \(\Gamma(s+1)=s\,\Gamma(s)\):
+      integrate by parts with \(u=t^{s}\) (so \(du=s\,t^{s-1}dt\)) and \(dv=e^{-t}dt\) (so
+      \(v=-e^{-t}\)):
+      $$ \Gamma(s+1) \;=\; \int_0^{\infty} t^{s} e^{-t}\, dt
+      \;=\; \Big[ -t^{s} e^{-t} \Big]_0^{\infty} + s\int_0^{\infty} t^{\,s-1} e^{-t}\, dt
+      \;=\; 0 + s\,\Gamma(s), $$
+      the boundary term vanishing at both ends (\(t^s e^{-t}\to0\) as \(t\to\infty\) because
+      the exponential beats any power; at \(t=0\), \(t^s=0\) for \(s>0\)). Second, the
+      anchor \(\Gamma(1)=\int_0^\infty e^{-t}dt=1\). Together they give, for whole numbers,
+      \(\Gamma(n) = (n-1)\,\Gamma(n-1) = \cdots = (n-1)!\): the Gamma function is the
+      factorial, shifted by one and extended to non-integers.</p></div>
+    </div>
+
+    <div class="obj" id="B.6.2">
+      <div class="okind">Definition B.6.2</div>
+      <div class="ottl">The Beta distribution</div>
+      <div class="obody"><p>For parameters \(\alpha>0\), \(\beta>0\), the
+      <em>Beta(\(\alpha,\beta\)) distribution</em> is the continuous distribution on
+      \([0,1]\) with density
+      $$ \pi(\theta) \;=\;
+      \frac{\theta^{\,\alpha-1}(1-\theta)^{\,\beta-1}}{\mathrm{B}(\alpha,\beta)},
+      \qquad
+      \mathrm{B}(\alpha,\beta) \;=\;
+      \frac{\Gamma(\alpha)\,\Gamma(\beta)}{\Gamma(\alpha+\beta)}, $$
+      the constant \(\mathrm{B}(\alpha,\beta)\) being exactly what makes the density
+      integrate to \(1\). The exponents steer the shape: mass shifts toward \(1\) as
+      \(\alpha\) grows and toward \(0\) as \(\beta\) grows, so \((\alpha,\beta)\) behave
+      like counts of imagined prior successes and failures—a reading
+      <a class="xr" href="#B.7.3">B.7.3</a> will make exact. One member deserves special
+      mention: \(\alpha=\beta=1\) gives
+      \(\pi(\theta)=\theta^{0}(1-\theta)^{0}/\mathrm{B}(1,1)\), and since
+      \(\mathrm{B}(1,1)=\Gamma(1)\Gamma(1)/\Gamma(2)=1\cdot1/1=1\), this is
+      \(\pi(\theta)\equiv1\): the <em>uniform</em> distribution, the flat prior that treats
+      every fraction as equally plausible.</p></div>
+    </div>
+
+    <div class="obj" id="B.6.3">
+      <div class="okind">Theorem B.6.3</div>
+      <div class="ottl">The mean of a Beta distribution</div>
+      <div class="obody"><p>If \(\theta\sim\) Beta(\(\alpha,\beta\)), then
+      $$ \E\{\theta\} \;=\; \frac{\alpha}{\alpha+\beta}. $$</p></div>
+    </div>
+
+    <div class="prf">
+      <div class="pkind">Proof B.6.3</div>
+      <div class="pttl">Proof of the Beta Mean by the Kernel Trick.</div>
+      <ol class="steps">
+        <li>From the definition of expectation, multiplying the density by \(\theta\) merges
+        the extra \(\theta\) into the exponent:
+        $$ \E\{\theta\} \;=\; \int_0^1 \theta\cdot
+        \frac{\theta^{\,\alpha-1}(1-\theta)^{\,\beta-1}}{\mathrm{B}(\alpha,\beta)}\,d\theta
+        \;=\; \frac{1}{\mathrm{B}(\alpha,\beta)}
+        \int_0^1 \theta^{\,(\alpha+1)-1}(1-\theta)^{\,\beta-1}\,d\theta. $$</li>
+        <li>Recognize the remaining integrand as the <em>un</em>normalized
+        Beta(\(\alpha+1,\beta\)) density. Its integral must therefore be that family's
+        normalizing constant:
+        $$ \int_0^1 \theta^{\,(\alpha+1)-1}(1-\theta)^{\,\beta-1}\,d\theta
+        \;=\; \mathrm{B}(\alpha+1,\beta). $$
+        (This maneuver—evaluate an integral by recognizing a known density's shape—is the
+        <em>kernel trick</em>, and it is the workhorse of every Bayesian computation to
+        come.)</li>
+        <li>So \(\E\{\theta\}=\mathrm{B}(\alpha+1,\beta)/\mathrm{B}(\alpha,\beta)\). Expand
+        both via <a class="xr" href="#B.6.2">B.6.2</a> and cancel:
+        $$ \E\{\theta\}
+        \;=\; \frac{\Gamma(\alpha+1)\,\Gamma(\beta)}{\Gamma(\alpha+\beta+1)}\cdot
+        \frac{\Gamma(\alpha+\beta)}{\Gamma(\alpha)\,\Gamma(\beta)}
+        \;=\; \frac{\Gamma(\alpha+1)}{\Gamma(\alpha)}\cdot
+        \frac{\Gamma(\alpha+\beta)}{\Gamma(\alpha+\beta+1)}. $$</li>
+        <li>Apply the recursion \(\Gamma(s+1)=s\,\Gamma(s)\)
+        (<a class="xr" href="#B.6.1">B.6.1</a>) to each ratio:
+        \(\Gamma(\alpha+1)/\Gamma(\alpha)=\alpha\) and
+        \(\Gamma(\alpha+\beta)/\Gamma(\alpha+\beta+1)=1/(\alpha+\beta)\). Hence
+        \(\E\{\theta\}=\alpha/(\alpha+\beta)\).</li>
+      </ol>
+      <div class="uses">Uses B.2.3, B.6.1, B.6.2.</div>
+    </div>
+
+    <!-- ============================================================ -->
+    <h2 class="sec" id="sB7"><span class="n">B.7</span>The Cure Rate, Start to Finish</h2>
+
+    <p class="noindent">Everything is on the table. Model: \(X\sim\) Binomial(\(n,\theta\))
+    (<a class="xr" href="#B.3.1">B.3.1</a>). Prior: to begin, the flat Beta(1,1)—“before
+    the trial, no fraction is privileged over any other.” Loss: squared error. Data: \(x=7\)
+    cures among \(n=10\) patients. The recipe of <a class="xr" href="#B.5.5">B.5.5</a>
+    says: form the posterior, report its mean.</p>
+
+    <div class="obj" id="B.7.1">
+      <div class="okind">Example B.7.1</div>
+      <div class="ottl">The posterior, by kernel-matching</div>
+      <div class="obody"><p>Bayes' theorem in its proportional form
+      (<a class="xr" href="#B.4.5">B.4.5</a>), for a general \(x\) and \(n\) under the flat
+      prior:
+      $$ \pi(\theta \mid x) \;\propto\; \pi(\theta)\, f(x\mid\theta)
+      \;=\; 1 \cdot \binom{n}{x}\,\theta^{x}(1-\theta)^{\,n-x}
+      \;\propto\; \theta^{x}(1-\theta)^{\,n-x}, $$
+      the binomial coefficient dropping because it does not involve \(\theta\)—it is
+      data-only, hence absorbed into the normalizing constant. Now <em>match the
+      kernel</em>: rewrite the exponents in Beta form,
+      $$ \theta^{x}(1-\theta)^{\,n-x} \;=\; \theta^{\,(x+1)-1}\,(1-\theta)^{\,(n-x+1)-1}, $$
+      which is precisely the shape of a Beta(\(x+1,\; n-x+1\)) density
+      (<a class="xr" href="#B.6.2">B.6.2</a>). A density's shape determines it (the
+      constant is forced by total mass 1), so
+      $$ \theta \mid X = x \;\sim\; \text{Beta}\big(x+1,\; n-x+1\big), $$
+      and the normalizing integral \(m(x)\) of <a class="xr" href="#B.4.3">B.4.3</a> was
+      never touched. By <a class="xr" href="#B.6.3">B.6.3</a>, the Bayes estimate—the
+      posterior mean—is
+      $$ a^{*}(x) \;=\; \E\{\theta\mid X=x\} \;=\; \frac{x+1}{(x+1)+(n-x+1)}
+      \;=\; \frac{x+1}{n+2}. $$</p></div>
+    </div>
+
+    <div class="obj" id="B.7.2">
+      <div class="okind">Example B.7.2</div>
+      <div class="ottl">The trial's numbers</div>
+      <div class="obody"><p>With \(n=10\) and \(x=7\): the posterior is Beta(8,4), and the
+      Bayes estimate is
+      $$ a^{*}(7) \;=\; \frac{7+1}{10+2} \;=\; \frac{8}{12} \;=\; \frac{2}{3}
+      \;\approx\; 0.667, $$
+      against the raw rate's \(x/n=0.700\). The posterior also prices its own uncertainty:
+      the Beta(\(\alpha,\beta\)) variance is
+      \(\alpha\beta/\big((\alpha+\beta)^2(\alpha+\beta+1)\big)\),<span class="fnref"><a href="#fn7" id="r7">7</a></span>
+      here
+      $$ \Var(\theta\mid X=7) \;=\; \frac{8\cdot4}{12^2\cdot13} \;=\; \frac{32}{1872}
+      \;=\; \frac{2}{117} \;\approx\; 0.0171,
+      \qquad \text{sd} \;\approx\; 0.131. $$
+      So the full Bayesian report is: <em>the cure rate is around 0.67, give or take about
+      0.13</em>—an estimate and an honest width, both read off one distribution.</p></div>
+    </div>
+
+    <div class="obj" id="B.7.3">
+      <div class="okind">Remark B.7.3</div>
+      <div class="ottl">The anatomy of \((x+1)/(n+2)\): a weighted average</div>
+      <div class="obody"><p>Rewrite the Bayes estimate to expose its structure:
+      $$ \frac{x+1}{n+2} \;=\; \frac{2\cdot\tfrac12 \;+\; n\cdot\dfrac{x}{n}}{2+n}. $$
+      (Check: the numerator is \(1+x\) and the denominator \(2+n\), as before.) Read it as
+      a weighted average of two guesses: the <em>prior mean</em> \(\tfrac12\), carrying
+      weight 2, and the <em>data's rate</em> \(x/n\), carrying weight \(n\). The flat prior
+      behaves exactly like <em>two phantom patients, one cured and one not</em>, mixed into
+      the sample. The same algebra runs for any Beta(\(\alpha,\beta\)) prior: the posterior
+      is Beta(\(\alpha+x,\,\beta+n-x\))—observed successes reinforce \(\alpha\), failures
+      reinforce \(\beta\)—and its mean is
+      $$ \frac{\alpha+x}{\alpha+\beta+n}
+      \;=\; \frac{(\alpha+\beta)\cdot\dfrac{\alpha}{\alpha+\beta} \;+\;
+      n\cdot\dfrac{x}{n}}{(\alpha+\beta)+n}: $$
+      prior mean weighted by \(\alpha+\beta\) (<em>the prior is worth \(\alpha+\beta\)
+      observations</em>), data rate weighted by \(n\). This is the general shape of Bayesian
+      estimates: a compromise between what you believed and what you saw, at exchange rates
+      set by how much each side knows.</p></div>
+    </div>
+
+    <!-- ============ LAB B.7.4 (Figure B.7.4 in print) ============ -->
+    <div class="widget" id="w2">
+      <h2>Laboratory B.7.4 <span class="inprint">— in the print edition, Figure B.7.4</span></h2>
+      <h3>The update, drawn—and steerable</h3>
+      <p>The print figure shows one update: flat prior, 7 cures in 10. Here the whole family
+      is under your hands. The dashed curve is the prior Beta(\(\alpha,\beta\)); the blue
+      curve is the data's own voice (the normalized likelihood, what a flat prior would
+      believe); the green curve is the posterior Beta(\(\alpha+x,\,\beta+n-x\)), with its
+      mean—the Bayes estimate—dropped to the axis. The readout writes the estimate as
+      B.7.3's weighted average with your numbers.</p>
+      <div class="controls">
+        <span class="ctl"><label>α</label>
+          <input type="range" min="1" max="20" step="0.5" value="1" id="w2a" data-out="w2av" data-dec="1">
+          <span class="val" id="w2av"></span></span>
+        <span class="ctl"><label>β</label>
+          <input type="range" min="1" max="20" step="0.5" value="1" id="w2b" data-out="w2bv" data-dec="1">
+          <span class="val" id="w2bv"></span></span>
+        <span class="ctl"><label>n patients</label>
+          <input type="range" min="0" max="60" step="1" value="10" id="w2n" data-out="w2nv" data-fmt="int">
+          <span class="val" id="w2nv"></span></span>
+        <span class="ctl"><label>x cures</label>
+          <input type="range" min="0" max="10" step="1" value="7" id="w2x" data-out="w2xv" data-fmt="int">
+          <span class="val" id="w2xv"></span></span>
+        <span class="ctl"><button id="w2flat" type="button">flat 1,1</button></span>
+        <span class="ctl"><button id="w2skep" type="button">skeptical 2,6</button></span>
+        <span class="ctl"><button id="w2opt" type="button">optimist 8,2</button></span>
+      </div>
+      <div class="charts">
+        <div class="chartwrap" id="w2dens"><div class="ct">densities on [0,1]</div></div>
+      </div>
+      <div class="legend">
+        <span class="chip"><span class="sw dash" style="border-color:var(--s2)"></span>prior Beta(α, β)</span>
+        <span class="chip"><span class="sw" style="border-color:var(--s1)"></span>data alone (normalized likelihood)</span>
+        <span class="chip"><span class="sw" style="border-color:var(--s3)"></span>posterior Beta(α+x, β+n−x)</span>
+      </div>
+      <div class="readout" id="w2read"></div>
+      <p class="note">Worth trying. <em>The print figure:</em> flat prior, \(n=10\),
+      \(x=7\)—posterior Beta(8,4), mean \(2/3\), the peak at \(0.7\). <em>No data:</em>
+      slide \(n\) to 0 and the posterior collapses onto the prior (sanity check B.7.5).
+      <em>Laplace:</em> flat prior, \(x=n\): the estimate is \((n+1)/(n+2)\), never quite
+      1. <em>Phantoms vs patients:</em> set the skeptical prior (worth 8 observations)
+      against \(7/10\) cures and watch the posterior mean land at \(0.500\), exactly as
+      computed in B.9.1—then grow \(n\) at the same cure fraction and watch the data win it
+      back.</p>
+    </div>
+
+    <div class="obj" id="B.7.5">
+      <div class="okind">Remark B.7.5</div>
+      <div class="ottl">Two sanity checks</div>
+      <div class="obody"><p><em>No data.</em> Set \(n=x=0\): the estimate is
+      \((0+1)/(0+2)=\tfrac12\), the prior mean—with nothing observed, the recipe reports
+      what you believed. <em>All cures.</em> Set \(x=n\): the estimate is
+      \((n+1)/(n+2)\), which is large but strictly less than 1: ten out of ten cures should
+      not convince anyone that failure is <em>impossible</em>. (The raw rate \(x/n=1\)
+      would assert exactly that.) This estimator for the all-successes case is old and
+      famous—it is <em>Laplace's rule of succession</em>, his answer to “what probability
+      that the sun rises tomorrow, given that it always has?”—and it falls out of the
+      machinery here as a routine special case.</p></div>
+    </div>
+
+    <!-- ============ LAB: the loss decides ============ -->
+    <div class="widget" id="w3">
+      <h2>Laboratory · §B.3.3 &amp; §B.5 <span class="inprint">— live; not in the print edition</span></h2>
+      <h3>One posterior, many possible reports: the loss decides</h3>
+      <p>Fix the trial's posterior, Beta(8,4), and revisit the theorem that picked the
+      number. Under squared error the expected loss of a constant guess \(a\) is exactly
+      B.5.1's identity
+      $$ \E\{(\theta-a)^2 \mid x\} \;=\; \Var(\theta\mid x)
+      \;+\; \big(\E\{\theta\mid x\}-a\big)^2, $$
+      a parabola with its floor at the posterior <em>mean</em>. But the mean is not the only
+      candidate summary: this posterior's <em>mode</em> (peak) is \(x/n = 0.7\) and its
+      <em>median</em> is different again. Move your guess, watch the expected loss—then
+      switch the loss to absolute error and watch the optimum walk from the mean to the
+      median. The loss is the question; the summary is the answer (B.3.3).</p>
+      <div class="controls">
+        <span class="ctl"><label>your guess a</label>
+          <input type="range" min="0.02" max="0.98" step="0.005" value="0.5" id="w3a" data-out="w3av" data-dec="3">
+          <span class="val" id="w3av"></span></span>
+        <span class="ctl"><button id="w3sq" type="button" aria-pressed="true">squared error</button></span>
+        <span class="ctl"><button id="w3abs" type="button" aria-pressed="false">absolute error</button></span>
+      </div>
+      <div class="charts">
+        <div class="chartwrap" id="w3post"><div class="ct">the posterior Beta(8,4), with its three summaries</div></div>
+        <div class="chartwrap" id="w3loss"><div class="ct">expected loss of the guess a</div></div>
+      </div>
+      <div class="legend">
+        <span class="chip"><span class="sw" style="border-color:var(--s3)"></span>mean 2/3 ≈ 0.667</span>
+        <span class="chip"><span class="sw dash" style="border-color:var(--s2)"></span>median ≈ 0.676</span>
+        <span class="chip"><span class="sw dash" style="border-color:var(--s1)"></span>mode = 0.700</span>
+      </div>
+      <div class="readout" id="w3read"></div>
+      <p class="note">Notice how <em>flat</em> the loss curve is near its floor: guesses a
+      point or two from the optimum cost almost nothing, while guesses out in the tail cost
+      quadratically. And notice what never wins: the mode. The peak is the single most
+      plausible value, but plausibility is not the question squared error asks—expected
+      distance is, and distance cares about the whole distribution, tails included.</p>
+    </div>
+
+    <!-- ============================================================ -->
+    <h2 class="sec" id="sB8"><span class="n">B.8</span>A Second Instrument: the Normal–Normal Pair</h2>
+
+    <p class="noindent">The Beta–binomial pair handled a fraction. The other workhorse
+    setting is a <em>measurement</em>: a quantity on the whole line, observed through noise.
+    One new distribution is needed.</p>
+
+    <div class="obj" id="B.8.1">
+      <div class="okind">Definition B.8.1</div>
+      <div class="ottl">The normal distribution</div>
+      <div class="obody"><p>The <em>normal</em> (or Gaussian) distribution
+      \(N(\mu,\sigma^2)\) is the continuous distribution with density
+      $$ f(y) \;=\; \frac{1}{\sigma\sqrt{2\pi}}\,
+      \exp\!\left( -\frac{(y-\mu)^2}{2\sigma^2} \right), \qquad y\in\mathbb{R}: $$
+      the bell curve, centered at its mean \(\mu\), with spread set by its standard
+      deviation \(\sigma\) (about \(68\%\) of the probability lies within one \(\sigma\) of
+      \(\mu\), about \(95\%\) within two). Its ubiquity has a theorem behind it (sums of
+      many small independent effects are approximately normal—the central limit theorem,
+      not needed here) and a practical reason: as a function of the variable in the
+      exponent, the density is \(e^{-\text{quadratic}}\), and quadratics are closed under
+      addition. That closure is exactly what the next example exploits.</p></div>
+    </div>
+
+    <div class="obj" id="B.8.2">
+      <div class="okind">Example B.8.2</div>
+      <div class="ottl">Normal prior, normal measurement: the posterior in full</div>
+      <div class="obody"><p><em>Setup.</em> A quantity \(\theta\) (an aptitude score, a
+      physical constant, a true weight) has prior \(\theta\sim N(m,\tau^2)\): best prior
+      guess \(m\), prior uncertainty \(\tau\). An instrument measures it once with known
+      noise level \(\sigma\): given the truth, \(X\mid\theta\sim N(\theta,\sigma^2)\).
+      Observe \(X=x\). What is the posterior?</p>
+      <p><em>Multiply prior by likelihood</em> (<a class="xr" href="#B.4.5">B.4.5</a>),
+      keeping only factors involving \(\theta\)—the two normalizing constants
+      \(1/(\tau\sqrt{2\pi})\) and \(1/(\sigma\sqrt{2\pi})\) drop:
+      $$ \pi(\theta\mid x) \;\propto\;
+      \exp\!\left( -\frac{(\theta-m)^2}{2\tau^2} \right)\cdot
+      \exp\!\left( -\frac{(x-\theta)^2}{2\sigma^2} \right)
+      \;=\; \exp\!\left( -\frac12\left[ \frac{(\theta-m)^2}{\tau^2}
+      + \frac{(\theta-x)^2}{\sigma^2} \right] \right). $$</p>
+      <p><em>Expand the bracket and collect powers of \(\theta\).</em> Expanding each
+      square,
+      $$ \frac{\theta^2 - 2m\theta + m^2}{\tau^2} +
+      \frac{\theta^2 - 2x\theta + x^2}{\sigma^2}
+      \;=\; \theta^2\Big( \frac{1}{\tau^2}+\frac{1}{\sigma^2} \Big)
+      \;-\; 2\theta\Big( \frac{m}{\tau^2}+\frac{x}{\sigma^2} \Big)
+      \;+\; \Big( \frac{m^2}{\tau^2}+\frac{x^2}{\sigma^2} \Big), $$
+      and the last group is free of \(\theta\)—bound for the normalizing constant.</p>
+      <p><em>Complete the square.</em> Abbreviate
+      $$ \frac1v \;=\; \frac{1}{\tau^2}+\frac{1}{\sigma^2}, \qquad
+      \frac{m^{*}}{v} \;=\; \frac{m}{\tau^2}+\frac{x}{\sigma^2}
+      \quad\text{(defining \(v\) and \(m^*\))}, $$
+      so the \(\theta\)-dependent part is
+      $$ \frac{\theta^2 - 2 m^{*}\theta}{v}
+      \;=\; \frac{(\theta - m^{*})^2 - (m^{*})^2}{v}, $$
+      by adding and subtracting \((m^*)^2\) inside—and \((m^*)^2/v\), constant in
+      \(\theta\), also departs for the normalizer. What remains is
+      $$ \pi(\theta\mid x) \;\propto\; \exp\!\left( -\frac{(\theta-m^{*})^2}{2v} \right): $$
+      the kernel of a normal density (<a class="xr" href="#B.8.1">B.8.1</a>). Matching
+      shapes,
+      $$ \theta \mid X=x \;\sim\; N\big( m^{*},\, v \big), \qquad
+      m^{*} \;=\; v\Big( \frac{m}{\tau^2}+\frac{x}{\sigma^2} \Big)
+      \;=\; \frac{\sigma^2\, m + \tau^2\, x}{\sigma^2+\tau^2}, $$
+      the last simplification by multiplying numerator and denominator by
+      \(\sigma^2\tau^2\):
+      $$ v\Big(\frac{m}{\tau^2}+\frac{x}{\sigma^2}\Big)
+      = \frac{\frac{m}{\tau^2}+\frac{x}{\sigma^2}}{\frac{1}{\tau^2}+\frac{1}{\sigma^2}}
+      = \frac{\sigma^2 m + \tau^2 x}{\sigma^2 + \tau^2}. $$
+      By <a class="xr" href="#B.5.4">B.5.4</a> the Bayes estimate is \(m^{*}\), and the
+      posterior variance \(v\) prices the remaining uncertainty.</p></div>
+    </div>
+
+    <div class="obj" id="B.8.3">
+      <div class="okind">Example B.8.3</div>
+      <div class="ottl">Numbers: one loud measurement</div>
+      <div class="obody"><p>Prior: \(\theta\sim N(100, 15^2)\) (say, an aptitude score
+      known to average 100 with spread 15 in the population the subject comes from).
+      Instrument: \(\sigma=10\). Observation: \(x=130\)—a strikingly high reading.
+      Posterior, by <a class="xr" href="#B.8.2">B.8.2</a>, in exact fractions:
+      $$ \frac1v \;=\; \frac{1}{225}+\frac{1}{100} \;=\; \frac{4}{900}+\frac{9}{900}
+      \;=\; \frac{13}{900}
+      \qquad\Longrightarrow\qquad v \;=\; \frac{900}{13} \;\approx\; 69.2,
+      \quad \sqrt{v} \;=\; \frac{30}{\sqrt{13}} \;\approx\; 8.3; $$
+      $$ m^{*} \;=\; v\Big( \frac{100}{225} + \frac{130}{100} \Big)
+      \;=\; \frac{900}{13}\Big( \frac{4}{9} + \frac{13}{10} \Big)
+      \;=\; \frac{900}{13}\cdot\frac{40 + 117}{90}
+      \;=\; \frac{10\cdot 157}{13}
+      \;=\; \frac{1570}{13} \;\approx\; 120.8. $$
+      The Bayes estimate is about \(120.8\): well above the prior's 100 (the measurement
+      was loud and the instrument decent), but pulled down meaningfully from the raw
+      reading 130 (a single reading, from a population where 130 is rare, is partly signal
+      and partly luck). The posterior spread \(8.3\) is smaller than <em>both</em> the
+      prior's 15 and the instrument's 10: two imperfect sources of information, combined,
+      know more than either alone.</p></div>
+    </div>
+
+    <!-- ============ CENTERPIECE LAB B.8.4 (Figure B.8.4 in print) ============ -->
+    <div class="widget centerpiece" id="w4">
+      <h2>Laboratory B.8.4 · the centerpiece <span class="inprint">— in the print edition, Figure B.8.4</span></h2>
+      <h3>Normal prior, normal measurement: the posterior in full, live</h3>
+      <p>Everything B.8.2 derived, under your hands. Steer the prior \(N(m,\tau^2)\), the
+      observed mean \(\bar x\) of \(n\) measurements, and the instrument noise \(\sigma\)
+      (a sample of \(n\) readings enters through \(\bar x\) with noise
+      \(\sigma/\sqrt{n}\), as B.8.2 notes). The curves redraw; the <em>derivation
+      stepper</em> below the chart replays the completing-the-square argument with your
+      numbers at every step; the precision ledger checks the theorem
+      \(1/v = 1/\tau^2 + n/\sigma^2\) visually; and the shrinkage strip shows the estimate
+      starting at \(m\) and covering its data-weight fraction of the distance to
+      \(\bar x\). The defaults are B.8.3's numbers, so the posterior mean opens at
+      \(1570/13 \approx 120.8\).</p>
+      <div class="controls">
+        <span class="ctl"><label>prior mean m</label>
+          <input type="range" min="60" max="140" step="1" value="100" id="w4m" data-out="w4mv" data-fmt="int">
+          <span class="val" id="w4mv"></span></span>
+        <span class="ctl"><label>prior sd τ</label>
+          <input type="range" min="3" max="30" step="0.5" value="15" id="w4t" data-out="w4tv" data-dec="1">
+          <span class="val" id="w4tv"></span></span>
+        <span class="ctl"><label>observed mean x̄</label>
+          <input type="range" min="60" max="160" step="1" value="130" id="w4x" data-out="w4xv" data-fmt="int">
+          <span class="val" id="w4xv"></span></span>
+        <span class="ctl"><label>noise sd σ</label>
+          <input type="range" min="3" max="30" step="0.5" value="10" id="w4s" data-out="w4sv" data-dec="1">
+          <span class="val" id="w4sv"></span></span>
+        <span class="ctl"><label>measurements n</label>
+          <input type="range" min="1" max="50" step="1" value="1" id="w4n" data-out="w4nv" data-fmt="int">
+          <span class="val" id="w4nv"></span></span>
+      </div>
+      <div class="charts">
+        <div class="chartwrap" id="w4dens"><div class="ct">prior · likelihood of x̄ · posterior</div></div>
+      </div>
+      <div class="legend">
+        <span class="chip"><span class="sw dash" style="border-color:var(--s2)"></span>prior N(m, τ²)</span>
+        <span class="chip"><span class="sw" style="border-color:var(--s1)"></span>likelihood of x̄ (noise σ²/n)</span>
+        <span class="chip"><span class="sw" style="border-color:var(--s3)"></span>posterior N(m*, v)</span>
+      </div>
+      <div class="stepper" id="w4stepper">
+        <div class="sbtns">
+          <button data-step="1" type="button">1 · multiply</button>
+          <button data-step="2" type="button">2 · collect θ</button>
+          <button data-step="3" type="button">3 · complete the square</button>
+          <button data-step="4" type="button" aria-pressed="true">4 · match the kernel</button>
+        </div>
+        <div class="dstep" id="w4s1">
+          <div class="dnum">Step 1 — multiply prior by likelihood</div>
+          <div class="dmath" id="w4s1m"></div>
+          <div class="dwhy">Bayes' theorem in proportional form (B.4.5): the posterior's
+          shape is the product of the two exponentials; both normalizing constants are
+          θ-free and drop.</div>
+        </div>
+        <div class="dstep" id="w4s2">
+          <div class="dnum">Step 2 — expand and collect powers of θ</div>
+          <div class="dmath" id="w4s2m"></div>
+          <div class="dwhy">Adding the two quadratics gives one quadratic; only the θ² and
+          θ coefficients matter, because everything θ-free joins the normalizer.</div>
+        </div>
+        <div class="dstep" id="w4s3">
+          <div class="dnum">Step 3 — complete the square</div>
+          <div class="dmath" id="w4s3m"></div>
+          <div class="dwhy">Define 1/v as the θ² coefficient and m*/v as half the θ
+          coefficient; then θ²/v − 2θm*/v = (θ − m*)²/v minus a constant. The posterior
+          precision is the sum of the input precisions.</div>
+        </div>
+        <div class="dstep" id="w4s4">
+          <div class="dnum">Step 4 — match the kernel</div>
+          <div class="dmath" id="w4s4m"></div>
+          <div class="dwhy">exp(−(θ−m*)²/2v) is the N(m*, v) shape (B.8.1), and a density's
+          shape determines it—so the posterior is normal, its mean is the Bayes estimate
+          (B.5.4), and its sd prices what uncertainty remains.</div>
+        </div>
+      </div>
+      <div class="charts">
+        <div class="chartwrap" id="w4prec"><div class="ct">the precision ledger: 1/τ² + n/σ² = 1/v</div></div>
+        <div class="chartwrap" id="w4shr"><div class="ct">the shrinkage strip: from m toward x̄</div></div>
+      </div>
+      <div class="readout" id="w4read"></div>
+      <p class="note">Three experiments. <em>Sloppy instrument:</em> raise σ and watch the
+      posterior hug the prior—the ledger shows the data bar shrinking. <em>Vague
+      prior:</em> raise τ and the estimate chases the data instead. <em>More data:</em>
+      grow n and watch the likelihood narrow and the data bar swell: the prior is a fixed
+      quantity of precision being steadily outvoted, which is §B.9's story in miniature.
+      Throughout, the green precision bar is exactly the other two stacked—that identity
+      <em>is</em> the theorem, and the reason the posterior is always narrower than both
+      parents.</p>
+    </div>
+
+    <div class="obj" id="B.8.5">
+      <div class="okind">Remark B.8.5</div>
+      <div class="ottl">The precision reading, and shrinkage</div>
+      <div class="obody"><p>State <a class="xr" href="#B.8.2">B.8.2</a>'s formulas in terms
+      of <em>precision</em> \(=\) 1/variance (how much a source of information knows):
+      $$ \underbrace{\frac1v}_{\text{posterior precision}}
+      \;=\; \underbrace{\frac{1}{\tau^2}}_{\text{prior precision}}
+      + \underbrace{\frac{1}{\sigma^2}}_{\text{data precision}},
+      \qquad
+      m^{*} \;=\; \frac{\frac{1}{\tau^2}}{\frac{1}{\tau^2}+\frac{1}{\sigma^2}}\; m
+      \;+\; \frac{\frac{1}{\sigma^2}}{\frac{1}{\tau^2}+\frac{1}{\sigma^2}}\; x: $$
+      <em>precisions add</em>, and the posterior mean weighs each guess by its share of the
+      total precision—the continuous twin of <a class="xr" href="#B.7.3">B.7.3</a>'s
+      observation-counting. In the numbers of <a class="xr" href="#B.8.3">B.8.3</a> the
+      weights are \(\frac{4}{13}\) on the prior and \(\frac{9}{13}\) on the data:
+      \(m^*=\frac{4}{13}\cdot100+\frac{9}{13}\cdot130=\frac{400+1170}{13}=\frac{1570}{13}\),
+      as before. Equivalently,
+      $$ m^{*} \;=\; m + \frac{\tau^2}{\sigma^2+\tau^2}\,(x - m)
+      \;=\; 100 + \frac{225}{325}\,(130-100) \;=\; 100 + \frac{9}{13}\cdot30
+      \;\approx\; 120.8: $$
+      the estimate starts at the prior mean and covers only the fraction
+      \(\tau^2/(\sigma^2+\tau^2)\) of the distance to the data. Bayesian estimates
+      <em>shrink</em> noisy observations toward what was already believed—gently when the
+      data are precise, firmly when they are not. This one word, <em>shrinkage</em>, is the
+      modern doorway from this handout into a large part of contemporary statistics and
+      machine learning.</p></div>
+    </div>
+
+    <!-- ============================================================ -->
+    <h2 class="sec" id="sB9"><span class="n">B.9</span>What to Make of the Prior</h2>
+
+    <div class="obj" id="B.9.1">
+      <div class="okind">Remark B.9.1</div>
+      <div class="ottl">The estimate depends on the prior—as it must</div>
+      <div class="obody"><p>Rerun the trial of <a class="xr" href="#B.7.2">B.7.2</a> under
+      a different premise. Suppose historical experience with similar treatments made low
+      cure rates plausible—say a Beta(2,6) prior, mean \(2/8=0.25\), worth
+      \(\alpha+\beta=8\) phantom observations. By <a class="xr" href="#B.7.3">B.7.3</a>
+      the posterior after 7 cures in 10 is Beta(\(2+7,\,6+3\)) \(=\) Beta(9,9), with mean
+      $$ \frac{2+7}{2+6+10} \;=\; \frac{9}{18} \;=\; 0.500, $$
+      against \(0.667\) under the flat prior and \(0.700\) raw. Ten patients cannot
+      overrule eight phantoms. This is not a defect; it is the premise doing exactly what
+      it claimed: with little data, background knowledge <em>should</em> matter, and the
+      machinery is transparent about how much. But it lays an obligation on the analyst—the
+      prior is part of the argument, must be stated, and must be defensible on grounds
+      <em>outside</em> the data being analyzed. Estimating the prior's location from the
+      same data it will then shrink is circular, and the circle does not
+      close.<span class="fnref"><a href="#fn8" id="r8">8</a></span></p></div>
+    </div>
+
+    <div class="obj" id="B.9.2">
+      <div class="okind">Remark B.9.2</div>
+      <div class="ottl">The data win in the end</div>
+      <div class="obody"><p>The dependence on the prior is a small-sample phenomenon.
+      Compare the Bayes estimate with the observed rate at stage \(n\) by putting them over
+      a common denominator:
+      $$ \frac{\alpha+x}{\alpha+\beta+n} - \frac{x}{n}
+      \;=\; \frac{n(\alpha+x) - x(\alpha+\beta+n)}{n\,(\alpha+\beta+n)}
+      \;=\; \frac{\alpha n - x(\alpha+\beta)}{n\,(\alpha+\beta+n)}
+      \;=\; \frac{\alpha - (\alpha+\beta)\,\frac{x}{n}}{\alpha+\beta+n}, $$
+      the middle step cancelling the \(xn\) terms. Since the rate \(x/n\) lies in
+      \([0,1]\), the numerator can be no larger in size than \(\max(\alpha,\beta)\)—a
+      fixed number—while the denominator grows without bound. So the gap between the Bayes
+      estimate and the observed rate shrinks to zero as data accumulate, <em>whatever</em>
+      the data do: every fixed Beta prior's estimate is eventually indistinguishable from
+      the raw rate—the phantoms are outvoted. Priors differing in judgment but agreed on
+      possibilities are eventually reconciled by evidence; where the prior genuinely
+      matters is exactly where matters are genuinely uncertain: small samples.</p></div>
+    </div>
+
+    <!-- ============ LAB: the data win ============ -->
+    <div class="widget" id="w5">
+      <h2>Laboratory · §B.9 <span class="inprint">— live; not in the print edition</span></h2>
+      <h3>Three priors meet the same evidence</h3>
+      <p>Three analysts watch one stream of patients from a treatment with true cure rate
+      \(\theta^{*}\). One starts flat—Beta(1,1). One is a skeptic—Beta(2,6), prior mean
+      0.25, worth 8 phantom observations (B.9.1's prior). One is an optimist—Beta(12,3),
+      prior mean 0.8, worth 15. After each patient, each reports the posterior mean
+      \( (\alpha+X_n)/(\alpha+\beta+n) \). Early on they disagree exactly as their phantom
+      counts dictate; by B.9.2's bound they must converge—the gap to the raw rate is at
+      most a constant over \(\alpha+\beta+n\). Where the curves still disagree is precisely
+      where the prior matters: small samples.</p>
+      <div class="controls">
+        <span class="ctl"><label>true θ*</label>
+          <input type="range" min="0.05" max="0.95" step="0.01" value="0.70" id="w5t" data-out="w5tv" data-dec="2">
+          <span class="val" id="w5tv"></span></span>
+        <span class="ctl"><button id="w5new" type="button">draw new patients</button></span>
+      </div>
+      <div class="charts">
+        <div class="chartwrap" id="w5conv"><div class="ct">posterior means along one data stream (log-scale n)</div></div>
+      </div>
+      <div class="legend">
+        <span class="chip"><span class="sw" style="border-color:var(--s1)"></span>flat Beta(1,1)</span>
+        <span class="chip"><span class="sw" style="border-color:var(--s2)"></span>skeptic Beta(2,6)</span>
+        <span class="chip"><span class="sw" style="border-color:var(--s3)"></span>optimist Beta(12,3)</span>
+      </div>
+      <div class="readout" id="w5read"></div>
+      <p class="note">Draw a few fresh streams. The wiggles are shared—all three analysts
+      see the same patients—so the vertical gaps between the curves are pure prior. Watch
+      how long the optimist holds out when \(\theta^{*}\) is low: fifteen phantoms take
+      dozens of real patients to outvote. That is not a bug; it is the honest price of the
+      premise, and the reason B.9.1 insists the prior be stated and defended.</p>
+    </div>
+
+    <div class="obj" id="B.9.3">
+      <div class="okind">Remark B.9.3</div>
+      <div class="ottl">Two schools, one course</div>
+      <div class="obody"><p>A statistician who declines to put a distribution on
+      \(\theta\)—who insists the cure rate is a fixed fact, not a random variable—works
+      instead with the risk <em>curves</em> of <a class="xr" href="#B.3.4">B.3.4</a> and
+      principles for comparing them (ruling out estimators beaten everywhere; guarding the
+      worst case). That is the <em>frequentist</em> school, and it is where the course
+      notes spend §1.5. The Bayesian school, this handout's subject, buys a complete and
+      unique answer at the price of a prior. The two are not enemies so much as different
+      contracts with the reader about what may be assumed—and they meet constantly: the
+      course's Lecture&nbsp;1 appendix shows a Bayesian-derived rule, \((x+1)/(n+2)\),
+      holding its own in a purely frequentist risk comparison (1.A.4, 1.A.5). A working
+      statistician reads both languages.</p></div>
+    </div>
+
+    <!-- ============================================================ -->
+    <h2 class="sec" id="sB10"><span class="n">B.10</span>The Vocabulary, and Where to Go Next</h2>
+
+    <div class="obj" id="B.10.1">
+      <div class="okind">Concept B.10.1</div>
+      <div class="ottl">The names of everything you just did</div>
+      <div class="obody"><p>For searching, reading, and talking to statisticians—the
+      standard names, each pointing at its object in this handout:</p>
+      <p class="noindent">• <em>Prior distribution</em>
+      (<a class="xr" href="#B.4.1">B.4.1</a>); <em>likelihood</em>
+      (<a class="xr" href="#B.4.5">B.4.5</a>); <em>posterior distribution</em>
+      (<a class="xr" href="#B.4.4">B.4.4</a>); <em>Bayes' theorem</em>
+      (<a class="xr" href="#B.4.4">B.4.4</a>); <em>Bayesian updating</em> (the whole
+      §<a class="xr" href="#sB4">B.4</a> pipeline).<br>
+      • <em>Bayes risk</em> (<a class="xr" href="#B.5.3">B.5.3</a>); <em>Bayes
+      estimator</em> or <em>Bayes rule</em> (<a class="xr" href="#B.5.4">B.5.4</a>)—beware
+      that “Bayes' rule” also names the updating theorem; context decides. The
+      posterior-mean result is often quoted as “the Bayes estimator under squared-error
+      (quadratic) loss is the posterior mean.”<br>
+      • <em>Conjugate prior</em>: a family, like Beta for the binomial
+      (§<a class="xr" href="#sB7">B.7</a>) or normal for the normal
+      (§<a class="xr" href="#sB8">B.8</a>), whose posteriors stay in the family—the kernel
+      trick succeeds by design. <em>Shrinkage</em>
+      (<a class="xr" href="#B.8.5">B.8.5</a>); <em>Laplace's rule of succession</em>
+      (<a class="xr" href="#B.7.5">B.7.5</a>).<br>
+      • In engineering literature the §<a class="xr" href="#sB5">B.5</a> mathematics runs
+      under <em>minimum mean squared error (MMSE) estimation</em>: the conditional
+      expectation as the MMSE predictor.<br>
+      • One report this handout did not build: an <em>interval</em> from the posterior
+      (e.g., the central 95% of Beta(8,4)), called a <em>credible interval</em>—the
+      Bayesian counterpart of the confidence sets in the course notes, §2.7.</p></div>
+    </div>
+
+    <div class="obj" id="B.10.2">
+      <div class="okind">Concept B.10.2</div>
+      <div class="ottl">Where to go next</div>
+      <div class="obody"><p>In the course notes: §2.8 proves the two prediction lemmas in
+      their general form, §2.9 is this handout's material at course pace (with the
+      Poisson–gamma pair as a third conjugate example), and 1.A.5 runs the trial's
+      computation inside the decision-theory frame of Lecture&nbsp;1. In the texts:
+      Hoel–Port–Stone treat Bayesian methods in §2.8 (their Theorem&nbsp;2 is
+      <a class="xr" href="#B.5.4">B.5.4</a>); DeGroot &amp; Schervish devote
+      Chapter&nbsp;7 (§§7.2–7.4) to priors, posteriors, and Bayes estimators at a gentle
+      pace with many worked examples; Blitzstein &amp; Hwang's Chapters 7–9 are the
+      friendliest place to firm up the conditional-probability foundations of
+      §<a class="xr" href="#sB2">B.2</a>. And carry out one exercise by hand before
+      reading further: redo §<a class="xr" href="#sB7">B.7</a> with your own prior—pick
+      \(\alpha\) and \(\beta\) to express something you actually believe about some
+      fraction in your life, invent data, and push it through
+      <a class="xr" href="#B.7.3">B.7.3</a>. The method fits on an index card; the point
+      of the theory was to earn it.</p></div>
+    </div>
+
+    <!-- ============ endnotes ============ -->
+    <div class="endnotes">
+      <div class="ehead">Notes</div>
+      <ol>
+        <li id="fn1">A density is not a probability but a probability <em>rate</em>:
+        probability per unit length, so that \(f(x)\,dx\approx P(x\le X\le x+dx)\) for
+        small \(dx\). Consequently a density can exceed 1 (the uniform density on
+        \([0,\frac12]\) is 2 there) and \(f(x)\) is emphatically not \(P(X=x)\), which is
+        0. Sums against a pmf and integrals against a density are the same idea with the
+        same rules; the handout states things once and trusts the reader to swap
+        \(\sum\leftrightarrow\int\). <a class="back" href="#r1">↩</a></li>
+        <li id="fn2">Why linearity is free: in \(\E\{aX+bY\}=\sum (ax+by)\,p(x,y)\) the sum
+        splits into \(a\sum x\,p(x,y)+b\sum y\,p(x,y)\) by ordinary algebra, and the two
+        pieces are \(a\,\E\{X\}\) and \(b\,\E\{Y\}\). Nothing about the relationship
+        between \(X\) and \(Y\) was used—only that both means exist.
+        <a class="back" href="#r2">↩</a></li>
+        <li id="fn3">The notation \(f(x\mid\theta)\)—“the pmf of the data <em>given</em>
+        the parameter”—is chosen deliberately: from §B.4 on, \(\theta\) will be treated as
+        a random variable and this really will be a conditional distribution in the sense
+        of B.2.6. The course notes write \(f(x;\theta)\) when \(\theta\) is being treated
+        as a fixed unknown; the two notations name the same function.
+        <a class="back" href="#r3">↩</a></li>
+        <li id="fn4">For instance, under absolute-error loss \(|\theta-a|\) the optimal
+        guess turns out to be the <em>median</em> of one's distribution rather than the
+        mean—the laboratory after B.7.5 lets you watch the switch happen. The loss
+        function is not a law of nature; it is the posed question, and it selects the
+        answer. <a class="back" href="#r4">↩</a></li>
+        <li id="fn5">Why: for independent \(U,V\) with means \(\mu_U,\mu_V\), the cross
+        term in \(\E\{((U-\mu_U)+(V-\mu_V))^2\}\) is
+        \(2\,\E\{(U-\mu_U)(V-\mu_V)\}=2\,\E\{U-\mu_U\}\E\{V-\mu_V\}=0\)—independence lets
+        the expectation of a product factor into a product of expectations, and each
+        factor is zero. <a class="back" href="#r5">↩</a></li>
+        <li id="fn6">Two readings coexist. If \(\theta\) was literally produced by a
+        random mechanism (a factory turns out batches whose defect rates vary), the prior
+        is that mechanism's distribution, an ordinary frequency statement. More commonly
+        nothing generated \(\theta\)—the cure rate simply <em>is</em>—and the prior is a
+        quantified statement of evidence and judgment: “I regard values near 0.4 as twice
+        as plausible as values near 0.7.” The mathematics downstream is identical under
+        either reading; the interpretation debate is real and is taken up in §B.9.
+        <a class="back" href="#r6">↩</a></li>
+        <li id="fn7">Derived by the same kernel trick as the mean:
+        \(\E\{\theta^2\}=\mathrm{B}(\alpha+2,\beta)/\mathrm{B}(\alpha,\beta)
+        =\frac{(\alpha+1)\alpha}{(\alpha+\beta+1)(\alpha+\beta)}\) (two applications of
+        the recursion), then \(\Var=\E\{\theta^2\}-\E\{\theta\}^2\) with common
+        denominator \((\alpha+\beta)^2(\alpha+\beta+1)\).
+        <a class="back" href="#r7">↩</a></li>
+        <li id="fn8">The course deck's aphorism, quoted in the notes at 2.10.2: “you
+        cannot use the data to know what to shrink towards; but you can use the data to
+        know how much to shrink towards it”—the <em>amount</em> of shrinkage, unlike the
+        <em>target</em>, is learnable when many parallel problems share one prior.
+        <a class="back" href="#r8">↩</a></li>
+      </ol>
+    </div>
+
+    <footer>
+      Web edition of the companion handout <em>Bayesian Estimation from First
+      Principles</em>; the typeset PDF is identical in content, with static figures where
+      this page has laboratories. Any errors are my own.
+      <div class="ln"><a href="handout-bayes-estimation.pdf">handout-bayes-estimation.pdf</a> ·
+        <a href="./">all notes</a> ·
+        <a href="mailto:tyler.sotomayor@columbia.edu">errata</a></div>
+    </footer>
+  </div><!-- /doc -->
+  </div><!-- /wrap -->
+  <div class="footerband"><div class="in"><img src="assets/summer-logo.svg" alt="Columbia University Summer Session"></div></div>
+
+<script src="assets/hw.js"></script>
+<script>
+"use strict";
+
+/* ---------- shared math ---------- */
+function logGamma(z){
+  const g = [676.5203681218851,-1259.1392167224028,771.32342877765313,
+             -176.61502916214059,12.507343278686905,-0.13857109526572012,
+             9.9843695780195716e-6,1.5056327351493116e-7];
+  if (z < 0.5) return Math.log(Math.PI/Math.sin(Math.PI*z)) - logGamma(1-z);
+  z -= 1;
+  let a = 0.99999999999980993;
+  const t = z + 7.5;
+  for (let i=0;i<8;i++) a += g[i]/(z+i+1);
+  return 0.5*Math.log(2*Math.PI) + (z+0.5)*Math.log(t) - t + Math.log(a);
+}
+const logBetaFn = (a,b) => logGamma(a)+logGamma(b)-logGamma(a+b);
+const betaPdf = (t,a,b) => (t<=0||t>=1) ? 0
+  : Math.exp((a-1)*Math.log(t)+(b-1)*Math.log(1-t)-logBetaFn(a,b));
+
+/* ---------- Lab 1: eikosogram ---------- */
+const w1sqH = document.getElementById("w1sq");
+const w1barH = document.getElementById("w1bar");
+function drawW1(){
+  const p    = +document.getElementById("w1p").value;
+  const sens = +document.getElementById("w1sens").value;
+  const fpr  = +document.getElementById("w1fpr").value;
+  const jTP = p*sens, jFP = (1-p)*fpr, jFN = p*(1-sens), jTN = (1-p)*(1-fpr);
+  const m1 = jTP + jFP;
+  const post = jTP / m1;
+  [w1sqH, w1barH].forEach(h => h.querySelectorAll("svg").forEach(s=>s.remove()));
+  const W=460, H=340, L=52, T=16, S=280;
+  const svg = el("svg", {viewBox:`0 0 ${W} ${H}`, role:"img",
+    "aria-label":"joint distribution of disease and test as an area diagram"}, w1sqH);
+  const gx = el("g", {transform:`translate(${L},${T})`}, svg);
+  const wSick = p*S, wHeal = (1-p)*S;
+  const hSickPos = sens*S, hHealPos = fpr*S;
+  el("rect",{x:0, y:0, width:wSick, height:hSickPos, fill:S1, opacity:0.92}, gx);
+  el("rect",{x:wSick, y:0, width:wHeal, height:hHealPos, fill:S2, opacity:0.85}, gx);
+  el("rect",{x:0, y:hSickPos, width:wSick, height:S-hSickPos, fill:S1, opacity:0.16}, gx);
+  el("rect",{x:wSick, y:hHealPos, width:wHeal, height:S-hHealPos, fill:S2, opacity:0.14}, gx);
+  el("rect",{x:0, y:0, width:S, height:S, fill:"none", stroke:"#9aa1a9"}, gx);
+  el("line",{x1:wSick, y1:0, x2:wSick, y2:S, stroke:"#fff", "stroke-width":1.5}, gx);
+  const lab = (x,y,txt,fill,size=12) => { const t = el("text",{x,y,fill,
+      "text-anchor":"middle","font-family":"Inter,sans-serif","font-size":size,
+      "font-weight":600}, gx); t.textContent = txt; return t; };
+  if (wSick > 34 && hSickPos > 22) lab(wSick/2, hSickPos/2+4, fmt(jTP,3), "#fff");
+  else { // column too narrow: set the key joint mass beside it
+    const t = el("text",{x:-10, y:Math.min(hSickPos/2, S-40)+22, fill:S1,
+      "text-anchor":"end","font-family":"Inter,sans-serif","font-size":11.5,
+      "font-weight":600}, gx);
+    t.textContent = fmt(jTP,3) + " →";
+  }
+  if (wHeal > 40 && hHealPos > 22) lab(wSick+wHeal/2, hHealPos/2+4, fmt(jFP,3), "#fff");
+  if (wHeal > 40) lab(wSick+wHeal/2, (hHealPos+S)/2+4, fmt(jTN,3), "#8a5a44");
+  if (wSick > 40 && (S-hSickPos) > 22) lab(wSick/2, (hSickPos+S)/2+4, fmt(jFN,3), "#4a628f");
+  lab(wSick/2, S+20, "sick "+fmt(p,2), "#4a628f", 11.5);
+  lab(wSick+wHeal/2, S+20, "healthy "+fmt(1-p,2), "#8a5a44", 11.5);
+  const yl = el("text",{x:-10, y:hSickPos/2+4, fill:"#646a72","text-anchor":"end",
+    "font-family":"Inter,sans-serif","font-size":11.5,"font-weight":600}, gx);
+  yl.textContent = "test +";
+  const yl2 = el("text",{x:-10, y:(Math.max(hSickPos,hHealPos)+S)/2, fill:"#b3b9c0",
+    "text-anchor":"end","font-family":"Inter,sans-serif","font-size":11.5,
+    "font-weight":600}, gx);
+  yl2.textContent = "test −";
+  const W2=210, svg2 = el("svg", {viewBox:`0 0 ${W2} ${H}`, role:"img",
+    "aria-label":"the positive-test slice renormalized"}, w1barH);
+  const g2 = el("g", {transform:`translate(70,${T})`}, svg2);
+  const bw = 64, hSick2 = post*S;
+  el("rect",{x:0, y:0, width:bw, height:hSick2, fill:S1, opacity:0.92}, g2);
+  el("rect",{x:0, y:hSick2, width:bw, height:S-hSick2, fill:S2, opacity:0.85}, g2);
+  el("rect",{x:0, y:0, width:bw, height:S, fill:"none", stroke:"#9aa1a9"}, g2);
+  const t1 = el("text",{x:bw+10, y:Math.max(hSick2/2+4, 14), fill:S1,
+    "font-family":"Inter,sans-serif","font-size":12.5,"font-weight":600}, g2);
+  t1.textContent = "sick " + fmt(100*post,1) + "%";
+  const t2 = el("text",{x:bw+10, y:Math.min((hSick2+S)/2+4, S-6), fill:S2,
+    "font-family":"Inter,sans-serif","font-size":12.5,"font-weight":600}, g2);
+  t2.textContent = "healthy " + fmt(100*(1-post),1) + "%";
+  const cap = el("text",{x:bw/2, y:S+20, fill:"#646a72","text-anchor":"middle",
+    "font-family":"Inter,sans-serif","font-size":11.5,"font-weight":600}, g2);
+  cap.textContent = "÷ " + fmt(m1,3);
+  document.getElementById("w1read").innerHTML =
+    `<span><span class="k">joint: sick∧+</span> <b>${fmt(jTP,3)}</b></span>` +
+    `<span><span class="k">healthy∧+</span> <b>${fmt(jFP,3)}</b></span>` +
+    `<span><span class="k">P(+) = slice mass</span> <b>${fmt(m1,3)}</b></span>` +
+    `<span><span class="k">posterior P(sick | +) = ${fmt(jTP,3)} / ${fmt(m1,3)}</span> <b>= ${fmt(post,3)}</b></span>`;
+}
+bindControls(document.getElementById("w1"), drawW1);
+drawW1();
+
+/* ---------- Lab B.7.4: beta-binomial ---------- */
+const w2densH = document.getElementById("w2dens");
+const w2aI = document.getElementById("w2a"), w2bI = document.getElementById("w2b");
+const w2nI = document.getElementById("w2n"), w2xI = document.getElementById("w2x");
+function drawW2(){
+  const a = +w2aI.value, b = +w2bI.value;
+  const n = Math.round(+w2nI.value);
+  const x = Math.min(Math.round(+w2xI.value), n);
+  const pa = a + x, pb = b + n - x;
+  const prior = t => betaPdf(t, a, b);
+  const lik   = n > 0 ? (t => betaPdf(t, x+1, n-x+1)) : null;
+  const post  = t => betaPdf(t, pa, pb);
+  let ymax = 0;
+  for (let i=1; i<400; i++){
+    const t = i/400;
+    ymax = Math.max(ymax, prior(t), post(t), lik ? lik(t) : 0);
+  }
+  ymax = Math.min(ymax*1.12, 14);
+  w2densH.querySelectorAll("svg").forEach(s=>s.remove());
+  w2densH.querySelectorAll(".tip").forEach(s=>s.remove());
+  const pm = a/(a+b), rate = n>0 ? x/n : NaN, postm = pa/(pa+pb);
+  const ch = makeChart(w2densH, {w:860, h:300, xdom:[0,1], ydom:[0,ymax],
+    xticks:[{v:0,l:"0"},{v:0.5,l:"1/2"},{v:1,l:"1"}], yticks:[],
+    xlab:"θ", ylab:"density", aria:"prior likelihood posterior"});
+  line(ch, fnPath(ch, prior, 0.003, 0.997, 301), S2, "7 5");
+  if (lik) line(ch, fnPath(ch, lik, 0.003, 0.997, 301), S1);
+  line(ch, fnPath(ch, post, 0.003, 0.997, 301), S3).setAttribute("stroke-width", 2.6);
+  vline(ch, postm, "crossline");
+  dirlab(ch, pm, ymax*0.97, "prior mean " + fmt(pm,2), S2, pm > 0.6 ? "end" : "start");
+  if (n>0) dirlab(ch, rate, ymax*0.89, "data " + fmt(rate,2), S1, rate > 0.6 ? "end" : "start");
+  dirlab(ch, postm, ymax*0.81, "posterior mean " + fmt(postm,3), S3, postm > 0.6 ? "end" : "start");
+  const series = [{name:"prior", color:S2, f:prior}];
+  if (lik) series.push({name:"data alone", color:S1, f:lik});
+  series.push({name:"posterior", color:S3, f:post});
+  attachHover(w2densH, ch, series, t => "θ = " + fmt(t,3), y => fmt(y,3));
+  const sd = Math.sqrt(pa*pb/((pa+pb)*(pa+pb)*(pa+pb+1)));
+  document.getElementById("w2read").innerHTML =
+    `<span><span class="k">posterior</span> <b>Beta(${fmt(pa,1)}, ${fmt(pb,1)})</b></span>` +
+    `<span><span class="k">mean = ((α+β)·${fmt(pm,3)} + n·${n>0?fmt(rate,3):"—"}) / (α+β+n)</span> <b>= ${fmt(postm,3)}</b></span>` +
+    `<span><span class="k">posterior sd</span> <b>${fmt(sd,3)}</b></span>` +
+    `<span><span class="k">prior worth</span> <b>${fmt(a+b,1)} obs.</b></span>`;
+}
+w2nI.addEventListener("input", () => {
+  w2xI.max = Math.round(+w2nI.value);
+  if (+w2xI.value > +w2xI.max){ w2xI.value = w2xI.max; }
+  w2xI.dispatchEvent(new Event("input"));
+});
+function w2preset(a,b){
+  w2aI.value = a; w2bI.value = b;
+  w2aI.dispatchEvent(new Event("input"));
+  w2bI.dispatchEvent(new Event("input"));
+}
+document.getElementById("w2flat").addEventListener("click", () => w2preset(1,1));
+document.getElementById("w2skep").addEventListener("click", () => w2preset(2,6));
+document.getElementById("w2opt").addEventListener("click", () => w2preset(8,2));
+bindControls(document.getElementById("w2"), drawW2);
+drawW2();
+
+/* ---------- Lab: the loss decides ---------- */
+const w3postH = document.getElementById("w3post");
+const w3lossH = document.getElementById("w3loss");
+const W3A = 8, W3B = 4;
+const W3MEAN = W3A/(W3A+W3B);
+const W3VAR = W3A*W3B/((W3A+W3B)**2*(W3A+W3B+1));
+const W3MODE = (W3A-1)/(W3A+W3B-2);
+const W3N = 1600, w3ts = [], w3fs = [];
+for (let i=0; i<=W3N; i++){ const t=i/W3N; w3ts.push(t); w3fs.push(betaPdf(t,W3A,W3B)); }
+const w3cum = [0];
+for (let i=1; i<=W3N; i++) w3cum.push(w3cum[i-1] + (w3fs[i-1]+w3fs[i])/2/W3N);
+let W3MED = 0.5;
+for (let i=1; i<=W3N; i++) if (w3cum[i] >= 0.5){
+  const c0=w3cum[i-1], c1=w3cum[i];
+  W3MED = (i-1 + (0.5-c0)/(c1-c0))/W3N; break;
+}
+const w3absLoss = a => {
+  let s = 0;
+  for (let i=0; i<=W3N; i++) s += Math.abs(w3ts[i]-a)*w3fs[i]*(i===0||i===W3N?0.5:1);
+  return s/W3N;
+};
+const w3sqLoss = a => W3VAR + (W3MEAN-a)*(W3MEAN-a);
+let w3mode = "sq";
+function drawW3(){
+  const a = +document.getElementById("w3a").value;
+  [w3postH, w3lossH].forEach(h => { h.querySelectorAll("svg").forEach(s=>s.remove());
+                                    h.querySelectorAll(".tip").forEach(s=>s.remove()); });
+  const pf = t => betaPdf(t,W3A,W3B);
+  const ymax = 3.3;
+  const chP = makeChart(w3postH, {w:420, h:300, xdom:[0,1], ydom:[0,ymax],
+    xticks:[{v:0,l:"0"},{v:0.5,l:"1/2"},{v:1,l:"1"}], yticks:[],
+    xlab:"θ", ylab:"posterior density", aria:"posterior with summaries"});
+  line(chP, fnPath(chP, pf, 0.003, 0.997, 301), "#8a929c");
+  el("line", {x1:chP.sx(W3MEAN), y1:0, x2:chP.sx(W3MEAN), y2:chP.ih,
+              stroke:S3, "stroke-width":2}, chP.plot);
+  el("line", {x1:chP.sx(W3MED), y1:0, x2:chP.sx(W3MED), y2:chP.ih,
+              stroke:S2, "stroke-width":2, "stroke-dasharray":"7 5"}, chP.plot);
+  el("line", {x1:chP.sx(W3MODE), y1:0, x2:chP.sx(W3MODE), y2:chP.ih,
+              stroke:S1, "stroke-width":2, "stroke-dasharray":"2 4"}, chP.plot);
+  vline(chP, a, "crossline");
+  dirlab(chP, a, ymax*0.97, "your guess " + fmt(a,3), "#1c2024", a > 0.55 ? "end" : "start");
+  attachHover(w3postH, chP, [{name:"density", color:"#8a929c", f:pf}],
+    t => "θ = " + fmt(t,3), y => fmt(y,3));
+  const lossF = w3mode === "sq" ? w3sqLoss : w3absLoss;
+  const opt = w3mode === "sq" ? W3MEAN : W3MED;
+  const ymaxL = lossF(0.02)*1.06;
+  const chL = makeChart(w3lossH, {w:420, h:300, xdom:[0,1], ydom:[0,ymaxL],
+    xticks:[{v:0,l:"0"},{v:opt,l:"optimum"},{v:1,l:"1"}],
+    yticks:[{v:lossF(opt), l:fmt(lossF(opt),3)}],
+    xlab:"guess a", ylab:"expected loss", aria:"expected loss curve"});
+  line(chL, fnPath(chL, lossF, 0.001, 0.999, 301), w3mode === "sq" ? S3 : S2);
+  vline(chL, opt, "crossline");
+  hline(chL, lossF(opt), "refline");
+  dot(chL, a, lossF(a), "#1c2024", 5);
+  attachHover(w3lossH, chL, [{name:"E loss", color:w3mode==="sq"?S3:S2, f:lossF}],
+    t => "a = " + fmt(t,3), y => fmt(y,4));
+  const read = document.getElementById("w3read");
+  if (w3mode === "sq"){
+    read.innerHTML =
+      `<span><span class="k">optimum = posterior mean</span> <b>${fmt(W3MEAN,4)}</b></span>` +
+      `<span><span class="k">your E loss = Var + (mean − a)²</span> <b>= ${fmt(W3VAR,4)} + ${fmt((W3MEAN-a)**2,4)} = ${fmt(w3sqLoss(a),4)}</b></span>` +
+      `<span><span class="k">floor (= posterior variance)</span> <b>${fmt(W3VAR,4)}</b></span>`;
+  } else {
+    read.innerHTML =
+      `<span><span class="k">optimum = posterior median</span> <b>${fmt(W3MED,4)}</b></span>` +
+      `<span><span class="k">your E loss</span> <b>${fmt(w3absLoss(a),4)}</b></span>` +
+      `<span><span class="k">floor</span> <b>${fmt(w3absLoss(W3MED),4)}</b></span>`;
+  }
+}
+document.getElementById("w3sq").addEventListener("click", function(){
+  w3mode = "sq"; this.setAttribute("aria-pressed","true");
+  document.getElementById("w3abs").setAttribute("aria-pressed","false"); drawW3();
+});
+document.getElementById("w3abs").addEventListener("click", function(){
+  w3mode = "abs"; this.setAttribute("aria-pressed","true");
+  document.getElementById("w3sq").setAttribute("aria-pressed","false"); drawW3();
+});
+bindControls(document.getElementById("w3"), drawW3);
+drawW3();
+
+/* ---------- CENTERPIECE Lab B.8.4: normal-normal ---------- */
+const w4densH = document.getElementById("w4dens");
+const w4precH = document.getElementById("w4prec");
+const w4shrH  = document.getElementById("w4shr");
+let w4step = 4;
+function drawW4(){
+  const m = +document.getElementById("w4m").value;
+  const tau = +document.getElementById("w4t").value;
+  const xb = +document.getElementById("w4x").value;
+  const sig = +document.getElementById("w4s").value;
+  const n = Math.round(+document.getElementById("w4n").value);
+  const sEff = sig/Math.sqrt(n);                 // noise sd of the mean
+  const pPrec = 1/(tau*tau), dPrec = n/(sig*sig), postPrec = pPrec + dPrec;
+  const v = 1/postPrec, sp = Math.sqrt(v);
+  const wPrior = pPrec/postPrec, wData = dPrec/postPrec;
+  const mstar = wPrior*m + wData*xb;
+  [w4densH, w4precH, w4shrH].forEach(h => { h.querySelectorAll("svg").forEach(s=>s.remove());
+                                            h.querySelectorAll(".tip").forEach(s=>s.remove()); });
+  // densities (full width)
+  const lo = Math.min(m-3.2*tau, xb-3.2*sEff), hi = Math.max(m+3.2*tau, xb+3.2*sEff);
+  const ymax = normPdf(0,0,sp)*1.12;
+  const ch = makeChart(w4densH, {w:860, h:300, xdom:[lo,hi], ydom:[0,ymax],
+    xticks:[{v:m,l:"m"},{v:xb,l:"x̄"}], yticks:[],
+    xlab:"θ", ylab:"density", aria:"normal prior likelihood posterior"});
+  line(ch, fnPath(ch, t => normPdf(t,m,tau), lo, hi, 301), S2, "7 5");
+  line(ch, fnPath(ch, t => normPdf(t,xb,sEff), lo, hi, 301), S1);
+  line(ch, fnPath(ch, t => normPdf(t,mstar,sp), lo, hi, 301), S3).setAttribute("stroke-width",2.6);
+  vline(ch, mstar, "crossline");
+  dirlab(ch, mstar, ymax*0.96, "m* = " + fmt(mstar,1), S3, mstar > (lo+hi)/2 ? "end" : "start");
+  attachHover(w4densH, ch, [
+    {name:"prior", color:S2, f:t=>normPdf(t,m,tau)},
+    {name:"likelihood", color:S1, f:t=>normPdf(t,xb,sEff)},
+    {name:"posterior", color:S3, f:t=>normPdf(t,mstar,sp)}],
+    t => "θ = " + fmt(t,1), y => fmt(y,4));
+  // derivation stepper (live numbers)
+  const t2 = tau*tau, s2n = sig*sig/n;
+  document.getElementById("w4s1m").textContent =
+    `posterior shape ∝ exp[ −(θ − ${fmt(m,0)})² / (2·${fmt(t2,1)}) ] · ` +
+    `exp[ −(θ − ${fmt(xb,0)})² / (2·${fmt(s2n,2)}) ]     (τ² = ${fmt(t2,1)};  σ²/n = ${fmt(s2n,2)})`;
+  document.getElementById("w4s2m").textContent =
+    `θ² coefficient: 1/τ² + n/σ² = ${fmt(pPrec,5)} + ${fmt(dPrec,5)} = ${fmt(postPrec,5)};   ` +
+    `−2θ coefficient: m/τ² + x̄·n/σ² = ${fmt(m*pPrec,4)} + ${fmt(xb*dPrec,4)} = ${fmt(m*pPrec + xb*dPrec,4)}`;
+  document.getElementById("w4s3m").textContent =
+    `v = 1 / ${fmt(postPrec,5)} = ${fmt(v,2)};   ` +
+    `m* = v · ${fmt(m*pPrec + xb*dPrec,4)} = ${fmt(mstar,2)}`;
+  document.getElementById("w4s4m").textContent =
+    `θ | x̄  ~  N( ${fmt(mstar,2)},  ${fmt(v,2)} );   posterior sd = √v = ${fmt(sp,2)}   ` +
+    `(prior sd ${fmt(tau,1)};  data sd ${fmt(sEff,2)})`;
+  [1,2,3,4].forEach(k => {
+    document.getElementById("w4s"+k).classList.toggle("active", k === w4step);
+  });
+  // precision ledger
+  const Wp=430, Hp=205, Lp=118, Tp=22, BW=250, BH=30, GAP=60;
+  const svg = el("svg", {viewBox:`0 0 ${Wp} ${Hp}`, role:"img",
+    "aria-label":"precisions of prior, data, posterior"}, w4precH);
+  const scale = BW/postPrec;
+  const rows = [
+    {name:"prior 1/τ²", val:pPrec, col:S2},
+    {name:"data n/σ²", val:dPrec, col:S1},
+    {name:"posterior 1/v", val:postPrec, col:S3},
+  ];
+  rows.forEach((r,i) => {
+    const y = Tp + i*GAP;
+    if (i === 2){
+      el("rect",{x:Lp, y, width:pPrec*scale, height:BH, fill:S2, opacity:0.9}, svg);
+      el("rect",{x:Lp+pPrec*scale, y, width:dPrec*scale, height:BH, fill:S1, opacity:0.9}, svg);
+      el("rect",{x:Lp, y, width:postPrec*scale, height:BH, fill:"none",
+                 stroke:S3, "stroke-width":2.5}, svg);
+    } else {
+      el("rect",{x:Lp, y, width:r.val*scale, height:BH, fill:r.col, opacity:0.9}, svg);
+    }
+    const t = el("text",{x:Lp-8, y:y+BH/2+4, "text-anchor":"end", fill:"#646a72",
+      "font-family":"Inter,sans-serif","font-size":11.5,"font-weight":600}, svg);
+    t.textContent = r.name;
+    const tv = el("text",{x:Lp + r.val*scale + 8, y:y+BH/2+4, fill:"#1c2024",
+      "font-family":"Inter,sans-serif","font-size":11,"font-weight":600}, svg);
+    tv.textContent = fmt(r.val*1000,2) + "×10⁻³";
+  });
+  const plus = el("text",{x:Lp-30, y:Tp+GAP-14, fill:"#9aa1a9",
+    "font-family":"Inter,sans-serif","font-size":17,"font-weight":600}, svg);
+  plus.textContent = "+";
+  const eq = el("text",{x:Lp-30, y:Tp+2*GAP-14, fill:"#9aa1a9",
+    "font-family":"Inter,sans-serif","font-size":17,"font-weight":600}, svg);
+  eq.textContent = "=";
+  // shrinkage strip
+  const Ws=430, Hs=205, Ls=40, Rs=390, Ys=92;
+  const svg2 = el("svg", {viewBox:`0 0 ${Ws} ${Hs}`, role:"img",
+    "aria-label":"shrinkage from the prior mean toward the data"}, w4shrH);
+  if (Math.abs(xb - m) < 1e-9){
+    const t = el("text",{x:Ws/2, y:Ys, "text-anchor":"middle", fill:"#646a72",
+      "font-family":"Inter,sans-serif","font-size":13,"font-weight":600}, svg2);
+    t.textContent = "m = x̄ — the two guesses agree; nothing to shrink.";
+  } else {
+    el("line",{x1:Ls, y1:Ys, x2:Rs, y2:Ys, stroke:"#c9ced4", "stroke-width":2}, svg2);
+    const px = Ls + wData*(Rs-Ls);
+    el("line",{x1:Ls, y1:Ys, x2:px, y2:Ys, stroke:S3, "stroke-width":4}, svg2);
+    [[Ls,S2,"m = "+fmt(m,0)],[Rs,S1,"x̄ = "+fmt(xb,0)]].forEach(([X,c,txt]) => {
+      el("line",{x1:X, y1:Ys-10, x2:X, y2:Ys+10, stroke:c, "stroke-width":2.5}, svg2);
+      const t = el("text",{x:X, y:Ys+30, "text-anchor":"middle", fill:c,
+        "font-family":"Inter,sans-serif","font-size":12,"font-weight":600}, svg2);
+      t.textContent = txt;
+    });
+    el("circle",{cx:px, cy:Ys, r:6, fill:S3, stroke:"#fff","stroke-width":1.5}, svg2);
+    const t = el("text",{x:px, y:Ys-18, "text-anchor":"middle", fill:S3,
+      "font-family":"Inter,sans-serif","font-size":12,"font-weight":600}, svg2);
+    t.textContent = "m* = " + fmt(mstar,1);
+    const t2b = el("text",{x:(Ls+Rs)/2, y:Ys+58, "text-anchor":"middle", fill:"#646a72",
+      "font-family":"Inter,sans-serif","font-size":11.5}, svg2);
+    t2b.textContent = "covers " + fmt(100*wData,1) + "% of the way (the data's precision share)";
+  }
+  document.getElementById("w4read").innerHTML =
+    `<span><span class="k">weights</span> <b>${fmt(100*wPrior,1)}% prior · ${fmt(100*wData,1)}% data</b></span>` +
+    `<span><span class="k">m* = ${fmt(wPrior,3)}·${fmt(m,0)} + ${fmt(wData,3)}·${fmt(xb,0)}</span> <b>= ${fmt(mstar,2)}</b></span>` +
+    `<span><span class="k">posterior sd √v</span> <b>${fmt(sp,2)}</b> <span class="k">(vs prior ${fmt(tau,1)}, data ${fmt(sEff,2)})</span></span>`;
+}
+document.querySelectorAll("#w4stepper .sbtns button").forEach(btn => {
+  btn.addEventListener("click", () => {
+    w4step = +btn.dataset.step;
+    document.querySelectorAll("#w4stepper .sbtns button").forEach(b =>
+      b.setAttribute("aria-pressed", b === btn ? "true" : "false"));
+    drawW4();
+  });
+});
+bindControls(document.getElementById("w4"), drawW4);
+drawW4();
+
+/* ---------- Lab: convergence ---------- */
+const w5H = document.getElementById("w5conv");
+let w5seed = 20260715;
+const W5NMAX = 500;
+const W5PRIORS = [
+  {name:"flat",     a:1,  b:1,  col:S1},
+  {name:"skeptic",  a:2,  b:6,  col:S2},
+  {name:"optimist", a:12, b:3,  col:S3},
+];
+function drawW5(){
+  const th = +document.getElementById("w5t").value;
+  const rnd = mulberry32(w5seed);
+  const cum = [0];
+  for (let i=1; i<=W5NMAX; i++) cum.push(cum[i-1] + (rnd() < th ? 1 : 0));
+  const trajs = W5PRIORS.map(p => {
+    const tr = [NaN];
+    for (let n=1; n<=W5NMAX; n++) tr.push((p.a + cum[n])/(p.a + p.b + n));
+    return tr;
+  });
+  w5H.querySelectorAll("svg").forEach(s=>s.remove());
+  w5H.querySelectorAll(".tip").forEach(s=>s.remove());
+  const ch = makeChart(w5H, {w:860, h:320, xdom:[1,W5NMAX], ydom:[0,1], xlog:true,
+    xticks:[{v:1,l:"1"},{v:3,l:"3"},{v:10,l:"10"},{v:30,l:"30"},{v:100,l:"100"},{v:300,l:"300"}],
+    yticks:[{v:0,l:"0"},{v:0.25,l:"0.25"},{v:0.5,l:"0.5"},{v:0.75,l:"0.75"},{v:1,l:"1"}],
+    xlab:"patients observed, n (log scale)", ylab:"posterior mean", aria:"posterior means vs n"});
+  hline(ch, th, "refline");
+  dirlab(ch, 1.35, th, "true θ* = " + fmt(th,2), "#646a72", "start",
+         th > 0.9 ? 16 : -7);
+  trajs.forEach((tr,i) => {
+    const pts = [];
+    for (let n=1; n<=W5NMAX; n++) pts.push([n, tr[n]]);
+    line(ch, pathFrom(pts, ch), W5PRIORS[i].col);
+  });
+  attachHover(w5H, ch, W5PRIORS.map((p,i) => ({name:p.name, color:p.col,
+    f: n => trajs[i][Math.max(1, Math.min(W5NMAX, Math.round(n)))]})),
+    n => "n = " + Math.round(n), y => fmt(y,3));
+  const at = n => W5PRIORS.map((p,i) => `${p.name} <b>${fmt(trajs[i][n],3)}</b>`).join(" · ");
+  document.getElementById("w5read").innerHTML =
+    `<span><span class="k">after n = 10</span> ${at(10)}</span>` +
+    `<span><span class="k">after n = 500</span> ${at(500)}</span>`;
+}
+document.getElementById("w5new").addEventListener("click", () => { w5seed += 1; drawW5(); });
+bindControls(document.getElementById("w5"), drawW5);
+drawW5();
+
+/* KaTeX */
+document.addEventListener("DOMContentLoaded", () => {
+  if (window.renderMathInElement) renderMathInElement(document.body, {
+    delimiters:[{left:"\\(",right:"\\)",display:false},{left:"$$",right:"$$",display:true}],
+    macros:{"\\E":"\\mathrm{E}","\\Var":"\\operatorname{Var}"}
+  });
+});
+</script>
+</body>
+</html>
