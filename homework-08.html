@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Homework 8 · Interactive — STAT S4204</title>
+<meta name="description" content="Interactive companion to Homework 8: HPS Chapter 2 exercises — precision weighting, the cost of unbiasedness, and sequential versus batch Bayes updating.">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="icon" href="favicon.ico" sizes="32x32">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<link rel="stylesheet" href="assets/hw.css">
+</head>
+<body>
+  <div class="band"><div class="in">
+    <div class="topnav"><a href="./">← Notes in Statistical Inference</a></div>
+    <p class="course">STAT&nbsp;S4204 · Summer&nbsp;2026 · Problem Sets</p>
+    <h1>Homework 8 — Interactive Companion</h1>
+    <p class="sub">Chapter 2 exercises: best weights, the cost of unbiasedness, and a Bayesian ledger settled in any order</p>
+  </div></div>
+  <div class="wrap">
+
+    <p class="lead">Assignment 8 works twelve exercises from the end of HPS's estimation
+    chapter—efficiency computations, minimizer facts, two Bayes estimators, a best
+    predictor, and a closing exercise on updating a posterior twice. The write-up carries
+    all twelve; the three laboratories below animate the ones with something to steer:
+    precision weighting (Exercise 9), the best multiple of the variance estimator
+    (Exercise 29), and sequential versus batch updating (Exercise 61).</p>
+    <div class="pdfbar">
+      <a class="btn" href="homework-08.pdf">Read the write-up (PDF)</a>
+      <a class="btn ghost" href="./">All notes</a>
+    </div>
+
+    <!-- ============ Widget 1: Ex 9(b) precision weights ============ -->
+    <div class="widget" id="w1">
+      <h2>Exercise 9 · Best weights</h2>
+      <h3>Weight by precision</h3>
+      <p>Three independent measurements of the same mean, with different variances. The
+      minimum-variance unbiased combination \( Z=\sum a_iX_i \), \( \sum a_i=1 \), weights
+      each observation by its reciprocal variance:
+      \( a_i = \sigma_i^{-2}\big/\sum_j\sigma_j^{-2} \). Steer the three variances and watch
+      the weights and the payoff move.</p>
+      <div class="controls">
+        <span class="ctl"><label>σ₁²</label>
+          <input type="range" min="0.2" max="8" step="0.1" value="1" id="w1a" data-out="w1av" data-dec="1">
+          <span class="val" id="w1av"></span></span>
+        <span class="ctl"><label>σ₂²</label>
+          <input type="range" min="0.2" max="8" step="0.1" value="4" id="w1b" data-out="w1bv" data-dec="1">
+          <span class="val" id="w1bv"></span></span>
+        <span class="ctl"><label>σ₃²</label>
+          <input type="range" min="0.2" max="8" step="0.1" value="0.5" id="w1c2" data-out="w1cv" data-dec="1">
+          <span class="val" id="w1cv"></span></span>
+      </div>
+      <div class="charts">
+        <div class="chartwrap" style="max-width:620px" id="w1c"></div>
+      </div>
+      <div class="legend">
+        <span class="chip"><span class="sw dot" style="background:var(--s1)"></span>optimal weights \(a_i\)</span>
+        <span class="chip"><span class="sw dot" style="background:#c3c8ce"></span>equal weights \(1/3\)</span>
+      </div>
+      <div class="readout" id="w1read"></div>
+      <p class="note">Noisy observations are not discarded—every measurement gets some
+      weight—but precise ones dominate. The optimal variance
+      \( \big(\sum_j\sigma_j^{-2}\big)^{-1} \) says precisions add, the same arithmetic that
+      set the posterior weights in Assignment 7's normal problem.</p>
+    </div>
+
+    <!-- ============ Widget 2: Ex 29 cost of unbiasedness ============ -->
+    <div class="widget" id="w2">
+      <h2>Exercise 29 · The best multiple of s²</h2>
+      <h3>What unbiasedness costs</h3>
+      <p>The known-mean variance estimator \(s^2\) is unbiased for \(\sigma^2\)
+      (Exercise 14). But among all multiples \(ks^2\), the expected squared error
+      \( E(ks^2-\sigma^2)^2 = \sigma^4\big[k^2(n+2)/n - 2k + 1\big] \) is minimized not at
+      \(k=1\) but at \( k = n/(n+2) \): shrinking beats unbiased, at every \(\sigma^2\) and
+      every \(n\). Slide \(n\) and hover the curve.</p>
+      <div class="controls">
+        <span class="ctl"><label>n</label>
+          <input type="range" min="2" max="80" step="1" value="6" id="w2n" data-out="w2nv" data-fmt="int">
+          <span class="val" id="w2nv"></span></span>
+      </div>
+      <div class="charts">
+        <div class="chartwrap" style="max-width:620px" id="w2c"></div>
+      </div>
+      <div class="legend">
+        <span class="chip"><span class="sw" style="border-color:var(--s2)"></span>\(E(ks^2-\sigma^2)^2/\sigma^4\)</span>
+        <span class="chip"><span class="sw dot" style="background:var(--s3)"></span>minimizer \(k=n/(n+2)\)</span>
+        <span class="chip"><span class="sw dot" style="background:var(--s1)"></span>unbiased \(k=1\)</span>
+      </div>
+      <div class="readout" id="w2read"></div>
+      <p class="note">As \(n\) grows the two dots merge and the argument fades—the
+      unbiasedness penalty is a small-sample phenomenon. At small \(n\) it is not small:
+      at \(n=2\) the shrunken estimator's expected squared error is half the unbiased
+      one's.</p>
+    </div>
+
+    <!-- ============ Widget 3: Ex 61 sequential vs batch ============ -->
+    <div class="widget" id="w3">
+      <h2>Exercise 61 · A ledger settled in any order</h2>
+      <h3>Sequential updating equals batch updating</h3>
+      <p>Uniform prior; a first experiment with \(s\) successes in \(m\) trials; a second
+      with \(S\) in \(n\), using the first posterior as the new prior. The sequential
+      posterior Beta\((1+s+S,\,1+m+n-s-S)\) is drawn dashed over the batch posterior
+      (all \(m+n\) trials against the uniform prior at once), drawn solid. They are the
+      same curve at every setting of the sliders—that is the exercise's answer.</p>
+      <div class="controls">
+        <span class="ctl"><label>m</label>
+          <input type="range" min="1" max="40" step="1" value="8" id="w3m" data-out="w3mv" data-fmt="int">
+          <span class="val" id="w3mv"></span></span>
+        <span class="ctl"><label>s/m</label>
+          <input type="range" min="0" max="1" step="0.01" value="0.4" id="w3s" data-out="w3sv" data-dec="2">
+          <span class="val" id="w3sv"></span></span>
+        <span class="ctl"><label>n</label>
+          <input type="range" min="1" max="40" step="1" value="12" id="w3n" data-out="w3nv" data-fmt="int">
+          <span class="val" id="w3nv"></span></span>
+        <span class="ctl"><label>S/n</label>
+          <input type="range" min="0" max="1" step="0.01" value="0.6" id="w3r" data-out="w3rv" data-dec="2">
+          <span class="val" id="w3rv"></span></span>
+      </div>
+      <div class="charts">
+        <div class="chartwrap" style="max-width:620px" id="w3c"></div>
+      </div>
+      <div class="legend">
+        <span class="chip"><span class="sw" style="border-color:var(--s3)"></span>batch: uniform prior, all m+n trials</span>
+        <span class="chip"><span class="sw dash" style="border-color:var(--s2)"></span>sequential: first posterior as second prior</span>
+        <span class="chip"><span class="sw" style="border-color:#c3c8ce"></span>intermediate posterior after experiment 1</span>
+      </div>
+      <div class="readout" id="w3read"></div>
+      <p class="note">Multiplication does not care how the factors are grouped: posterior
+      ∝ prior × likelihood₁ × likelihood₂ either way. The intermediate posterior (gray) is a
+      complete record of the first experiment—yesterday's posterior serves as today's prior
+      without loss.</p>
+    </div>
+
+    <footer>
+      Interactive companion to the Homework&nbsp;8 write-up; the PDF is the submitted
+      document. Any errors are my own.
+      <div class="ln"><a href="homework-08.pdf">homework-08.pdf</a> ·
+        <a href="./">all notes</a> ·
+        <a href="mailto:tyler.sotomayor@columbia.edu">errata</a></div>
+    </footer>
+  </div>
+  <div class="footerband"><div class="in"><img src="assets/summer-logo.svg" alt="Columbia University Summer Session"></div></div>
+
+<script src="assets/hw.js"></script>
+<script>
+"use strict";
+function lgamma(x){
+  const g = [76.18009172947146,-86.50532032941677,24.01409824083091,
+             -1.231739572450155,0.1208650973866179e-2,-0.5395239384953e-5];
+  let a = x, tmp = x + 5.5;
+  tmp -= (x + 0.5)*Math.log(tmp);
+  let ser = 1.000000000190015;
+  for (let j=0; j<6; j++) ser += g[j]/(++a);
+  return -tmp + Math.log(2.5066282746310005*ser/x);
+}
+const betaPdf = (x,a,b) => (x<=0||x>=1) ? 0 :
+  Math.exp((a-1)*Math.log(x)+(b-1)*Math.log(1-x)+lgamma(a+b)-lgamma(a)-lgamma(b));
+
+/* ---------- Widget 1: precision weights ---------- */
+const w1host = document.getElementById("w1c");
+function drawW1(){
+  const s2 = [+document.getElementById("w1a").value,
+              +document.getElementById("w1b").value,
+              +document.getElementById("w1c2").value];
+  const prec = s2.map(v => 1/v);
+  const tot = prec.reduce((a,b)=>a+b,0);
+  const w = prec.map(p => p/tot);
+  const vopt = 1/tot;
+  const veq = s2.reduce((a,b)=>a+b,0)/9;
+  w1host.querySelectorAll("svg").forEach(s=>s.remove());
+  const ch = makeChart(w1host, {w:620, h:300, xdom:[0.4,3.6], ydom:[0,1],
+    xticks:[{v:1,l:"obs 1"},{v:2,l:"obs 2"},{v:3,l:"obs 3"}],
+    yticks:[{v:1/3,l:"1/3"},{v:1,l:"1"}],
+    xlab:"", ylab:"weight aᵢ", aria:"optimal weights"});
+  hline(ch, 1/3, "refline");
+  w.forEach((wi,i) => {
+    const x = i+1;
+    el("rect", {x:ch.sx(x-0.22), y:ch.sy(wi), width:ch.sx(x+0.22)-ch.sx(x-0.22),
+      height:ch.sy(0)-ch.sy(wi), fill:S1, "fill-opacity":0.75, rx:3}, ch.plot);
+    el("text", {x:ch.sx(x), y:ch.sy(wi)-7, "text-anchor":"middle", class:"dirlab",
+      fill:"#1c2024"}, ch.fore).textContent = fmt(wi,3);
+  });
+  document.getElementById("w1read").innerHTML =
+    `<span><span class="k">Var, optimal weights</span> <b>= ${fmt(vopt,4)}</b></span>` +
+    `<span><span class="k">Var, equal weights</span> <b>= ${fmt(veq,4)}</b></span>` +
+    `<span><span class="k">saving</span> <b>${fmt(100*(1-vopt/veq),1)}%</b></span>`;
+}
+bindControls(document.getElementById("w1"), drawW1);
+drawW1();
+
+/* ---------- Widget 2: cost of unbiasedness ---------- */
+const w2host = document.getElementById("w2c");
+function drawW2(){
+  const n = +document.getElementById("w2n").value;
+  const f = k => k*k*(n+2)/n - 2*k + 1;
+  const kstar = n/(n+2);
+  const ymax = Math.max(f(0.2), f(1.35))*1.1;
+  w2host.querySelectorAll("svg").forEach(s=>s.remove());
+  w2host.querySelectorAll(".tip").forEach(s=>s.remove());
+  const ch = makeChart(w2host, {w:620, h:320, xdom:[0.2,1.35], ydom:[0,ymax],
+    xticks:[{v:0.5,l:"1/2"},{v:kstar,l:"n/(n+2)"},{v:1,l:"1"}],
+    yticks:[{v:f(kstar),l:fmt(f(kstar),3)},{v:f(1),l:fmt(f(1),3)}],
+    xlab:"k", ylab:"E(ks² − σ²)²/σ⁴", aria:"mse of k s squared"});
+  line(ch, fnPath(ch, f, 0.2, 1.35), S2);
+  vline(ch, kstar, "crossline"); vline(ch, 1, "crossline");
+  dot(ch, kstar, f(kstar), S3, 5);
+  dot(ch, 1, f(1), S1, 5);
+  attachHover(w2host, ch, [{name:"MSE/σ⁴", color:S2, f}],
+    x => "k = " + fmt(x,3), y => fmt(y,4));
+  document.getElementById("w2read").innerHTML =
+    `<span><span class="k">minimizer k = n/(n+2)</span> <b>= ${fmt(kstar,4)}</b></span>` +
+    `<span><span class="k">MSE at k* (÷σ⁴)</span> <b>= 2/(n+2) = ${fmt(2/(n+2),4)}</b></span>` +
+    `<span><span class="k">MSE at k=1 (÷σ⁴)</span> <b>= 2/n = ${fmt(2/n,4)}</b></span>`;
+}
+bindControls(document.getElementById("w2"), drawW2);
+drawW2();
+
+/* ---------- Widget 3: sequential vs batch ---------- */
+const w3host = document.getElementById("w3c");
+function drawW3(){
+  const m = +document.getElementById("w3m").value;
+  const s = Math.round(+document.getElementById("w3s").value * m);
+  const n = +document.getElementById("w3n").value;
+  const S = Math.round(+document.getElementById("w3r").value * n);
+  const a1 = 1+s, b1 = 1+m-s;               // after experiment 1
+  const a2 = 1+s+S, b2 = 1+m+n-s-S;         // sequential = batch
+  let ymax = 1.2;
+  for (let i=1; i<200; i++){ const x=i/200; ymax = Math.max(ymax, betaPdf(x,a2,b2), betaPdf(x,a1,b1)); }
+  ymax *= 1.12;
+  const dm = a2/(a2+b2);
+  w3host.querySelectorAll("svg").forEach(x=>x.remove());
+  w3host.querySelectorAll(".tip").forEach(x=>x.remove());
+  const ch = makeChart(w3host, {w:620, h:320, xdom:[0,1], ydom:[0,ymax],
+    xticks:[{v:dm,l:"δ = "+fmt(dm,3)}], yticks:[],
+    xlab:"p", ylab:"density", aria:"sequential vs batch posteriors"});
+  line(ch, fnPath(ch, x => betaPdf(x,a1,b1), 0.003, 0.997, 301), "#c3c8ce");
+  line(ch, fnPath(ch, x => betaPdf(x,a2,b2), 0.003, 0.997, 301), S3);
+  line(ch, fnPath(ch, x => betaPdf(x,a2,b2), 0.003, 0.997, 301), S2, "8 6");
+  vline(ch, dm, "crossline");
+  document.getElementById("w3read").innerHTML =
+    `<span><span class="k">s, S</span> <b>= ${s}, ${S}</b></span>` +
+    `<span><span class="k">both posteriors</span> <b>Beta(${a2}, ${b2})</b></span>` +
+    `<span><span class="k">Bayes estimate (1+s+S)/(2+m+n)</span> <b>= ${fmt(dm,4)}</b></span>`;
+}
+bindControls(document.getElementById("w3"), drawW3);
+drawW3();
+
+/* KaTeX */
+document.addEventListener("DOMContentLoaded", () => {
+  if (window.renderMathInElement) renderMathInElement(document.body, {
+    delimiters:[{left:"\\(",right:"\\)",display:false},{left:"$$",right:"$$",display:true}],
+    macros:{"\\E":"\\mathrm{E}"}
+  });
+});
+</script>
+</body>
+</html>
