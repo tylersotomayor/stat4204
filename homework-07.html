@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Homework 7 · Interactive — STAT S4204</title>
+<meta name="description" content="Interactive companion to Homework 7: three conjugate Bayes estimators — normal-normal, beta-Bernoulli, and Poisson-gamma updates, each a weighted average of data and prior.">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="icon" href="favicon.ico" sizes="32x32">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<link rel="stylesheet" href="assets/hw.css">
+</head>
+<body>
+  <div class="band"><div class="in">
+    <div class="topnav"><a href="./">← Notes in Statistical Inference</a></div>
+    <p class="course">STAT&nbsp;S4204 · Summer&nbsp;2026 · Problem Sets</p>
+    <h1>Homework 7 — Interactive Companion</h1>
+    <p class="sub">Three conjugate Bayes estimators: update, then average</p>
+  </div></div>
+  <div class="wrap">
+
+    <p class="lead">Assignment 7 asks for the Bayes estimator under squared-error loss in
+    three conjugate models. The answer is the posterior mean each time, and each posterior
+    mean is a weighted average of the sample mean and the prior mean, with weights set by
+    how much the prior is worth in observations. The three laboratories below run each
+    update live: steer the prior and the data and watch the posterior—and the
+    estimate—negotiate between them.</p>
+    <div class="pdfbar">
+      <a class="btn" href="homework-07.pdf">Read the write-up (PDF)</a>
+      <a class="btn ghost" href="./">All notes</a>
+    </div>
+
+    <!-- ============ Widget 1: normal-normal ============ -->
+    <div class="widget" id="w1">
+      <h2>Problem 1 · Normal data, normal prior</h2>
+      <h3>Precisions add, means average</h3>
+      <p>Data \(N(\theta,\sigma^2)\) with \(\sigma^2\) known; prior
+      \(\theta\sim N(\eta,\tau^2)\). The posterior is normal with precision
+      \(1/\tau^2+n/\sigma^2\), and the Bayes estimator is
+      \( \delta = \frac{n\tau^2}{n\tau^2+\sigma^2}\,\bar y + \frac{\sigma^2}{n\tau^2+\sigma^2}\,\eta \).</p>
+      <div class="controls">
+        <span class="ctl"><label>η</label>
+          <input type="range" min="-3" max="5" step="0.1" value="0" id="w1eta" data-out="w1etav" data-dec="1">
+          <span class="val" id="w1etav"></span></span>
+        <span class="ctl"><label>τ</label>
+          <input type="range" min="0.2" max="3" step="0.05" value="1" id="w1tau" data-out="w1tauv" data-dec="2">
+          <span class="val" id="w1tauv"></span></span>
+        <span class="ctl"><label>σ²</label>
+          <input type="range" min="0.5" max="9" step="0.25" value="4" id="w1s2" data-out="w1s2v" data-dec="2">
+          <span class="val" id="w1s2v"></span></span>
+        <span class="ctl"><label>n</label>
+          <input type="range" min="1" max="100" step="1" value="8" id="w1n" data-out="w1nv" data-fmt="int">
+          <span class="val" id="w1nv"></span></span>
+        <span class="ctl"><label>ȳ</label>
+          <input type="range" min="-3" max="5" step="0.1" value="2.5" id="w1yb" data-out="w1ybv" data-dec="1">
+          <span class="val" id="w1ybv"></span></span>
+      </div>
+      <div class="charts">
+        <div class="chartwrap" style="max-width:640px" id="w1c"></div>
+      </div>
+      <div class="legend">
+        <span class="chip"><span class="sw dash" style="border-color:var(--s2)"></span>prior</span>
+        <span class="chip"><span class="sw" style="border-color:var(--s1)"></span>likelihood of ȳ</span>
+        <span class="chip"><span class="sw" style="border-color:var(--s3)"></span>posterior</span>
+      </div>
+      <div class="readout" id="w1read"></div>
+      <p class="note">Grow \(n\) and the posterior chases the likelihood; tighten \(\tau\)
+      and it clings to the prior. The weight on the data is the data's share of the total
+      precision—the same arithmetic that ran through Assignments 3 and 5.</p>
+    </div>
+
+    <!-- ============ Widget 2: beta-Bernoulli ============ -->
+    <div class="widget" id="w2">
+      <h2>Problem 2 · Bernoulli data, Beta prior</h2>
+      <h3>Successes join α, failures join β</h3>
+      <p>Prior Beta\((\alpha,\beta)\), data \(s\) successes in \(n\) trials. Posterior
+      Beta\((\alpha+s,\;\beta+n-s)\); Bayes estimator
+      \( \delta=\frac{\alpha+s}{\alpha+\beta+n} \), a compromise between \(\bar y = s/n\)
+      and the prior mean \(\alpha/(\alpha+\beta)\) in which the prior counts for
+      \(\alpha+\beta\) pseudo-observations.</p>
+      <div class="controls">
+        <span class="ctl"><label>α</label>
+          <input type="range" min="0.5" max="12" step="0.5" value="2" id="w2a" data-out="w2av" data-dec="1">
+          <span class="val" id="w2av"></span></span>
+        <span class="ctl"><label>β</label>
+          <input type="range" min="0.5" max="12" step="0.5" value="2" id="w2b" data-out="w2bv" data-dec="1">
+          <span class="val" id="w2bv"></span></span>
+        <span class="ctl"><label>n</label>
+          <input type="range" min="1" max="100" step="1" value="10" id="w2n" data-out="w2nv" data-fmt="int">
+          <span class="val" id="w2nv"></span></span>
+        <span class="ctl"><label>s/n</label>
+          <input type="range" min="0" max="1" step="0.01" value="0.7" id="w2r" data-out="w2rv" data-dec="2">
+          <span class="val" id="w2rv"></span></span>
+      </div>
+      <div class="charts">
+        <div class="chartwrap" style="max-width:640px" id="w2c"></div>
+      </div>
+      <div class="legend">
+        <span class="chip"><span class="sw dash" style="border-color:var(--s2)"></span>prior</span>
+        <span class="chip"><span class="sw" style="border-color:var(--s3)"></span>posterior</span>
+        <span class="chip"><span class="sw" style="border-color:#9aa1a9;border-top-style:dotted"></span>prior mean · δ · ȳ</span>
+      </div>
+      <div class="readout" id="w2read"></div>
+      <p class="note">Set \(\alpha=\beta=1\): the uniform prior, and the estimator becomes
+      \((1+s)/(2+n)\)—the shaded estimator this course has carried since Assignment 1,
+      Laplace's rule of succession.</p>
+    </div>
+
+    <!-- ============ Widget 3: Poisson-gamma ============ -->
+    <div class="widget" id="w3">
+      <h2>Problem 3 · Poisson data, Gamma prior</h2>
+      <h3>Counts join the shape, exposure joins the rate</h3>
+      <p>Prior Gamma\((\alpha,\beta)\) in the shape–rate convention (mean \(\alpha/\beta\));
+      data a Poisson sample with total \(s\). Posterior Gamma\((\alpha+s,\;\beta+n)\);
+      Bayes estimator \( \delta=\frac{\alpha+s}{\beta+n} \): the prior is worth \(\beta\)
+      observations of exposure carrying \(\alpha\) events.</p>
+      <div class="controls">
+        <span class="ctl"><label>α</label>
+          <input type="range" min="0.5" max="15" step="0.5" value="3" id="w3a" data-out="w3av" data-dec="1">
+          <span class="val" id="w3av"></span></span>
+        <span class="ctl"><label>β (rate)</label>
+          <input type="range" min="0.25" max="8" step="0.25" value="1.5" id="w3b" data-out="w3bv" data-dec="2">
+          <span class="val" id="w3bv"></span></span>
+        <span class="ctl"><label>n</label>
+          <input type="range" min="1" max="100" step="1" value="9" id="w3n" data-out="w3nv" data-fmt="int">
+          <span class="val" id="w3nv"></span></span>
+        <span class="ctl"><label>ȳ</label>
+          <input type="range" min="0.2" max="8" step="0.1" value="3" id="w3y" data-out="w3yv" data-dec="1">
+          <span class="val" id="w3yv"></span></span>
+      </div>
+      <div class="charts">
+        <div class="chartwrap" style="max-width:640px" id="w3c"></div>
+      </div>
+      <div class="legend">
+        <span class="chip"><span class="sw dash" style="border-color:var(--s2)"></span>prior</span>
+        <span class="chip"><span class="sw" style="border-color:var(--s3)"></span>posterior</span>
+        <span class="chip"><span class="sw" style="border-color:#9aa1a9;border-top-style:dotted"></span>prior mean · δ · ȳ</span>
+      </div>
+      <div class="readout" id="w3read"></div>
+      <p class="note">All three problems share one skeleton:
+      \( \delta = w\,\bar y + (1-w)\times\text{prior mean} \) with
+      \( w = n/(n+\text{prior weight}) \). The prior weight is \(\sigma^2/\tau^2\)
+      observations here, \(\alpha+\beta\) trials in Problem 2, \(\beta\) exposure in
+      Problem 3—and in every case \(w\to1\): the data buy out the prior.</p>
+    </div>
+
+    <footer>
+      Interactive companion to the Homework&nbsp;7 write-up; the PDF is the submitted
+      document. Any errors are my own.
+      <div class="ln"><a href="homework-07.pdf">homework-07.pdf</a> ·
+        <a href="./">all notes</a> ·
+        <a href="mailto:tyler.sotomayor@columbia.edu">errata</a></div>
+    </footer>
+  </div>
+  <div class="footerband"><div class="in"><img src="assets/summer-logo.svg" alt="Columbia University Summer Session"></div></div>
+
+<script src="assets/hw.js"></script>
+<script>
+"use strict";
+/* log-gamma (Lanczos) for Beta and Gamma densities */
+function lgamma(x){
+  const g = [76.18009172947146,-86.50532032941677,24.01409824083091,
+             -1.231739572450155,0.1208650973866179e-2,-0.5395239384953e-5];
+  let a = x, tmp = x + 5.5;
+  tmp -= (x + 0.5)*Math.log(tmp);
+  let ser = 1.000000000190015;
+  for (let j=0; j<6; j++) ser += g[j]/(++a);
+  return -tmp + Math.log(2.5066282746310005*ser/x);
+}
+const betaPdf = (x,a,b) => (x<=0||x>=1) ? 0 :
+  Math.exp((a-1)*Math.log(x)+(b-1)*Math.log(1-x)+lgamma(a+b)-lgamma(a)-lgamma(b));
+const gammaPdf = (x,a,b) => (x<=0) ? 0 :
+  Math.exp(a*Math.log(b)+(a-1)*Math.log(x)-b*x-lgamma(a));
+
+/* ---------- Widget 1: normal-normal ---------- */
+const w1host = document.getElementById("w1c");
+function drawW1(){
+  const eta = +document.getElementById("w1eta").value;
+  const tau = +document.getElementById("w1tau").value;
+  const s2 = +document.getElementById("w1s2").value;
+  const n = +document.getElementById("w1n").value;
+  const yb = +document.getElementById("w1yb").value;
+  const sl = Math.sqrt(s2/n);
+  const v = 1/(1/(tau*tau) + n/s2);
+  const m = v*(eta/(tau*tau) + n*yb/s2);
+  const sp = Math.sqrt(v);
+  const lo = Math.min(eta-3.4*tau, yb-3.4*sl), hi = Math.max(eta+3.4*tau, yb+3.4*sl);
+  const ymax = Math.max(normPdf(0,0,tau), normPdf(0,0,sl), normPdf(0,0,sp))*1.14;
+  w1host.querySelectorAll("svg").forEach(s=>s.remove());
+  w1host.querySelectorAll(".tip").forEach(s=>s.remove());
+  const ch = makeChart(w1host, {w:640, h:320, xdom:[lo,hi], ydom:[0,ymax],
+    xticks:[{v:eta,l:"η"},{v:yb,l:"ȳ"},{v:m,l:"δ"}], yticks:[],
+    xlab:"θ", ylab:"density", aria:"normal normal update"});
+  line(ch, fnPath(ch, x => normPdf(x,eta,tau), lo, hi, 301), S2, "7 5");
+  line(ch, fnPath(ch, x => normPdf(x,yb,sl), lo, hi, 301), S1);
+  line(ch, fnPath(ch, x => normPdf(x,m,sp), lo, hi, 301), S3);
+  vline(ch, m, "crossline");
+  const w = n*tau*tau/(n*tau*tau + s2);
+  document.getElementById("w1read").innerHTML =
+    `<span><span class="k">weight on data w</span> <b>= ${fmt(w,3)}</b></span>` +
+    `<span><span class="k">δ = wȳ + (1−w)η</span> <b>= ${fmt(m,3)}</b></span>` +
+    `<span><span class="k">posterior sd</span> <b>= ${fmt(sp,3)}</b></span>`;
+}
+bindControls(document.getElementById("w1"), drawW1);
+drawW1();
+
+/* ---------- Widget 2: beta-Bernoulli ---------- */
+const w2host = document.getElementById("w2c");
+function drawW2(){
+  const a = +document.getElementById("w2a").value;
+  const b = +document.getElementById("w2b").value;
+  const n = +document.getElementById("w2n").value;
+  const r = +document.getElementById("w2r").value;
+  const s = Math.round(r*n);
+  const a1 = a+s, b1 = b+n-s;
+  const pm = a/(a+b), dm = a1/(a1+b1), ybar = n ? s/n : 0;
+  let ymax = 1.2;
+  for (let i=1; i<200; i++){ const x=i/200; ymax = Math.max(ymax, betaPdf(x,a1,b1), betaPdf(x,a,b)); }
+  ymax *= 1.12;
+  w2host.querySelectorAll("svg").forEach(s2=>s2.remove());
+  w2host.querySelectorAll(".tip").forEach(s2=>s2.remove());
+  const ch = makeChart(w2host, {w:640, h:320, xdom:[0,1], ydom:[0,ymax],
+    xticks:[{v:pm,l:"prior"},{v:dm,l:"δ"},{v:ybar,l:"ȳ"}], yticks:[],
+    xlab:"p", ylab:"density", aria:"beta bernoulli update"});
+  line(ch, fnPath(ch, x => betaPdf(x,a,b), 0.003, 0.997, 301), S2, "7 5");
+  line(ch, fnPath(ch, x => betaPdf(x,a1,b1), 0.003, 0.997, 301), S3);
+  vline(ch, dm, "crossline");
+  document.getElementById("w2read").innerHTML =
+    `<span><span class="k">s</span> <b>= ${s}</b></span>` +
+    `<span><span class="k">posterior</span> <b>Beta(${fmt(a1,1)}, ${fmt(b1,1)})</b></span>` +
+    `<span><span class="k">δ = (α+s)/(α+β+n)</span> <b>= ${fmt(dm,3)}</b></span>` +
+    `<span><span class="k">weight on data</span> <b>= ${fmt(n/(a+b+n),3)}</b></span>`;
+}
+bindControls(document.getElementById("w2"), drawW2);
+drawW2();
+
+/* ---------- Widget 3: Poisson-gamma ---------- */
+const w3host = document.getElementById("w3c");
+function drawW3(){
+  const a = +document.getElementById("w3a").value;
+  const b = +document.getElementById("w3b").value;
+  const n = +document.getElementById("w3n").value;
+  const yb = +document.getElementById("w3y").value;
+  const s = Math.round(yb*n);
+  const a1 = a+s, b1 = b+n;
+  const pm = a/b, dm = a1/b1;
+  const hi = Math.max(pm + 3.5*Math.sqrt(a)/b, dm + 4*Math.sqrt(a1)/b1, 4);
+  let ymax = 0.2;
+  for (let i=1; i<240; i++){ const x=i*hi/240; ymax = Math.max(ymax, gammaPdf(x,a1,b1), gammaPdf(x,a,b)); }
+  ymax *= 1.12;
+  w3host.querySelectorAll("svg").forEach(s2=>s2.remove());
+  w3host.querySelectorAll(".tip").forEach(s2=>s2.remove());
+  const ch = makeChart(w3host, {w:640, h:320, xdom:[0,hi], ydom:[0,ymax],
+    xticks:[{v:pm,l:"prior"},{v:dm,l:"δ"},{v:yb,l:"ȳ"}], yticks:[],
+    xlab:"λ", ylab:"density", aria:"poisson gamma update"});
+  line(ch, fnPath(ch, x => gammaPdf(x,a,b), 0.001, hi, 301), S2, "7 5");
+  line(ch, fnPath(ch, x => gammaPdf(x,a1,b1), 0.001, hi, 301), S3);
+  vline(ch, dm, "crossline");
+  document.getElementById("w3read").innerHTML =
+    `<span><span class="k">s = nȳ</span> <b>= ${s}</b></span>` +
+    `<span><span class="k">posterior</span> <b>Gamma(${fmt(a1,1)}, ${fmt(b1,2)})</b></span>` +
+    `<span><span class="k">δ = (α+s)/(β+n)</span> <b>= ${fmt(dm,3)}</b></span>` +
+    `<span><span class="k">weight on data</span> <b>= ${fmt(n/(b+n),3)}</b></span>`;
+}
+bindControls(document.getElementById("w3"), drawW3);
+drawW3();
+
+/* KaTeX */
+document.addEventListener("DOMContentLoaded", () => {
+  if (window.renderMathInElement) renderMathInElement(document.body, {
+    delimiters:[{left:"\\(",right:"\\)",display:false},{left:"$$",right:"$$",display:true}],
+    macros:{"\\E":"\\mathrm{E}"}
+  });
+});
+</script>
+</body>
+</html>
