@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Homework 9 · Interactive — STAT S4204</title>
+<meta name="description" content="Interactive companion to Homework 9: all sixty-one exercises of HPS Chapter 2 — the minimax equalizer, inverse sampling, the cost of unbiasedness, method-of-moments instability, the chi-square interval, a shifted-exponential posterior, and best versus best-linear prediction.">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="icon" href="favicon.ico" sizes="32x32">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<link rel="stylesheet" href="assets/hw.css">
+<style>
+  /* toggle buttons for the predictor lab */
+  #w7 .ctl button{margin-right:8px}
+  #w7 .ctl button.on{background:var(--navy);color:#fff}
+</style>
+</head>
+<body>
+  <div class="band"><div class="in">
+    <div class="topnav"><a href="./">← Notes in Statistical Inference</a></div>
+    <p class="course">STAT&nbsp;S4204 · Summer&nbsp;2026 · Problem Sets</p>
+    <h1>Homework 9 — Interactive Companion</h1>
+    <p class="sub">All sixty-one exercises of Chapter 2: the equalizer, inverse sampling, the cost of unbiasedness, an unstable count, a skewed interval, and two pictures of prediction</p>
+  </div></div>
+  <div class="wrap">
+
+    <p class="lead">Assignment 9 works the entire exercise set at the end of HPS's
+    estimation chapter—Exercises 1 through 61, the full sweep from unbiasedness and the
+    variance bound through maximum likelihood, the method of moments, confidence intervals,
+    and Bayes and minimax estimation. The write-up carries all sixty-one. The seven
+    laboratories below animate the ones with something to steer: the minimax binomial
+    estimator whose risk is flat (Exercises&nbsp;5–6), the inverse-sampling estimator that
+    corrects a biased instinct (Exercise&nbsp;7), the multiple of the variance estimator that
+    beats unbiased (Exercise&nbsp;29), the method-of-moments estimate of a binomial's number
+    of trials and why it wobbles (Exercises&nbsp;33–34), the chi-square interval for a
+    variance and its skew (Exercises&nbsp;42–45), a posterior that is an exponential shifted
+    to the data (Exercise&nbsp;53), and the best predictor against its best linear
+    approximation (Exercises&nbsp;59–60).</p>
+    <div class="pdfbar">
+      <a class="btn" href="homework-09.pdf">Read the write-up (PDF)</a>
+      <a class="btn ghost" href="./">All notes</a>
+    </div>
+
+    <!-- ============ Widget 1: Ex 5–6 minimax binomial ============ -->
+    <div class="widget" id="w1">
+      <h2>Exercises 5–6 · The minimax binomial estimator</h2>
+      <h3>A risk that does not depend on \(p\)</h3>
+      <p>The estimator \( d'=(X+\sqrt n/2)/(n+\sqrt n) \) pulls the observed rate \(X/n\)
+      toward \(\tfrac12\). Its risk is the flat line \( \Rs(p,d')=1/[4(\sqrt n+1)^2] \)
+      (Exercise 6)—the same at every \(p\), which is what makes it minimax. The plain rate
+      \(X/n\) has risk \( p(1-p)/n \), a hump that is smaller at the extremes but larger in
+      the middle. Slide \(n\) and watch the two cross.</p>
+      <div class="controls">
+        <span class="ctl"><label>n</label>
+          <input type="range" min="2" max="120" step="1" value="16" id="w1n" data-out="w1nv" data-fmt="int">
+          <span class="val" id="w1nv"></span></span>
+      </div>
+      <div class="charts">
+        <div class="chartwrap" style="max-width:640px" id="w1c"></div>
+      </div>
+      <div class="legend">
+        <span class="chip"><span class="sw" style="border-color:var(--s2)"></span>rate \(X/n\): risk \(p(1-p)/n\)</span>
+        <span class="chip"><span class="sw" style="border-color:var(--s3)"></span>minimax \(d'\): risk \(1/[4(\sqrt n+1)^2]\)</span>
+      </div>
+      <div class="readout" id="w1read"></div>
+      <p class="note">The minimax rule trades a worse risk near \(p=\tfrac12\) for a better one
+      than \(X/n\) would have at its own worst case: its flat height
+      \(1/[4(\sqrt n+1)^2]\) sits just below the rate's peak \(1/(4n)\). As \(n\) grows the
+      hump flattens toward the line and the advantage fades—minimaxity is a small-sample
+      insurance policy.</p>
+    </div>
+
+    <!-- ============ Widget 2: Ex 7 inverse sampling ============ -->
+    <div class="widget" id="w2">
+      <h2>Exercise 7 · Inverse sampling</h2>
+      <h3>The unbiased estimator is not the obvious one</h3>
+      <p>Fish are caught until \(n\) of a type appear; \(X\) is the total caught, negative
+      binomial. The tempting estimator \(n/X\) is biased <em>upward</em>; the fix is
+      \((n-1)/(X-1)\), which is exactly unbiased for \(p\). The curves below plot the
+      expected value of each as \(p\) varies—one rides the diagonal \( \E=p \), the other
+      floats above it. Slide \(n\).</p>
+      <div class="controls">
+        <span class="ctl"><label>n</label>
+          <input type="range" min="2" max="24" step="1" value="5" id="w2n" data-out="w2nv" data-fmt="int">
+          <span class="val" id="w2nv"></span></span>
+      </div>
+      <div class="charts">
+        <div class="chartwrap" style="max-width:640px" id="w2c"></div>
+      </div>
+      <div class="legend">
+        <span class="chip"><span class="sw" style="border-color:var(--s3)"></span>\((n-1)/(X-1)\): unbiased, \(\E=p\)</span>
+        <span class="chip"><span class="sw" style="border-color:var(--s2)"></span>\(n/X\): biased upward</span>
+      </div>
+      <div class="readout" id="w2read"></div>
+      <p class="note">The upward bias of \(n/X\) is Jensen's inequality: \(x\mapsto n/x\) is
+      convex, so \( \E\{n/X\}>n/\E\{X\}=p \). Lowering both the numerator and the count by one
+      is precisely the correction that lands the expectation on \(p\). The gap is largest for
+      small \(n\) and shrinks as the sample of successes grows.</p>
+    </div>
+
+    <!-- ============ Widget 3: Ex 29 cost of unbiasedness ============ -->
+    <div class="widget" id="w3">
+      <h2>Exercise 29 · The best multiple of s²</h2>
+      <h3>What unbiasedness costs</h3>
+      <p>The known-mean variance estimator \(s^2\) is unbiased for \(\sigma^2\)
+      (Exercise 14). But among all multiples \(ks^2\), the expected squared error
+      \( E(ks^2-\sigma^2)^2 = \sigma^4\big[k^2(n+2)/n - 2k + 1\big] \) is minimized not at
+      \(k=1\) but at \( k = n/(n+2) \): shrinking beats unbiased, at every \(\sigma^2\) and
+      every \(n\). Slide \(n\) and hover the curve.</p>
+      <div class="controls">
+        <span class="ctl"><label>n</label>
+          <input type="range" min="2" max="80" step="1" value="6" id="w3n" data-out="w3nv" data-fmt="int">
+          <span class="val" id="w3nv"></span></span>
+      </div>
+      <div class="charts">
+        <div class="chartwrap" style="max-width:620px" id="w3c"></div>
+      </div>
+      <div class="legend">
+        <span class="chip"><span class="sw" style="border-color:var(--s2)"></span>\(E(ks^2-\sigma^2)^2/\sigma^4\)</span>
+        <span class="chip"><span class="sw dot" style="background:var(--s3)"></span>minimizer \(k=n/(n+2)\)</span>
+        <span class="chip"><span class="sw dot" style="background:var(--s1)"></span>unbiased \(k=1\)</span>
+      </div>
+      <div class="readout" id="w3read"></div>
+      <p class="note">As \(n\) grows the two dots merge and the argument fades—the
+      unbiasedness penalty is a small-sample phenomenon. At small \(n\) it is not small:
+      at \(n=2\) the shrunken estimator's expected squared error is half the unbiased
+      one's.</p>
+    </div>
+
+    <!-- ============ Widget 4: Ex 33–34 method-of-moments instability ============ -->
+    <div class="widget" id="w4">
+      <h2>Exercises 33–34 · Estimating a binomial's number of trials</h2>
+      <h3>A moment estimator that wobbles</h3>
+      <p>From \(m\) counts of heads in eight tosses (true \(n=8\), \(p=\tfrac12\)), the method
+      of moments gives \( \hat n = m_1^2/(m_1-\hat s^2) \). Because it divides by the small gap
+      between the sample mean and variance, ordinary noise throws it a long way. The histogram
+      shows \(\hat n\) across 400 replications; slide \(m\) to watch the spread tighten—slowly.</p>
+      <div class="controls">
+        <span class="ctl"><label>m (counts per replication)</label>
+          <input type="range" min="10" max="400" step="5" value="20" id="w4m" data-out="w4mv" data-fmt="int">
+          <span class="val" id="w4mv"></span></span>
+      </div>
+      <div class="charts">
+        <div class="chartwrap" style="max-width:640px" id="w4c"></div>
+      </div>
+      <div class="legend">
+        <span class="chip"><span class="sw dot" style="background:var(--s1)"></span>\(\hat n\) across 400 replications</span>
+        <span class="chip"><span class="sw" style="border-color:var(--s3)"></span>true \(n=8\)</span>
+      </div>
+      <div class="readout" id="w4read"></div>
+      <p class="note">Even the median \(\hat n\) drifts and the spread is wide until \(m\) runs
+      into the hundreds; the tail of large \(\hat n\) is the small-denominator blow-up. Some
+      replications give \(\hat s^2\ge m_1\) and no admissible \(\hat n\) at all—those are
+      dropped and counted below. Estimating how many trials produced a set of counts is a
+      genuinely hard problem, and the moment estimator is not equal to it at small \(m\).</p>
+    </div>
+
+    <!-- ============ Widget 5: Ex 42–45 chi-square interval ============ -->
+    <div class="widget" id="w5">
+      <h2>Exercises 42–45 · The interval for a variance</h2>
+      <h3>A pivot that is not symmetric</h3>
+      <p>With \(\sum(X_i-\bar X)^2/\sigma^2\sim\chi^2_{\nu}\), a confidence interval for
+      \(\sigma^2\) brackets the chi-square between two percentiles and inverts. The chi-square
+      is skewed, so the two cut points sit at unequal distances and the resulting interval
+      \(\big(\mathrm{SS}/\chi^2_{\text{hi}},\ \mathrm{SS}/\chi^2_{\text{lo}}\big)\) reaches
+      farther above the point estimate than below. Slide the degrees of freedom, the
+      confidence level, and the sum of squares.</p>
+      <div class="controls">
+        <span class="ctl"><label>ν (df)</label>
+          <input type="range" min="2" max="60" step="1" value="14" id="w5df" data-out="w5dfv" data-fmt="int">
+          <span class="val" id="w5dfv"></span></span>
+        <span class="ctl"><label>confidence</label>
+          <input type="range" min="0.80" max="0.99" step="0.01" value="0.95" id="w5cl" data-out="w5clv" data-dec="2">
+          <span class="val" id="w5clv"></span></span>
+        <span class="ctl"><label>SS = Σ(xᵢ−x̄)²</label>
+          <input type="range" min="5" max="200" step="1" value="61" id="w5ss" data-out="w5ssv" data-fmt="int">
+          <span class="val" id="w5ssv"></span></span>
+      </div>
+      <div class="charts">
+        <div class="chartwrap" style="max-width:640px" id="w5c"></div>
+      </div>
+      <div class="legend">
+        <span class="chip"><span class="sw" style="border-color:var(--s1)"></span>\(\chi^2_{\nu}\) density</span>
+        <span class="chip"><span class="sw dot" style="background:var(--s2)"></span>the two percentiles</span>
+      </div>
+      <div class="readout" id="w5read"></div>
+      <p class="note">The shaded central mass is the confidence level; the unequal tails are
+      the skew. Notice the interval's upper limit runs well past twice the lower for small
+      \(\nu\)—a variance is pinned down loosely until the sample is large, which is why it
+      demands more data than a mean for the same relative precision.</p>
+    </div>
+
+    <!-- ============ Widget 6: Ex 53 shifted-exponential posterior ============ -->
+    <div class="widget" id="w6">
+      <h2>Exercise 53 · A posterior shifted to the data</h2>
+      <h3>The likelihood cancels the prior</h3>
+      <p>A uniform observation on \([0,\theta]\) with the Gamma\((2,1)\) prior
+      \(\pi(\theta)=\theta e^{-\theta}\): the joint collapses to \(e^{-\theta}\), the marginal
+      is \(e^{-x}\), and the posterior is a unit exponential shifted to start at the observed
+      \(x\), \( f(\theta\mid x)=e^{-(\theta-x)} \) for \(\theta>x\). Its mean is
+      \( E(\theta\mid x)=x+1 \). Slide the observation and watch the whole posterior slide with
+      it.</p>
+      <div class="controls">
+        <span class="ctl"><label>observed x</label>
+          <input type="range" min="0" max="5" step="0.05" value="1.5" id="w6x" data-out="w6xv" data-dec="2">
+          <span class="val" id="w6xv"></span></span>
+      </div>
+      <div class="charts">
+        <div class="chartwrap" style="max-width:640px" id="w6c"></div>
+      </div>
+      <div class="legend">
+        <span class="chip"><span class="sw" style="border-color:#c3c8ce"></span>prior \(\theta e^{-\theta}\)</span>
+        <span class="chip"><span class="sw" style="border-color:var(--s3)"></span>posterior \(e^{-(\theta-x)},\ \theta>x\)</span>
+        <span class="chip"><span class="sw dot" style="background:var(--s2)"></span>Bayes estimate \(x+1\)</span>
+      </div>
+      <div class="readout" id="w6read"></div>
+      <p class="note">The observation supplies a hard floor—\(\theta\) cannot be below the
+      value already seen—and the prior adds exactly one expected unit above it. As \(x\) grows
+      the posterior marches right, never doubling back below \(x\), and the estimate tracks it
+      at a constant lead of one.</p>
+    </div>
+
+    <!-- ============ Widget 7: Ex 59–60 best vs best-linear predictor ============ -->
+    <div class="widget" id="w7">
+      <h2>Exercises 59–60 · Best predictor versus best linear predictor</h2>
+      <h3>When the line is exact, and when it only approximates</h3>
+      <p>The best predictor is \(E(Y\mid x)\); the best linear predictor of Formula (31) is the
+      least-squares line through the joint distribution. For \(f=8xy\) (Exercise 59) the
+      conditional mean is already a line, so the two coincide exactly. For
+      \(f=(2x+4y)/3\) (Exercise 60) the conditional mean is a gentle curve and the line only
+      approximates it. Toggle the joint density.</p>
+      <div class="controls">
+        <span class="ctl">
+          <button id="w7b1" class="on">f = 8xy&nbsp; (Ex 59)</button>
+          <button id="w7b2">f = (2x+4y)/3&nbsp; (Ex 60)</button>
+        </span>
+      </div>
+      <div class="charts">
+        <div class="chartwrap" style="max-width:640px" id="w7c"></div>
+      </div>
+      <div class="legend">
+        <span class="chip"><span class="sw" style="border-color:var(--s3)"></span>best predictor \(E(Y\mid x)\)</span>
+        <span class="chip"><span class="sw dash" style="border-color:var(--s2)"></span>best linear predictor \(\ell(x)\)</span>
+      </div>
+      <div class="readout" id="w7read"></div>
+      <p class="note">Restricting to lines loses nothing in Exercise 59—the curves lie on top of
+      one another—and almost nothing in Exercise 60, where they run within about \(0.01\) of each
+      other across the whole range. The best linear predictor is the cheapest useful summary of
+      a dependence: two numbers, a slope and an intercept, standing in for a whole conditional
+      mean.</p>
+    </div>
+
+    <footer>
+      Interactive companion to the Homework&nbsp;9 write-up; the PDF is the submitted
+      document, and it carries the full solutions to all sixty-one exercises. Any errors are my own.
+      <div class="ln"><a href="homework-09.pdf">homework-09.pdf</a> ·
+        <a href="./">all notes</a> ·
+        <a href="mailto:tyler.sotomayor@columbia.edu">errata</a></div>
+    </footer>
+  </div>
+  <div class="footerband"><div class="in"><img src="assets/summer-logo.svg" alt="Columbia University Summer Session"></div></div>
+
+<script src="assets/hw.js"></script>
+<script>
+"use strict";
+/* ---------- special functions ---------- */
+function lgamma(x){
+  const g = [76.18009172947146,-86.50532032941677,24.01409824083091,
+             -1.231739572450155,0.1208650973866179e-2,-0.5395239384953e-5];
+  let a = x, tmp = x + 5.5;
+  tmp -= (x + 0.5)*Math.log(tmp);
+  let ser = 1.000000000190015;
+  for (let j=0; j<6; j++) ser += g[j]/(++a);
+  return -tmp + Math.log(2.5066282746310005*ser/x);
+}
+/* regularized lower incomplete gamma P(a,x) — Numerical Recipes */
+function gammap(a,x){
+  if (x<=0) return 0;
+  const gln = lgamma(a);
+  if (x < a+1){
+    let ap=a, sum=1/a, del=1/a;
+    for (let i=0;i<300;i++){ ap++; del*=x/ap; sum+=del; if (Math.abs(del)<Math.abs(sum)*1e-13) break; }
+    return sum*Math.exp(-x + a*Math.log(x) - gln);
+  } else {
+    const FP=1e-300; let b=x+1-a, c=1/FP, d=1/b, h=d;
+    for (let i=1;i<300;i++){ const an=-i*(i-a); b+=2; d=an*d+b; if (Math.abs(d)<FP) d=FP;
+      c=b+an/c; if (Math.abs(c)<FP) c=FP; d=1/d; const del=d*c; h*=del; if (Math.abs(del-1)<1e-13) break; }
+    return 1 - Math.exp(-x + a*Math.log(x) - gln)*h;
+  }
+}
+const chi2pdf = (x,k) => x<=0 ? 0 :
+  Math.exp((k/2-1)*Math.log(x) - x/2 - (k/2)*Math.LN2 - lgamma(k/2));
+const chi2cdf = (x,k) => gammap(k/2, x/2);
+function chi2inv(p,k){
+  let lo=0, hi=Math.max(40*k, 2000);
+  for (let i=0;i<120;i++){ const mid=(lo+hi)/2; if (chi2cdf(mid,k) < p) lo=mid; else hi=mid; }
+  return (lo+hi)/2;
+}
+/* negative-binomial pmf P(X=x) for waiting to nth success */
+function nbPmf(x,n,p){
+  if (x<n) return 0;
+  const lc = lgamma(x) - lgamma(n) - lgamma(x-n+1);   // log C(x-1, n-1)
+  return Math.exp(lc + n*Math.log(p) + (x-n)*Math.log(1-p));
+}
+
+/* ---------- Widget 1: minimax binomial ---------- */
+const w1host = document.getElementById("w1c");
+function drawW1(){
+  const n = +document.getElementById("w1n").value;
+  const fRate = p => p*(1-p)/n;
+  const rmm = 1/(4*Math.pow(Math.sqrt(n)+1,2));
+  const ymax = Math.max(1/(4*n), rmm)*1.18;
+  // crossing point p(1-p)/n = rmm -> p(1-p)=n*rmm ; solve
+  const c = n*rmm; const disc = 1-4*c; const pcross = disc>=0 ? (1-Math.sqrt(disc))/2 : NaN;
+  w1host.querySelectorAll("svg,.tip").forEach(s=>s.remove());
+  const ch = makeChart(w1host, {w:640, h:330, xdom:[0,1], ydom:[0,ymax],
+    xticks:[{v:0,l:"0"},{v:0.5,l:"½"},{v:1,l:"1"}],
+    yticks:[{v:rmm,l:fmt(rmm,4)},{v:1/(4*n),l:"1/4n"}],
+    xlab:"p", ylab:"risk", aria:"minimax vs rate risk"});
+  hline(ch, rmm, "refline");
+  line(ch, fnPath(ch, fRate, 0, 1, 201), S2);
+  line(ch, "M"+ch.sx(0).toFixed(2)+" "+ch.sy(rmm).toFixed(2)+"L"+ch.sx(1).toFixed(2)+" "+ch.sy(rmm).toFixed(2), S3);
+  dot(ch, 0.5, 1/(4*n), S2, 4.5);
+  if (isFinite(pcross)){ dot(ch, pcross, rmm, S3, 4); dot(ch, 1-pcross, rmm, S3, 4); }
+  attachHover(w1host, ch, [{name:"rate p(1−p)/n", color:S2, f:fRate},
+                           {name:"minimax d′", color:S3, f:()=>rmm}],
+    x => "p = "+fmt(x,3), y => fmt(y,4));
+  document.getElementById("w1read").innerHTML =
+    `<span><span class="k">minimax risk (flat)</span> <b>= ${fmt(rmm,4)}</b></span>` +
+    `<span><span class="k">rate's peak 1/4n</span> <b>= ${fmt(1/(4*n),4)}</b></span>` +
+    `<span><span class="k">curves cross at p</span> <b>= ${isFinite(pcross)?fmt(pcross,3)+", "+fmt(1-pcross,3):"—"}</b></span>`;
+}
+bindControls(document.getElementById("w1"), drawW1); drawW1();
+
+/* ---------- Widget 2: inverse sampling ---------- */
+const w2host = document.getElementById("w2c");
+function expNoverX(n,p){
+  // E[n/X] = sum_{x=n}^inf (n/x) nbPmf(x,n,p)
+  const xmax = Math.min(6000, Math.ceil(n/p*40)+200);
+  let s=0;
+  for (let x=n; x<=xmax; x++) s += (n/x)*nbPmf(x,n,p);
+  return s;
+}
+function drawW2(){
+  const n = +document.getElementById("w2n").value;
+  const pf = p => p;                 // unbiased estimator's expectation
+  const bf = p => expNoverX(n,p);    // biased n/X expectation
+  w2host.querySelectorAll("svg,.tip").forEach(s=>s.remove());
+  const ch = makeChart(w2host, {w:640, h:330, xdom:[0.1,0.9], ydom:[0,1],
+    xticks:[0.1,0.3,0.5,0.7,0.9],
+    yticks:[0.25,0.5,0.75,1],
+    xlab:"true p", ylab:"expected estimate", aria:"inverse sampling bias"});
+  line(ch, fnPath(ch, pf, 0.1, 0.9, 161), S3);
+  line(ch, fnPath(ch, bf, 0.1, 0.9, 81), S2);
+  const psh=0.5;
+  document.getElementById("w2read").innerHTML =
+    `<span><span class="k">at p = 0.5, unbiased</span> <b>= 0.5</b></span>` +
+    `<span><span class="k">E[n/X] at p = 0.5</span> <b>= ${fmt(bf(psh),4)}</b></span>` +
+    `<span><span class="k">bias of n/X there</span> <b>= +${fmt(bf(psh)-psh,4)}</b></span>`;
+}
+bindControls(document.getElementById("w2"), drawW2); drawW2();
+
+/* ---------- Widget 3: cost of unbiasedness ---------- */
+const w3host = document.getElementById("w3c");
+function drawW3(){
+  const n = +document.getElementById("w3n").value;
+  const f = k => k*k*(n+2)/n - 2*k + 1;
+  const kstar = n/(n+2);
+  const ymax = Math.max(f(0.2), f(1.35))*1.1;
+  w3host.querySelectorAll("svg,.tip").forEach(s=>s.remove());
+  const ch = makeChart(w3host, {w:620, h:320, xdom:[0.2,1.35], ydom:[0,ymax],
+    xticks:[{v:0.5,l:"1/2"},{v:kstar,l:"n/(n+2)"},{v:1,l:"1"}],
+    yticks:[{v:f(kstar),l:fmt(f(kstar),3)},{v:f(1),l:fmt(f(1),3)}],
+    xlab:"k", ylab:"E(ks² − σ²)²/σ⁴", aria:"mse of k s squared"});
+  line(ch, fnPath(ch, f, 0.2, 1.35), S2);
+  vline(ch, kstar, "crossline"); vline(ch, 1, "crossline");
+  dot(ch, kstar, f(kstar), S3, 5);
+  dot(ch, 1, f(1), S1, 5);
+  attachHover(w3host, ch, [{name:"MSE/σ⁴", color:S2, f}],
+    x => "k = " + fmt(x,3), y => fmt(y,4));
+  document.getElementById("w3read").innerHTML =
+    `<span><span class="k">minimizer k = n/(n+2)</span> <b>= ${fmt(kstar,4)}</b></span>` +
+    `<span><span class="k">MSE at k* (÷σ⁴)</span> <b>= 2/(n+2) = ${fmt(2/(n+2),4)}</b></span>` +
+    `<span><span class="k">MSE at k=1 (÷σ⁴)</span> <b>= 2/n = ${fmt(2/n,4)}</b></span>`;
+}
+bindControls(document.getElementById("w3"), drawW3); drawW3();
+
+/* ---------- Widget 4: method-of-moments instability ---------- */
+const w4host = document.getElementById("w4c");
+function binomSample(rnd, ntr, p){ let k=0; for (let j=0;j<ntr;j++) if (rnd()<p) k++; return k; }
+function drawW4(){
+  const m = +document.getElementById("w4m").value;
+  const REPS = 400, NTR = 8, P = 0.5;
+  const rnd = mulberry32(9000 + m);       // reproducible, varies with m
+  const nhats = []; let dropped = 0;
+  for (let r=0; r<REPS; r++){
+    let sum=0, sum2=0;
+    for (let i=0;i<m;i++){ const x=binomSample(rnd, NTR, P); sum+=x; sum2+=x*x; }
+    const m1=sum/m, s2=sum2/m - m1*m1;
+    if (m1 - s2 <= 0){ dropped++; continue; }
+    nhats.push(m1*m1/(m1-s2));
+  }
+  // histogram of nhat, clipped to [0,20]
+  const CLIP=20, BINS=40, bw=CLIP/BINS;
+  const hist=new Array(BINS).fill(0);
+  nhats.forEach(v => { const b=Math.min(BINS-1, Math.floor(Math.max(0,v)/bw)); hist[b]++; });
+  const hmax = Math.max(1, ...hist);
+  const sorted = nhats.slice().sort((a,b)=>a-b);
+  const med = sorted.length ? sorted[Math.floor(sorted.length/2)] : NaN;
+  const within = nhats.filter(v=>v>=6 && v<=10).length;
+  w4host.querySelectorAll("svg,.tip").forEach(s=>s.remove());
+  const ch = makeChart(w4host, {w:640, h:330, xdom:[0,CLIP], ydom:[0,hmax*1.12],
+    xticks:[0,5,{v:8,l:"8"},10,15,{v:20,l:"20+"}], yticks:[],
+    xlab:"n̂  (clipped at 20)", ylab:"count", aria:"histogram of n-hat"});
+  for (let b=0;b<BINS;b++){
+    if (!hist[b]) continue;
+    const x0=ch.sx(b*bw), x1=ch.sx((b+1)*bw);
+    el("rect", {x:x0+0.5, y:ch.sy(hist[b]), width:Math.max(0.8,x1-x0-1),
+      height:ch.sy(0)-ch.sy(hist[b]), fill:S1, "fill-opacity":0.68, rx:1}, ch.plot);
+  }
+  vline(ch, 8, "refline"); // won't show (plot clip ok), draw via fore instead
+  el("line", {x1:ch.sx(8), y1:0, x2:ch.sx(8), y2:ch.ih, stroke:S3, "stroke-width":2}, ch.fore);
+  document.getElementById("w4read").innerHTML =
+    `<span><span class="k">median n̂</span> <b>= ${isFinite(med)?fmt(med,2):"—"}</b> (true 8)</span>` +
+    `<span><span class="k">within [6,10]</span> <b>= ${fmt(100*within/REPS,0)}%</b></span>` +
+    `<span><span class="k">no admissible n̂ (ŝ²≥m₁)</span> <b>= ${fmt(100*dropped/REPS,0)}%</b></span>`;
+}
+bindControls(document.getElementById("w4"), drawW4); drawW4();
+
+/* ---------- Widget 5: chi-square interval ---------- */
+const w5host = document.getElementById("w5c");
+function drawW5(){
+  const df = +document.getElementById("w5df").value;
+  const cl = +document.getElementById("w5cl").value;
+  const SS = +document.getElementById("w5ss").value;
+  const a = 1-cl;
+  const clo = chi2inv(a/2, df), chi = chi2inv(1-a/2, df);
+  const xmax = Math.max(chi*1.15, chi2inv(0.999, df));
+  let ymax=0; for (let i=1;i<=200;i++){ ymax=Math.max(ymax, chi2pdf(xmax*i/200, df)); }
+  ymax*=1.15;
+  const ci_lo = SS/chi, ci_hi = SS/clo, pt = SS/df;
+  w5host.querySelectorAll("svg,.tip").forEach(s=>s.remove());
+  const ch = makeChart(w5host, {w:640, h:330, xdom:[0,xmax], ydom:[0,ymax],
+    xticks:[{v:clo,l:fmt(clo,1)},{v:df,l:"ν"},{v:chi,l:fmt(chi,1)}], yticks:[],
+    xlab:"χ²ᵥ", ylab:"density", aria:"chi-square interval"});
+  // shaded central region
+  const pts=[]; const N=200;
+  for (let i=0;i<=N;i++){ const x=clo+(chi-clo)*i/N; pts.push([x, chi2pdf(x,df)]); }
+  let d="M"+ch.sx(clo).toFixed(2)+" "+ch.sy(0).toFixed(2);
+  pts.forEach(p=> d+="L"+ch.sx(p[0]).toFixed(2)+" "+ch.sy(p[1]).toFixed(2));
+  d+="L"+ch.sx(chi).toFixed(2)+" "+ch.sy(0).toFixed(2)+"Z";
+  el("path", {d, fill:S1, "fill-opacity":0.14}, ch.plot);
+  line(ch, fnPath(ch, x=>chi2pdf(x,df), 0.001, xmax, 260), S1);
+  vline(ch, clo, "crossline"); vline(ch, chi, "crossline");
+  dot(ch, clo, chi2pdf(clo,df), S2, 4.5); dot(ch, chi, chi2pdf(chi,df), S2, 4.5);
+  document.getElementById("w5read").innerHTML =
+    `<span><span class="k">χ² percentiles</span> <b>${fmt(clo,2)}, ${fmt(chi,2)}</b></span>` +
+    `<span><span class="k">CI for σ²</span> <b>(${fmt(ci_lo,2)}, ${fmt(ci_hi,2)})</b></span>` +
+    `<span><span class="k">point est SS/ν</span> <b>= ${fmt(pt,2)}</b></span>` +
+    `<span><span class="k">upper reach ÷ lower reach</span> <b>= ${fmt((ci_hi-pt)/(pt-ci_lo),2)}×</b></span>`;
+}
+bindControls(document.getElementById("w5"), drawW5); drawW5();
+
+/* ---------- Widget 6: shifted-exponential posterior ---------- */
+const w6host = document.getElementById("w6c");
+function drawW6(){
+  const x = +document.getElementById("w6x").value;
+  const prior = t => t<=0 ? 0 : t*Math.exp(-t);
+  const post  = t => t<x ? 0 : Math.exp(-(t-x));
+  const xmax = 8, ymax = 1.1;
+  w6host.querySelectorAll("svg,.tip").forEach(s=>s.remove());
+  const ch = makeChart(w6host, {w:640, h:330, xdom:[0,xmax], ydom:[0,ymax],
+    xticks:[{v:0},{v:x,l:"x="+fmt(x,2)},{v:x+1,l:"x+1"},{v:xmax,l:"8"}], yticks:[],
+    xlab:"θ", ylab:"density", aria:"shifted exponential posterior"});
+  line(ch, fnPath(ch, prior, 0.001, xmax, 240), "#c3c8ce");
+  // posterior: jump at theta=x then decay
+  line(ch, "M"+ch.sx(x).toFixed(2)+" "+ch.sy(0).toFixed(2)+"L"+ch.sx(x).toFixed(2)+" "+ch.sy(1).toFixed(2), S3);
+  line(ch, fnPath(ch, post, x, xmax, 200), S3);
+  vline(ch, x+1, "crossline");
+  dot(ch, x+1, post(x+1), S2, 5);
+  document.getElementById("w6read").innerHTML =
+    `<span><span class="k">observation x</span> <b>= ${fmt(x,2)}</b></span>` +
+    `<span><span class="k">posterior floor</span> <b>θ > ${fmt(x,2)}</b></span>` +
+    `<span><span class="k">Bayes estimate E(θ|x) = x+1</span> <b>= ${fmt(x+1,2)}</b></span>`;
+}
+bindControls(document.getElementById("w6"), drawW6); drawW6();
+
+/* ---------- Widget 7: best vs best-linear predictor ---------- */
+const w7host = document.getElementById("w7c");
+let w7mode = 59;
+function drawW7(){
+  let best, lin, ydom, yt, label;
+  if (w7mode === 59){
+    best = x => 2*x/3;
+    lin  = x => 2*x/3;
+    ydom = [0, 0.72]; yt=[0.2,0.4,0.6];
+    label = "E(Y|x)=2x/3,   ℓ(x)=2x/3   (identical)";
+  } else {
+    best = x => (3*x+4)/(6*(x+1));
+    lin  = x => 17/26 - x/13;
+    ydom = [0.5, 0.7]; yt=[0.55,0.6,0.65];
+    label = "E(Y|x)=(3x+4)/6(x+1),   ℓ(x)=17/26 − x/13";
+  }
+  w7host.querySelectorAll("svg,.tip").forEach(s=>s.remove());
+  const ch = makeChart(w7host, {w:640, h:330, xdom:[0,1], ydom,
+    xticks:[0,0.25,0.5,0.75,{v:1,l:"1"}], yticks:yt,
+    xlab:"x", ylab:"predicted Y", aria:"best vs best linear predictor"});
+  line(ch, fnPath(ch, best, 0, 1, 161), S3);
+  line(ch, fnPath(ch, lin, 0, 1, 161), S2, "8 6");
+  const gap = x => Math.abs(best(x)-lin(x));
+  let maxgap=0, atx=0; for (let i=0;i<=100;i++){ const xx=i/100; if (gap(xx)>maxgap){maxgap=gap(xx);atx=xx;} }
+  document.getElementById("w7read").innerHTML =
+    `<span><span class="k">density</span> <b>${w7mode===59?"f = 8xy":"f = (2x+4y)/3"}</b></span>` +
+    `<span><span class="k">${label}</span></span>` +
+    `<span><span class="k">largest gap |E−ℓ|</span> <b>= ${fmt(maxgap,4)}</b> at x=${fmt(atx,2)}</span>`;
+}
+document.getElementById("w7b1").addEventListener("click", ()=>{
+  w7mode=59; document.getElementById("w7b1").classList.add("on");
+  document.getElementById("w7b2").classList.remove("on"); drawW7();
+});
+document.getElementById("w7b2").addEventListener("click", ()=>{
+  w7mode=60; document.getElementById("w7b2").classList.add("on");
+  document.getElementById("w7b1").classList.remove("on"); drawW7();
+});
+drawW7();
+
+/* KaTeX */
+document.addEventListener("DOMContentLoaded", () => {
+  if (window.renderMathInElement) renderMathInElement(document.body, {
+    delimiters:[{left:"\\(",right:"\\)",display:false},{left:"$$",right:"$$",display:true}],
+    macros:{"\\E":"\\mathrm{E}","\\Rs":"\\mathscr{R}"}
+  });
+});
+</script>
+</body>
+</html>
