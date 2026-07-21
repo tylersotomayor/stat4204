@@ -99,8 +99,9 @@
         <li><a href="#sB6">B.6&emsp;A Toolkit Distribution: the Beta Family</a></li>
         <li><a href="#sB7">B.7&emsp;The Cure Rate, Start to Finish</a></li>
         <li><a href="#sB8">B.8&emsp;A Second Instrument: the Normal–Normal Pair</a></li>
-        <li><a href="#sB9">B.9&emsp;What to Make of the Prior</a></li>
-        <li><a href="#sB10">B.10&emsp;The Vocabulary, and Where to Go Next</a></li>
+        <li><a href="#sB9">B.9&emsp;A Third Instrument: Counts—and the One Formula All Three Share</a></li>
+        <li><a href="#sB10">B.10&emsp;What to Make of the Prior</a></li>
+        <li><a href="#sB11">B.11&emsp;The Vocabulary, and Where to Go Next</a></li>
       </ol>
     </div>
 
@@ -167,10 +168,12 @@
       updating that belief with data. §<a class="xr" href="#sB5">B.5</a> proves the
       punchline: once beliefs are updated, the best single-number guess under the natural
       error measure is the <em>average of the updated belief</em>.
-      §§<a class="xr" href="#sB6">B.6</a>–<a class="xr" href="#sB8">B.8</a> then work two
-      complete examples with real numbers, including the ten-patient trial above, and
-      §<a class="xr" href="#sB9">B.9</a> asks the honest question—where did the prior belief
-      come from?—before §<a class="xr" href="#sB10">B.10</a> hands you the standard
+      §§<a class="xr" href="#sB6">B.6</a>–<a class="xr" href="#sB9">B.9</a> then work three
+      complete examples with real numbers—a fraction, a measurement, and a count—and close
+      with the one formula all three share: the Bayes estimate as a <em>linear
+      combination</em> of the prior's guess and the data's average.
+      §<a class="xr" href="#sB10">B.10</a> asks the honest question—where did the prior belief
+      come from?—before §<a class="xr" href="#sB11">B.11</a> hands you the standard
       vocabulary for further reading.</p></div>
     </div>
 
@@ -987,7 +990,7 @@
       <em>Laplace:</em> flat prior, \(x=n\): the estimate is \((n+1)/(n+2)\), never quite
       1. <em>Phantoms vs patients:</em> set the skeptical prior (worth 8 observations)
       against \(7/10\) cures and watch the posterior mean land at \(0.500\), exactly as
-      computed in B.9.1—then grow \(n\) at the same cure fraction and watch the data win it
+      computed in B.10.1—then grow \(n\) at the same cure fraction and watch the data win it
       back.</p>
     </div>
 
@@ -1221,7 +1224,7 @@
       posterior hug the prior—the ledger shows the data bar shrinking. <em>Vague
       prior:</em> raise τ and the estimate chases the data instead. <em>More data:</em>
       grow n and watch the likelihood narrow and the data bar swell: the prior is a fixed
-      quantity of precision being steadily outvoted, which is §B.9's story in miniature.
+      quantity of precision being steadily outvoted, which is §B.10's story in miniature.
       Throughout, the green precision bar is exactly the other two stacked—that identity
       <em>is</em> the theorem, and the reason the posterior is always narrower than both
       parents.</p>
@@ -1256,10 +1259,224 @@
     </div>
 
     <!-- ============================================================ -->
-    <h2 class="sec" id="sB9"><span class="n">B.9</span>What to Make of the Prior</h2>
+    <h2 class="sec" id="sB9"><span class="n">B.9</span>A Third Instrument: Counts—and the One Formula All Three Share</h2>
+
+    <p class="noindent">A fraction (§<a class="xr" href="#sB7">B.7</a>), a measurement
+    (§<a class="xr" href="#sB8">B.8</a>)—the third workhorse setting is a <em>count</em>:
+    arrivals per hour, defects per batch, calls per shift. The same three-step recipe runs
+    once more, and then this section collects the reward for having watched it three times:
+    all three answers are instances of <em>one formula</em>, a linear combination of the
+    prior's guess and the data's average, with weights that say how much each side
+    knows.</p>
 
     <div class="obj" id="B.9.1">
-      <div class="okind">Remark B.9.1</div>
+      <div class="okind">Definition B.9.1</div>
+      <div class="ottl">The Poisson distribution</div>
+      <div class="obody"><p>A count \(X\) (values \(0, 1, 2, \dots\), no upper limit) has
+      the <em>Poisson(\(\theta\)) distribution</em>, \(\theta>0\), if
+      $$ P(X = x) \;=\; \frac{e^{-\theta}\,\theta^{x}}{x!}, \qquad x = 0, 1, 2, \dots $$
+      It is the standard model for the number of events in a window of time when events
+      occur independently at a steady underlying rate \(\theta\). Its mean <em>is</em> that
+      rate: from the definition of expectation (<a class="xr" href="#B.2.3">B.2.3</a>),
+      dropping the \(x=0\) term (it contributes nothing) and cancelling one factor of
+      \(x\) into the factorial,
+      $$ \E\{X\} \;=\; \sum_{x=1}^{\infty} x\,\frac{e^{-\theta}\theta^{x}}{x!}
+      \;=\; e^{-\theta}\,\theta \sum_{x=1}^{\infty} \frac{\theta^{\,x-1}}{(x-1)!}
+      \;=\; e^{-\theta}\,\theta\, e^{\theta} \;=\; \theta, $$
+      the last sum being the exponential series \(\sum_{k\ge0}\theta^k/k! = e^{\theta}\)
+      with \(k=x-1\). (The same maneuver applied to \(\E\{X(X-1)\}\) gives \(\theta^2\),
+      whence \(\Var(X)=\theta\) as well: for a Poisson count, mean and variance are the
+      same number.)</p></div>
+    </div>
+
+    <div class="obj" id="B.9.2">
+      <div class="okind">Definition B.9.2</div>
+      <div class="ottl">The Gamma distribution</div>
+      <div class="obody"><p>For parameters \(a>0\) (<em>shape</em>) and \(b>0\)
+      (<em>rate</em>), the <em>Gamma(\(a,b\)) distribution</em> is the continuous
+      distribution on \((0,\infty)\) with density
+      $$ \pi(\theta) \;=\; \frac{b^{\,a}\,\theta^{\,a-1}\,e^{-b\theta}}{\Gamma(a)},
+      \qquad \theta > 0. $$
+      The constant is right because substituting \(u = b\theta\) (so \(\theta = u/b\),
+      \(d\theta = du/b\)) turns the total mass into the Gamma function itself:
+      $$ \int_0^{\infty} \theta^{\,a-1} e^{-b\theta}\, d\theta
+      \;=\; \int_0^{\infty} \Big(\frac{u}{b}\Big)^{\!a-1} e^{-u}\, \frac{du}{b}
+      \;=\; \frac{1}{b^{\,a}} \int_0^{\infty} u^{\,a-1} e^{-u}\, du
+      \;=\; \frac{\Gamma(a)}{b^{\,a}}. $$
+      Its mean comes from the kernel trick of <a class="xr" href="#B.6.3">B.6.3</a>,
+      verbatim: multiplying the density by \(\theta\) raises the shape by one, and the
+      resulting integral is the Gamma(\(a+1,b\)) normalizer,
+      $$ \E\{\theta\} \;=\; \frac{b^{\,a}}{\Gamma(a)} \int_0^{\infty}
+      \theta^{\,(a+1)-1} e^{-b\theta}\, d\theta
+      \;=\; \frac{b^{\,a}}{\Gamma(a)} \cdot \frac{\Gamma(a+1)}{b^{\,a+1}}
+      \;=\; \frac{a}{b}, $$
+      using \(\Gamma(a+1)=a\,\Gamma(a)\) (<a class="xr" href="#B.6.1">B.6.1</a>). Read
+      \((a,b)\) the way <a class="xr" href="#B.7.3">B.7.3</a> taught: \(a\) behaves like a
+      count of <em>phantom events</em> observed over \(b\) <em>phantom windows</em>, and
+      the prior's best guess at the rate is their ratio \(a/b\).</p></div>
+    </div>
+
+    <div class="obj" id="B.9.3">
+      <div class="okind">Example B.9.3</div>
+      <div class="ottl">The Poisson–gamma update, by kernel-matching</div>
+      <div class="obody"><p>Watch \(n\) windows: counts \(X_1,\dots,X_n\), independent
+      Poisson(\(\theta\)) given the rate, with total \(s = x_1+\cdots+x_n\). The likelihood
+      multiplies (independence), and everything free of \(\theta\) falls away:
+      $$ f(x_1,\dots,x_n \mid \theta)
+      \;=\; \prod_{i=1}^{n} \frac{e^{-\theta}\theta^{x_i}}{x_i!}
+      \;\propto\; e^{-n\theta}\,\theta^{\,s}. $$
+      Take a Gamma(\(a,b\)) prior and multiply (Bayes' theorem in proportional form,
+      <a class="xr" href="#B.4.5">B.4.5</a>):
+      $$ \pi(\theta \mid \text{data}) \;\propto\;
+      \underbrace{\theta^{\,a-1} e^{-b\theta}}_{\text{prior}}\;\cdot\;
+      \underbrace{\theta^{\,s} e^{-n\theta}}_{\text{likelihood}}
+      \;=\; \theta^{\,(a+s)-1}\, e^{-(b+n)\theta}: $$
+      the Gamma(\(a+s,\; b+n\)) kernel—events reinforce the shape, windows reinforce the
+      rate. By <a class="xr" href="#B.9.2">B.9.2</a> the Bayes estimate is
+      $$ \E\{\theta \mid \text{data}\} \;=\; \frac{a+s}{b+n}. $$</p></div>
+    </div>
+
+    <div class="obj" id="B.9.4">
+      <div class="okind">Example B.9.4</div>
+      <div class="ottl">Numbers: arrivals at a clinic</div>
+      <div class="obody"><p>Historical experience suggests a clinic sees about 3 arrivals
+      per hour, with the confidence of roughly two hours' worth of watching: prior
+      Gamma(6, 2) (mean \(6/2=3\); worth \(b=2\) phantom hours carrying \(a=6\) phantom
+      arrivals). Now watch \(n=5\) hours and count \(4, 2, 5, 3, 3\) arrivals: total
+      \(s=17\), average \(\bar x = 17/5 = 3.4\). The posterior is
+      Gamma(\(6+17,\; 2+5\)) \(=\) Gamma(23, 7), and the Bayes estimate is
+      $$ \E\{\theta \mid \text{data}\} \;=\; \frac{23}{7} \;\approx\; 3.29,
+      \qquad\text{with posterior sd } \frac{\sqrt{23}}{7} \approx 0.69 $$
+      (the Gamma(\(a,b\)) variance is \(a/b^2\), by one more round of the kernel trick).
+      And notice the anatomy, one more time:
+      $$ \frac{23}{7} \;=\; \frac{2\cdot 3 \;+\; 5\cdot 3.4}{2+5}
+      \;=\; \frac{b\cdot\dfrac{a}{b} \;+\; n\cdot\bar x}{b+n}: $$
+      prior guess 3 weighted by its 2 phantom hours, data average 3.4 weighted by the 5
+      real ones.</p></div>
+    </div>
+
+    <!-- ============ LAB: Poisson-gamma ============ -->
+    <div class="widget" id="w6">
+      <h2>Laboratory · §B.9 <span class="inprint">— live; not in the print edition</span></h2>
+      <h3>The count update, steerable</h3>
+      <p>The clinic of B.9.4, under your hands. The dashed curve is the prior
+      Gamma(\(a,b\)); the blue curve is the data's own voice (the normalized likelihood,
+      Gamma(\(s+1, n\))); the green curve is the posterior Gamma(\(a+s,\, b+n\)). The
+      readout writes the estimate as the linear combination of B.9.5, with the
+      <em>credibility weight</em> \(n/(b+n)\) on the data. Defaults are B.9.4's numbers,
+      so the estimate opens at \(23/7 \approx 3.29\).</p>
+      <div class="controls">
+        <span class="ctl"><label>a (phantom events)</label>
+          <input type="range" min="1" max="20" step="0.5" value="6" id="w6a" data-out="w6av" data-dec="1">
+          <span class="val" id="w6av"></span></span>
+        <span class="ctl"><label>b (phantom windows)</label>
+          <input type="range" min="0.5" max="10" step="0.5" value="2" id="w6b" data-out="w6bv" data-dec="1">
+          <span class="val" id="w6bv"></span></span>
+        <span class="ctl"><label>n windows watched</label>
+          <input type="range" min="0" max="40" step="1" value="5" id="w6n" data-out="w6nv" data-fmt="int">
+          <span class="val" id="w6nv"></span></span>
+        <span class="ctl"><label>s total events</label>
+          <input type="range" min="0" max="160" step="1" value="17" id="w6s" data-out="w6sv" data-fmt="int">
+          <span class="val" id="w6sv"></span></span>
+      </div>
+      <div class="charts">
+        <div class="chartwrap" id="w6dens"><div class="ct">densities on the rate θ</div></div>
+      </div>
+      <div class="legend">
+        <span class="chip"><span class="sw dash" style="border-color:var(--s2)"></span>prior Gamma(a, b)</span>
+        <span class="chip"><span class="sw" style="border-color:var(--s1)"></span>data alone (normalized likelihood)</span>
+        <span class="chip"><span class="sw" style="border-color:var(--s3)"></span>posterior Gamma(a+s, b+n)</span>
+      </div>
+      <div class="readout" id="w6read"></div>
+      <p class="note">Worth trying. <em>No data:</em> slide \(n\) to 0 and the posterior
+      collapses onto the prior. <em>Credibility climbing:</em> hold the observed average
+      near 3.4 (e.g., double \(n\) and \(s\) together) and watch the data weight
+      \(n/(b+n)\) rise toward 1 while the estimate slides from the prior's 3 toward the
+      data's 3.4—the one dial of B.9.6, turned by sample size. <em>A loud hour:</em> set
+      \(n=1, s=8\): one wild window moves a 2-phantom-hour prior a long way, and a
+      10-phantom-hour prior barely at all.</p>
+    </div>
+
+    <div class="obj" id="B.9.5">
+      <div class="okind">Proposition B.9.5</div>
+      <div class="ottl">Three pairs, one formula: the Bayes estimate is a linear combination</div>
+      <div class="obody"><p>In each of the handout's three conjugate pairs, the Bayes
+      estimate is the <em>same linear combination</em>—a weighted average of the prior mean
+      \(m_0\) and the sample mean \(\bar x\), with weights set by the prior's worth
+      \(n_0\) (measured in observations) against the sample size \(n\):
+      $$ \E\{\theta \mid \text{data}\}
+      \;=\; \frac{n_0}{\,n_0+n\,}\; m_0 \;+\; \frac{n}{\,n_0+n\,}\; \bar x, $$
+      with
+      $$ \begin{array}{llll}
+      \text{pair} & \text{prior} & m_0 & n_0 \\ \hline
+      \text{binomial–beta (§B.7)} & \text{Beta}(\alpha,\beta)
+      & \alpha/(\alpha+\beta) & \alpha+\beta \\
+      \text{normal–normal (§B.8)} & N(m,\tau^2) & m & \sigma^2/\tau^2 \\
+      \text{Poisson–gamma (§B.9)} & \text{Gamma}(a,b) & a/b & b
+      \end{array} $$</p></div>
+    </div>
+
+    <div class="prf">
+      <div class="pkind">Proof B.9.5</div>
+      <div class="pttl">Proof of the One Formula by Assembling the Three Cases.</div>
+      <ol class="steps">
+        <li>For the binomial–beta pair, the sample mean of the \(n\) cure indicators is the
+        observed rate, \(\bar x = x/n\), and <a class="xr" href="#B.7.3">B.7.3</a> already
+        wrote the estimate in exactly the displayed form:
+        $$ \frac{\alpha+x}{\alpha+\beta+n}
+        \;=\; \frac{(\alpha+\beta)\cdot\frac{\alpha}{\alpha+\beta} + n\cdot\frac{x}{n}}
+        {(\alpha+\beta)+n}, $$
+        which is the formula with \(m_0=\alpha/(\alpha+\beta)\) and
+        \(n_0=\alpha+\beta\).</li>
+        <li>For the Poisson–gamma pair the identification is identical, from
+        <a class="xr" href="#B.9.4">B.9.4</a>'s anatomy display with general symbols:
+        \(\dfrac{a+s}{b+n}=\dfrac{b\cdot\frac{a}{b}+n\cdot\bar x}{b+n}\) (since
+        \(s=n\bar x\)), so \(m_0=a/b\) and \(n_0=b\).</li>
+        <li>For the normal–normal pair, \(n\) measurements enter through \(\bar x\) with
+        noise variance \(\sigma^2/n\) (<a class="xr" href="#B.8.2">B.8.2</a>), so the
+        posterior-mean weights of <a class="xr" href="#B.8.5">B.8.5</a> are the precision
+        shares
+        $$ \E\{\theta\mid\text{data}\}
+        \;=\; \frac{\frac{1}{\tau^2}}{\frac{1}{\tau^2}+\frac{n}{\sigma^2}}\; m
+        \;+\; \frac{\frac{n}{\sigma^2}}{\frac{1}{\tau^2}+\frac{n}{\sigma^2}}\; \bar x. $$
+        Multiply the top and bottom of both fractions by \(\sigma^2\):
+        $$ \E\{\theta\mid\text{data}\}
+        \;=\; \frac{\sigma^2/\tau^2}{\,\sigma^2/\tau^2+n\,}\; m
+        \;+\; \frac{n}{\,\sigma^2/\tau^2+n\,}\; \bar x, $$
+        the formula with \(m_0=m\) and \(n_0=\sigma^2/\tau^2\). The worth \(n_0\) has a
+        concrete reading: it is the number of real measurements whose combined precision,
+        \(n_0/\sigma^2\), exactly matches the prior's precision \(1/\tau^2\).</li>
+      </ol>
+      <div class="uses">Uses B.7.3, B.8.2, B.8.5, B.9.3.</div>
+    </div>
+
+    <div class="obj" id="B.9.6">
+      <div class="okind">Remark B.9.6</div>
+      <div class="ottl">Reading the one formula</div>
+      <div class="obody"><p>The formula is a <em>convex</em> linear combination: the
+      weights are nonnegative and sum to 1, so the Bayes estimate always sits
+      <em>between</em> the prior's guess and the data's average, never outside them. The
+      weight on the data, \(n/(n_0+n)\), climbs from 0 (no data: report \(m_0\), as in
+      <a class="xr" href="#B.7.5">B.7.5</a>) toward 1 (the data drown the phantoms)—one
+      dial, turned by sample size. This weighting has an old name in actuarial work, where
+      the formula is used to blend a new client's short claims record with the book rate
+      for their class: the data weight \(n/(n_0+n)\) is called the <em>credibility
+      factor</em>. And the pattern is not a coincidence of three lucky examples: for the
+      standard families of models (the <em>exponential families</em>, which include all
+      three pairs here) paired with their conjugate priors, the posterior mean is
+      <em>always</em> linear in the sample mean—and a theorem of Diaconis and Ylvisaker
+      (1979) runs the implication backward: within those families, linearity of the
+      posterior mean is exactly what characterizes conjugate priors. Proving that is beyond
+      this handout; recognizing the formula when it appears—in credibility pricing, in
+      shrinkage estimators, in empirical-Bayes methods—is the skill the three examples
+      were building.</p></div>
+    </div>
+
+    <!-- ============================================================ -->
+    <h2 class="sec" id="sB10"><span class="n">B.10</span>What to Make of the Prior</h2>
+
+    <div class="obj" id="B.10.1">
+      <div class="okind">Remark B.10.1</div>
       <div class="ottl">The estimate depends on the prior—as it must</div>
       <div class="obody"><p>Rerun the trial of <a class="xr" href="#B.7.2">B.7.2</a> under
       a different premise. Suppose historical experience with similar treatments made low
@@ -1277,8 +1494,8 @@
       close.<span class="fnref"><a href="#fn8" id="r8">8</a></span></p></div>
     </div>
 
-    <div class="obj" id="B.9.2">
-      <div class="okind">Remark B.9.2</div>
+    <div class="obj" id="B.10.2">
+      <div class="okind">Remark B.10.2</div>
       <div class="ottl">The data win in the end</div>
       <div class="obody"><p>The dependence on the prior is a small-sample phenomenon.
       Compare the Bayes estimate with the observed rate at stage \(n\) by putting them over
@@ -1299,14 +1516,14 @@
 
     <!-- ============ LAB: the data win ============ -->
     <div class="widget" id="w5">
-      <h2>Laboratory · §B.9 <span class="inprint">— live; not in the print edition</span></h2>
+      <h2>Laboratory · §B.10 <span class="inprint">— live; not in the print edition</span></h2>
       <h3>Three priors meet the same evidence</h3>
       <p>Three analysts watch one stream of patients from a treatment with true cure rate
       \(\theta^{*}\). One starts flat—Beta(1,1). One is a skeptic—Beta(2,6), prior mean
-      0.25, worth 8 phantom observations (B.9.1's prior). One is an optimist—Beta(12,3),
+      0.25, worth 8 phantom observations (B.10.1's prior). One is an optimist—Beta(12,3),
       prior mean 0.8, worth 15. After each patient, each reports the posterior mean
       \( (\alpha+X_n)/(\alpha+\beta+n) \). Early on they disagree exactly as their phantom
-      counts dictate; by B.9.2's bound they must converge—the gap to the raw rate is at
+      counts dictate; by B.10.2's bound they must converge—the gap to the raw rate is at
       most a constant over \(\alpha+\beta+n\). Where the curves still disagree is precisely
       where the prior matters: small samples.</p>
       <div class="controls">
@@ -1328,11 +1545,11 @@
       see the same patients—so the vertical gaps between the curves are pure prior. Watch
       how long the optimist holds out when \(\theta^{*}\) is low: fifteen phantoms take
       dozens of real patients to outvote. That is not a bug; it is the honest price of the
-      premise, and the reason B.9.1 insists the prior be stated and defended.</p>
+      premise, and the reason B.10.1 insists the prior be stated and defended.</p>
     </div>
 
-    <div class="obj" id="B.9.3">
-      <div class="okind">Remark B.9.3</div>
+    <div class="obj" id="B.10.3">
+      <div class="okind">Remark B.10.3</div>
       <div class="ottl">Two schools, one course</div>
       <div class="obody"><p>A statistician who declines to put a distribution on
       \(\theta\)—who insists the cure rate is a fixed fact, not a random variable—works
@@ -1348,10 +1565,10 @@
     </div>
 
     <!-- ============================================================ -->
-    <h2 class="sec" id="sB10"><span class="n">B.10</span>The Vocabulary, and Where to Go Next</h2>
+    <h2 class="sec" id="sB11"><span class="n">B.11</span>The Vocabulary, and Where to Go Next</h2>
 
-    <div class="obj" id="B.10.1">
-      <div class="okind">Concept B.10.1</div>
+    <div class="obj" id="B.11.1">
+      <div class="okind">Concept B.11.1</div>
       <div class="ottl">The names of everything you just did</div>
       <div class="obody"><p>For searching, reading, and talking to statisticians—the
       standard names, each pointing at its object in this handout:</p>
@@ -1380,12 +1597,12 @@
       Bayesian counterpart of the confidence sets in the course notes, §2.7.</p></div>
     </div>
 
-    <div class="obj" id="B.10.2">
-      <div class="okind">Concept B.10.2</div>
+    <div class="obj" id="B.11.2">
+      <div class="okind">Concept B.11.2</div>
       <div class="ottl">Where to go next</div>
       <div class="obody"><p>In the course notes: §2.8 proves the two prediction lemmas in
       their general form, §2.9 is this handout's material at course pace (with the
-      Poisson–gamma pair as a third conjugate example), and 1.A.5 runs the trial's
+      same three conjugate pairs, Poisson–gamma included), and 1.A.5 runs the trial's
       computation inside the decision-theory frame of Lecture&nbsp;1. In the texts:
       Hoel–Port–Stone treat Bayesian methods in §2.8 (their Theorem&nbsp;2 is
       <a class="xr" href="#B.5.4">B.5.4</a>); DeGroot &amp; Schervish devote
@@ -1438,7 +1655,7 @@
         nothing generated \(\theta\)—the cure rate simply <em>is</em>—and the prior is a
         quantified statement of evidence and judgment: “I regard values near 0.4 as twice
         as plausible as values near 0.7.” The mathematics downstream is identical under
-        either reading; the interpretation debate is real and is taken up in §B.9.
+        either reading; the interpretation debate is real and is taken up in §B.10.
         <a class="back" href="#r6">↩</a></li>
         <li id="fn7">Derived by the same kernel trick as the mean:
         \(\E\{\theta^2\}=\mathrm{B}(\alpha+2,\beta)/\mathrm{B}(\alpha,\beta)
@@ -1819,6 +2036,64 @@ document.querySelectorAll("#w4stepper .sbtns button").forEach(btn => {
 });
 bindControls(document.getElementById("w4"), drawW4);
 drawW4();
+
+/* ---------- Lab: Poisson-gamma ---------- */
+const gammaPdf = (t,a,b) => (t<=0) ? 0
+  : Math.exp(a*Math.log(b) + (a-1)*Math.log(t) - b*t - logGamma(a));
+const w6densH = document.getElementById("w6dens");
+const w6nI = document.getElementById("w6n"), w6sI = document.getElementById("w6s");
+function drawW6(){
+  const a = +document.getElementById("w6a").value;
+  const b = +document.getElementById("w6b").value;
+  const n = Math.round(+w6nI.value);
+  const s = n === 0 ? 0 : Math.round(+w6sI.value);
+  const pa = a + s, pb = b + n;
+  const prior = t => gammaPdf(t, a, b);
+  const lik   = n > 0 ? (t => gammaPdf(t, s+1, n)) : null;   // normalized likelihood
+  const post  = t => gammaPdf(t, pa, pb);
+  const priM = a/b, priSd = Math.sqrt(a)/b;
+  const postM = pa/pb, postSd = Math.sqrt(pa)/pb;
+  const likM = n>0 ? (s+1)/n : 0, likSd = n>0 ? Math.sqrt(s+1)/n : 0;
+  const xbar = n>0 ? s/n : NaN;
+  let hi = Math.max(priM + 4*priSd, postM + 4*postSd, n>0 ? likM + 4*likSd : 0, 6);
+  let ymax = 0;
+  for (let i=1; i<300; i++){
+    const t = hi*i/300;
+    ymax = Math.max(ymax, prior(t), post(t), lik ? lik(t) : 0);
+  }
+  ymax = Math.min(ymax*1.12, 5);
+  w6densH.querySelectorAll("svg").forEach(el2=>el2.remove());
+  w6densH.querySelectorAll(".tip").forEach(el2=>el2.remove());
+  const ch = makeChart(w6densH, {w:860, h:300, xdom:[0,hi], ydom:[0,ymax],
+    xticks:[0, Math.round(hi/3), Math.round(2*hi/3), Math.round(hi)].map(v=>({v,l:fmt(v,0)})),
+    yticks:[], xlab:"rate θ (events per window)", ylab:"density",
+    aria:"gamma prior likelihood posterior"});
+  line(ch, fnPath(ch, prior, 0.01, hi, 301), S2, "7 5");
+  if (lik) line(ch, fnPath(ch, lik, 0.01, hi, 301), S1);
+  line(ch, fnPath(ch, post, 0.01, hi, 301), S3).setAttribute("stroke-width", 2.6);
+  vline(ch, postM, "crossline");
+  dirlab(ch, priM, ymax*0.97, "prior mean " + fmt(priM,2), S2, priM > hi*0.6 ? "end" : "start");
+  if (n>0) dirlab(ch, xbar, ymax*0.89, "data x̄ = " + fmt(xbar,2), S1, xbar > hi*0.6 ? "end" : "start");
+  dirlab(ch, postM, ymax*0.81, "posterior mean " + fmt(postM,3), S3, postM > hi*0.6 ? "end" : "start");
+  const series = [{name:"prior", color:S2, f:prior}];
+  if (lik) series.push({name:"data alone", color:S1, f:lik});
+  series.push({name:"posterior", color:S3, f:post});
+  attachHover(w6densH, ch, series, t => "θ = " + fmt(t,2), y => fmt(y,3));
+  const w = n/(b+n);
+  document.getElementById("w6read").innerHTML =
+    `<span><span class="k">posterior</span> <b>Gamma(${fmt(pa,1)}, ${fmt(pb,1)})</b></span>` +
+    `<span><span class="k">mean = (b·${fmt(priM,2)} + n·${n>0?fmt(xbar,2):"—"}) / (b+n)</span> <b>= ${fmt(postM,3)}</b></span>` +
+    `<span><span class="k">credibility weight n/(b+n)</span> <b>${fmt(100*w,1)}%</b></span>` +
+    `<span><span class="k">posterior sd</span> <b>${fmt(postSd,3)}</b></span>`;
+}
+w6nI.addEventListener("input", () => {
+  if (Math.round(+w6nI.value) === 0 && +w6sI.value > 0){
+    w6sI.value = 0;
+    w6sI.dispatchEvent(new Event("input"));
+  }
+});
+bindControls(document.getElementById("w6"), drawW6);
+drawW6();
 
 /* ---------- Lab: convergence ---------- */
 const w5H = document.getElementById("w5conv");
