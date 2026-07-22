@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Homework 10 · Interactive — STAT S4204</title>
+<meta name="description" content="Interactive companion to Homework 10: the two-group normal model under two parameterizations — the MLE as the pair of group means, the downward bias of the variance MLE, the standard error of the treatment effect and why a balanced design minimizes it, and the t distribution of the studentized coefficient.">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="icon" href="favicon.ico" sizes="32x32">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<link rel="stylesheet" href="assets/hw.css">
+</head>
+<body>
+  <div class="band"><div class="in">
+    <div class="topnav"><a href="./">← Notes in Statistical Inference</a></div>
+    <p class="course">STAT&nbsp;S4204 · Summer&nbsp;2026 · Problem Sets</p>
+    <h1>Homework 10 — Interactive Companion</h1>
+    <p class="sub">The two-group normal model, two ways: the fit that is a pair of group means, the variance estimate that runs low, the standard error of the treatment effect, and the t that studentizes it</p>
+  </div></div>
+  <div class="wrap">
+
+    <p class="lead">Assignment 10 carries the two-group model worked in lecture—a control
+    group and a treated group of normal observations with a common variance—through eleven
+    parts, twice over: once with the group means \(a_1,a_2\) as the parameters, and once in the
+    lecture's regression coding \(b_0=a_1,\ b_1=a_2-a_1\), with \(b_1\) the treatment effect. The
+    write-up does the algebra; the four laboratories below put the moving parts on screen. The
+    maximum likelihood fit is nothing but the pair of group averages, read two ways
+    (Parts&nbsp;1–4). The variance MLE divides by \(n\) and lands systematically below
+    \(\sigma^2\) (Part&nbsp;6). The treatment effect's standard error is
+    \(\sigma\sqrt{1/n_1+1/n_2}\), smallest when the two groups are the same size
+    (Parts&nbsp;8&amp;10). And the studentized coefficient
+    \((\hat b_1-b_1)/\widehat{\mathrm{SE}}\) follows a \(t\) on \(n-2\) degrees of freedom—fatter
+    in the tails than the normal until the sample grows (Parts&nbsp;7,&nbsp;9&amp;11).</p>
+    <div class="pdfbar">
+      <a class="btn" href="homework-10.pdf">Read the write-up (PDF)</a>
+      <a class="btn ghost" href="./">All notes</a>
+    </div>
+
+    <!-- ============ Widget 1: the fit and the two parameterizations ============ -->
+    <div class="widget" id="w1">
+      <h2>Parts 1–4 · The fit, read two ways</h2>
+      <h3>Maximum likelihood is the pair of group means</h3>
+      <p>Least squares (equivalently, maximum likelihood under normality) sets each fitted value
+      to its group average: \(\hat a_1=\bar Y_1\), \(\hat a_2=\bar Y_2\). The regression coding
+      reports the same fit differently—\(\hat b_0=\bar Y_1\) is the control level and
+      \(\hat b_1=\bar Y_2-\bar Y_1\) is the vertical jump to the treated level. Slide the true
+      group means and the two sample sizes; the cloud is a fixed set of standard normals shifted
+      into place, so the estimates move smoothly.</p>
+      <div class="controls">
+        <span class="ctl"><label>a₁ (control mean)</label>
+          <input type="range" min="-2" max="3" step="0.1" value="0.5" id="w1a1" data-out="w1a1v" data-dec="1">
+          <span class="val" id="w1a1v"></span></span>
+        <span class="ctl"><label>a₂ (treated mean)</label>
+          <input type="range" min="-2" max="3" step="0.1" value="1.8" id="w1a2" data-out="w1a2v" data-dec="1">
+          <span class="val" id="w1a2v"></span></span>
+        <span class="ctl"><label>n₁</label>
+          <input type="range" min="3" max="60" step="1" value="18" id="w1n1" data-out="w1n1v" data-fmt="int">
+          <span class="val" id="w1n1v"></span></span>
+        <span class="ctl"><label>n₂</label>
+          <input type="range" min="3" max="60" step="1" value="18" id="w1n2" data-out="w1n2v" data-fmt="int">
+          <span class="val" id="w1n2v"></span></span>
+      </div>
+      <div class="charts">
+        <div class="chartwrap" style="max-width:660px" id="w1c"></div>
+      </div>
+      <div class="legend">
+        <span class="chip"><span class="sw dot" style="background:var(--s1)"></span>control \(Y_{1i}\), mean \(\hat a_1=\hat b_0\)</span>
+        <span class="chip"><span class="sw dot" style="background:var(--s2)"></span>treated \(Y_{2j}\), mean \(\hat a_2\)</span>
+        <span class="chip"><span class="sw" style="border-color:var(--s3)"></span>the jump \(\hat b_1=\hat a_2-\hat a_1\)</span>
+      </div>
+      <div class="readout" id="w1read"></div>
+      <p class="note">The two codings are one fit in two bases: the estimates always satisfy
+      \(\hat b_0=\hat a_1\) and \(\hat b_1=\hat a_2-\hat a_1\), the same invertible relabelling
+      that connects the parameters. The dashed line extends the control mean across the plot; the
+      green segment measures the treatment effect the regression coefficient \(\hat b_1\)
+      reports.</p>
+    </div>
+
+    <!-- ============ Widget 2: bias of the variance MLE ============ -->
+    <div class="widget" id="w2">
+      <h2>Part 6 · The variance MLE runs low</h2>
+      <h3>Dividing by \(n\) instead of \(n-2\)</h3>
+      <p>The MLE \(\hat\sigma^2=\mathrm{RSS}/n\) averages squared residuals about the two fitted
+      means, and residuals about a fitted mean are smaller than errors about the true one—two
+      means were estimated, so \(\mathrm{E}\{\hat\sigma^2\}=\tfrac{n-2}{n}\,\sigma^2<\sigma^2\).
+      The histogram shows \(\hat\sigma^2\) across 600 simulated datasets (true \(\sigma^2=1\));
+      the unbiased \(s^2=\mathrm{RSS}/(n-2)\) centers on the line instead. Slide the group
+      sizes.</p>
+      <div class="controls">
+        <span class="ctl"><label>n₁</label>
+          <input type="range" min="2" max="40" step="1" value="4" id="w2n1" data-out="w2n1v" data-fmt="int">
+          <span class="val" id="w2n1v"></span></span>
+        <span class="ctl"><label>n₂</label>
+          <input type="range" min="2" max="40" step="1" value="4" id="w2n2" data-out="w2n2v" data-fmt="int">
+          <span class="val" id="w2n2v"></span></span>
+      </div>
+      <div class="charts">
+        <div class="chartwrap" style="max-width:660px" id="w2c"></div>
+      </div>
+      <div class="legend">
+        <span class="chip"><span class="sw dot" style="background:var(--s1)"></span>\(\hat\sigma^2=\mathrm{RSS}/n\) across 600 datasets</span>
+        <span class="chip"><span class="sw" style="border-color:var(--s2)"></span>mean of \(\hat\sigma^2\)</span>
+        <span class="chip"><span class="sw" style="border-color:var(--s3)"></span>true \(\sigma^2=1\)</span>
+      </div>
+      <div class="readout" id="w2read"></div>
+      <p class="note">The gap between the two vertical lines is the bias, \(-2\sigma^2/n\): the
+      MLE's mean sits at \((n-2)/n\), the unbiased estimator's at \(1\). It is a small-sample
+      effect—at \(n_1=n_2=2\) the MLE is low by half—and it melts away as the groups grow, but
+      it never quite vanishes. This is why the standard errors in the next lab use \(s\), not
+      \(\hat\sigma\).</p>
+    </div>
+
+    <!-- ============ Widget 3: standard error and optimal allocation ============ -->
+    <div class="widget" id="w3">
+      <h2>Parts 8 &amp; 10 · The standard error of the treatment effect</h2>
+      <h3>Why a balanced design wins</h3>
+      <p>The treatment effect's standard error is
+      \(\widehat{\mathrm{SE}}(\hat b_1)=s\sqrt{1/n_1+1/n_2}\)—the classical two-sample form, in
+      which estimating a contrast pays the variance of <em>both</em> group means. Hold the total
+      \(N=n_1+n_2\) fixed and split it: the curve is \(\sigma\sqrt{1/n_1+1/n_2}\) as the
+      allocation \(f=n_1/N\) varies, and it bottoms out exactly at the balanced split
+      \(f=\tfrac12\). Slide the total and the allocation.</p>
+      <div class="controls">
+        <span class="ctl"><label>N (total)</label>
+          <input type="range" min="10" max="200" step="2" value="60" id="w3N" data-out="w3Nv" data-fmt="int">
+          <span class="val" id="w3Nv"></span></span>
+        <span class="ctl"><label>allocation f = n₁/N</label>
+          <input type="range" min="0.1" max="0.9" step="0.01" value="0.3" id="w3f" data-out="w3fv" data-dec="2">
+          <span class="val" id="w3fv"></span></span>
+      </div>
+      <div class="charts">
+        <div class="chartwrap" style="max-width:660px" id="w3c"></div>
+      </div>
+      <div class="legend">
+        <span class="chip"><span class="sw" style="border-color:var(--s2)"></span>\(\mathrm{SE}(\hat b_1)=\sigma\sqrt{1/n_1+1/n_2}\)</span>
+        <span class="chip"><span class="sw dot" style="background:var(--s3)"></span>balanced minimum \(f=\tfrac12\)</span>
+        <span class="chip"><span class="sw dot" style="background:var(--s1)"></span>current allocation</span>
+      </div>
+      <div class="readout" id="w3read"></div>
+      <p class="note">The square root makes the penalty forgiving near the middle and punishing at
+      the edges: a 60–40 split costs only about 2% over balanced, but 90–10 nearly doubles the
+      standard error, because the tiny group's mean is barely pinned down and it is the sum
+      \(1/n_1+1/n_2\) that matters. Given a fixed number of subjects, split them evenly to learn
+      the treatment effect most precisely (\(\sigma=1\) is used for the curve).</p>
+    </div>
+
+    <!-- ============ Widget 4: the t distribution capstone ============ -->
+    <div class="widget" id="w4">
+      <h2>Parts 7, 9 &amp; 11 · The studentized coefficient is a \(t\)</h2>
+      <h3>Fatter tails than the normal, until the sample grows</h3>
+      <p>Standardizing \(\hat b_1\) by its <em>true</em> standard error gives a standard normal;
+      dividing instead by the <em>estimated</em> \(\widehat{\mathrm{SE}}\) replaces \(\sigma\) with
+      \(s\), and because \(\hat b_1\perp s\) (Part 7) the ratio is a standard normal over an
+      independent \(\sqrt{\chi^2_{n-2}/(n-2)}\)—a \(t\) on \(n-2\) degrees of freedom. The
+      histogram is \(T=(\hat b_1-b_1)/\widehat{\mathrm{SE}}(\hat b_1)\) over 3000 datasets, against
+      the \(t_{n-2}\) density and the \(N(0,1)\) it is often mistaken for. Slide the group
+      sizes.</p>
+      <div class="controls">
+        <span class="ctl"><label>n₁</label>
+          <input type="range" min="2" max="40" step="1" value="4" id="w4n1" data-out="w4n1v" data-fmt="int">
+          <span class="val" id="w4n1v"></span></span>
+        <span class="ctl"><label>n₂</label>
+          <input type="range" min="2" max="40" step="1" value="4" id="w4n2" data-out="w4n2v" data-fmt="int">
+          <span class="val" id="w4n2v"></span></span>
+      </div>
+      <div class="charts">
+        <div class="chartwrap" style="max-width:660px" id="w4c"></div>
+      </div>
+      <div class="legend">
+        <span class="chip"><span class="sw dot" style="background:var(--s1)"></span>\(T\) across 3000 datasets</span>
+        <span class="chip"><span class="sw" style="border-color:var(--s3)"></span>\(t_{n-2}\) density</span>
+        <span class="chip"><span class="sw dash" style="border-color:var(--s2)"></span>\(N(0,1)\) density</span>
+      </div>
+      <div class="readout" id="w4read"></div>
+      <p class="note">The \(t\) matches the simulated statistic where the normal does not: its
+      peak is a touch lower and its tails a touch heavier, so a threshold read off the normal
+      table would reject a true null too often at small \(n\). The degrees of freedom \(n-2\) are
+      exactly the two the variance estimate spent on the two group means; as the groups grow,
+      \(t_{n-2}\to N(0,1)\) and the two curves close up.</p>
+    </div>
+
+    <footer>
+      Interactive companion to the Homework&nbsp;10 write-up; the PDF is the submitted document,
+      and it carries the full derivations for all eleven parts under both parameterizations. Any
+      errors are my own.
+      <div class="ln"><a href="homework-10.pdf">homework-10.pdf</a> ·
+        <a href="./">all notes</a> ·
+        <a href="mailto:tyler.sotomayor@columbia.edu">errata</a></div>
+    </footer>
+  </div>
+  <div class="footerband"><div class="in"><img src="assets/summer-logo.svg" alt="Columbia University Summer Session"></div></div>
+
+<script src="assets/hw.js"></script>
+<script>
+"use strict";
+/* ---------- special functions (local to this page) ---------- */
+function lgamma(x){
+  const g = [76.18009172947146,-86.50532032941677,24.01409824083091,
+             -1.231739572450155,0.1208650973866179e-2,-0.5395239384953e-5];
+  let a = x, tmp = x + 5.5;
+  tmp -= (x + 0.5)*Math.log(tmp);
+  let ser = 1.000000000190015;
+  for (let j=0; j<6; j++) ser += g[j]/(++a);
+  return -tmp + Math.log(2.5066282746310005*ser/x);
+}
+function tpdf(x, nu){
+  return Math.exp(lgamma((nu+1)/2) - lgamma(nu/2) - 0.5*Math.log(nu*Math.PI))
+       * Math.pow(1 + x*x/nu, -(nu+1)/2);
+}
+/* a cached Box–Muller stream from a mulberry32 seed, for reproducible sims */
+function normalStream(seed){
+  const r = mulberry32(seed); let has = false, cache = 0;
+  return function(){
+    if (has){ has = false; return cache; }
+    const u1 = Math.max(r(), 1e-12), u2 = r();
+    const R = Math.sqrt(-2*Math.log(u1));
+    cache = R*Math.sin(2*Math.PI*u2); has = true;
+    return R*Math.cos(2*Math.PI*u2);
+  };
+}
+const mean = a => a.reduce((s,v)=>s+v,0)/a.length;
+
+/* ---------- Widget 1: the fit, two parameterizations ---------- */
+/* A fixed pool of standard normals so the clouds only shift when the means move. */
+const Z1 = [], Z2 = [], JX1 = [], JX2 = [];
+(function(){
+  const pairs = gaussPairs(120, 4201);
+  for (let i=0;i<120;i++){ Z1.push(pairs[i][0]); Z2.push(pairs[i][1]); }
+  const r = mulberry32(88);
+  for (let i=0;i<120;i++){ JX1.push(r()); JX2.push(r()); }
+})();
+const w1host = document.getElementById("w1c");
+function drawW1(){
+  const a1 = +document.getElementById("w1a1").value;
+  const a2 = +document.getElementById("w1a2").value;
+  const n1 = +document.getElementById("w1n1").value;
+  const n2 = +document.getElementById("w1n2").value;
+  const g1 = [], g2 = [];
+  for (let i=0;i<n1;i++) g1.push(a1 + Z1[i]);
+  for (let i=0;i<n2;i++) g2.push(a2 + Z2[i]);
+  const y1 = mean(g1), y2 = mean(g2), b0 = y1, b1 = y2 - y1;
+  const all = g1.concat(g2);
+  let lo = Math.min(...all), hi = Math.max(...all);
+  const pad = (hi-lo)*0.12 + 0.4; lo -= pad; hi += pad;
+  w1host.querySelectorAll("svg,.tip").forEach(s=>s.remove());
+  const ch = makeChart(w1host, {w:660, h:360, xdom:[0,1], ydom:[lo,hi],
+    xticks:[{v:0.25,l:"control"},{v:0.75,l:"treated"}],
+    yticks:[{v:y1,l:fmt(y1,2)},{v:y2,l:fmt(y2,2)}],
+    xlab:"group", ylab:"Y", aria:"two-group fit"});
+  // dashed baseline at the control mean, extended across
+  line(ch, "M"+ch.sx(0.45).toFixed(2)+" "+ch.sy(y1).toFixed(2)+
+           "L"+ch.sx(0.98).toFixed(2)+" "+ch.sy(y1).toFixed(2), "#c3c8ce", "5 5");
+  // data dots
+  for (let i=0;i<n1;i++) dot(ch, 0.09 + 0.30*JX1[i], g1[i], S1, 3, ch.plot);
+  for (let i=0;i<n2;i++) dot(ch, 0.61 + 0.30*JX2[i], g2[i], S2, 3, ch.plot);
+  // fitted-mean segments
+  line(ch, "M"+ch.sx(0.05).toFixed(2)+" "+ch.sy(y1).toFixed(2)+
+           "L"+ch.sx(0.45).toFixed(2)+" "+ch.sy(y1).toFixed(2), S1);
+  line(ch, "M"+ch.sx(0.55).toFixed(2)+" "+ch.sy(y2).toFixed(2)+
+           "L"+ch.sx(0.95).toFixed(2)+" "+ch.sy(y2).toFixed(2), S2);
+  // the jump b1 = y2 - y1, drawn as a vertical segment at x = 0.5
+  el("line", {x1:ch.sx(0.5), y1:ch.sy(y1), x2:ch.sx(0.5), y2:ch.sy(y2),
+              stroke:S3, "stroke-width":2.5}, ch.fore);
+  dirlab(ch, 0.5, (y1+y2)/2, "  b̂₁", S3, "start", 4);
+  document.getElementById("w1read").innerHTML =
+    `<span><span class="k">â₁ = b̂₀ (control)</span> <b>= ${fmt(b0,3)}</b></span>` +
+    `<span><span class="k">â₂ (treated)</span> <b>= ${fmt(y2,3)}</b></span>` +
+    `<span><span class="k">b̂₁ = â₂ − â₁ (effect)</span> <b>= ${fmt(b1,3)}</b></span>` +
+    `<span><span class="k">check â₁ + b̂₁</span> <b>= ${fmt(b0+b1,3)} = â₂</b></span>`;
+}
+bindControls(document.getElementById("w1"), drawW1); drawW1();
+
+/* ---------- Widget 2: bias of the variance MLE ---------- */
+const w2host = document.getElementById("w2c");
+function drawW2(){
+  const n1 = +document.getElementById("w2n1").value;
+  const n2 = +document.getElementById("w2n2").value;
+  const n = n1+n2, nu = n-2, REPS = 600;
+  const rng = normalStream(7000 + n1*211 + n2);
+  const mle = [], unb = [];
+  for (let r=0;r<REPS;r++){
+    let s1=0,q1=0; for (let i=0;i<n1;i++){ const z=rng(); s1+=z; q1+=z*z; }
+    let s2=0,q2=0; for (let j=0;j<n2;j++){ const z=rng(); s2+=z; q2+=z*z; }
+    const ss = (q1 - s1*s1/n1) + (q2 - s2*s2/n2);   // residual sum of squares
+    mle.push(ss/n); unb.push(ss/nu);
+  }
+  const CLIP = 3, BINS = 40, bw = CLIP/BINS;
+  const hist = new Array(BINS).fill(0);
+  mle.forEach(v => { const b = Math.min(BINS-1, Math.floor(Math.max(0,v)/bw)); hist[b]++; });
+  const hmax = Math.max(1, ...hist);
+  const mMle = mean(mle), mUnb = mean(unb);
+  w2host.querySelectorAll("svg,.tip").forEach(s=>s.remove());
+  const ch = makeChart(w2host, {w:660, h:340, xdom:[0,CLIP], ydom:[0,hmax*1.14],
+    xticks:[0,0.5,{v:1,l:"1"},1.5,2,2.5,{v:3,l:"3+"}], yticks:[],
+    xlab:"estimate of σ²", ylab:"count", aria:"histogram of the variance MLE"});
+  for (let b=0;b<BINS;b++){
+    if (!hist[b]) continue;
+    const x0=ch.sx(b*bw), x1=ch.sx((b+1)*bw);
+    el("rect", {x:x0+0.5, y:ch.sy(hist[b]), width:Math.max(0.8,x1-x0-1),
+      height:ch.sy(0)-ch.sy(hist[b]), fill:S1, "fill-opacity":0.66, rx:1}, ch.plot);
+  }
+  el("line", {x1:ch.sx(1), y1:0, x2:ch.sx(1), y2:ch.ih, stroke:S3, "stroke-width":2}, ch.fore);
+  el("line", {x1:ch.sx(mMle), y1:0, x2:ch.sx(mMle), y2:ch.ih, stroke:S2,
+              "stroke-width":2, "stroke-dasharray":"4 3"}, ch.fore);
+  document.getElementById("w2read").innerHTML =
+    `<span><span class="k">mean of MLE (RSS/n)</span> <b>= ${fmt(mMle,3)}</b></span>` +
+    `<span><span class="k">theory (n−2)/n</span> <b>= ${fmt(nu/n,3)}</b></span>` +
+    `<span><span class="k">mean of s² (RSS/(n−2))</span> <b>= ${fmt(mUnb,3)}</b></span>` +
+    `<span><span class="k">bias of MLE = −2σ²/n</span> <b>= ${fmt(mMle-1,3)}</b></span>`;
+}
+bindControls(document.getElementById("w2"), drawW2); drawW2();
+
+/* ---------- Widget 3: standard error and optimal allocation ---------- */
+const w3host = document.getElementById("w3c");
+function drawW3(){
+  const N = +document.getElementById("w3N").value;
+  const f = +document.getElementById("w3f").value;
+  const se = ff => Math.sqrt(1/(ff*N) + 1/((1-ff)*N));   // sigma = 1
+  const seBal = se(0.5), seNow = se(f);
+  const ymax = Math.max(se(0.1), se(0.9))*1.08;
+  w3host.querySelectorAll("svg,.tip").forEach(s=>s.remove());
+  const ch = makeChart(w3host, {w:660, h:340, xdom:[0.1,0.9], ydom:[0,ymax],
+    xticks:[{v:0.1,l:"10%"},{v:0.3,l:"30%"},{v:0.5,l:"½"},{v:0.7,l:"70%"},{v:0.9,l:"90%"}],
+    yticks:[{v:seBal,l:fmt(seBal,3)},{v:se(0.2),l:fmt(se(0.2),3)}],
+    xlab:"allocation f = n₁/N", ylab:"SE(b̂₁)", aria:"standard error vs allocation"});
+  line(ch, fnPath(ch, se, 0.1, 0.9, 201), S2);
+  vline(ch, 0.5, "crossline");
+  vline(ch, f, "crossline");
+  dot(ch, 0.5, seBal, S3, 5);
+  dot(ch, f, seNow, S1, 5);
+  attachHover(w3host, ch, [{name:"SE(b̂₁)", color:S2, f:se}],
+    x => "f = "+fmt(x,2), y => fmt(y,4));
+  document.getElementById("w3read").innerHTML =
+    `<span><span class="k">n₁, n₂</span> <b>= ${Math.round(f*N)}, ${Math.round((1-f)*N)}</b></span>` +
+    `<span><span class="k">SE(b̂₁) here</span> <b>= ${fmt(seNow,4)}</b></span>` +
+    `<span><span class="k">balanced SE (f = ½)</span> <b>= ${fmt(seBal,4)}</b></span>` +
+    `<span><span class="k">penalty vs balanced</span> <b>= ${fmt(100*(seNow/seBal-1),1)}%</b></span>`;
+}
+bindControls(document.getElementById("w3"), drawW3); drawW3();
+
+/* ---------- Widget 4: the t distribution capstone ---------- */
+const w4host = document.getElementById("w4c");
+function drawW4(){
+  const n1 = +document.getElementById("w4n1").value;
+  const n2 = +document.getElementById("w4n2").value;
+  const n = n1+n2, nu = n-2, REPS = 3000;
+  const rng = normalStream(3300 + n1*97 + n2*7);
+  const Ts = [];
+  let sumsq = 0, tail = 0;
+  for (let r=0;r<REPS;r++){
+    let s1=0,q1=0; for (let i=0;i<n1;i++){ const z=rng(); s1+=z; q1+=z*z; }
+    let s2=0,q2=0; for (let j=0;j<n2;j++){ const z=rng(); s2+=z; q2+=z*z; }
+    const m1=s1/n1, m2=s2/n2;
+    const ss = (q1 - s1*s1/n1) + (q2 - s2*s2/n2);
+    const s2v = ss/nu;
+    const seh = Math.sqrt(s2v*(1/n1 + 1/n2));
+    const T = (m2 - m1)/seh;          // true b1 = 0
+    Ts.push(T); sumsq += T*T; if (Math.abs(T) > 1.96) tail++;
+  }
+  const CLIP = 5, BINS = 48, bw = 2*CLIP/BINS;
+  const hist = new Array(BINS).fill(0);
+  Ts.forEach(v => { if (v>-CLIP && v<CLIP){ const b=Math.min(BINS-1, Math.floor((v+CLIP)/bw)); hist[b]++; } });
+  // convert counts to a density for overlay comparison
+  const dens = hist.map(c => c/(REPS*bw));
+  const ymax = Math.max(tpdf(0,nu), ...dens)*1.15;
+  w4host.querySelectorAll("svg,.tip").forEach(s=>s.remove());
+  const ch = makeChart(w4host, {w:660, h:340, xdom:[-CLIP,CLIP], ydom:[0,ymax],
+    xticks:[-4,-2,0,2,4], yticks:[],
+    xlab:"T = (b̂₁ − b₁) / SE", ylab:"density", aria:"t distribution of the studentized coefficient"});
+  for (let b=0;b<BINS;b++){
+    if (!dens[b]) continue;
+    const x0=ch.sx(-CLIP+b*bw), x1=ch.sx(-CLIP+(b+1)*bw);
+    el("rect", {x:x0+0.5, y:ch.sy(dens[b]), width:Math.max(0.8,x1-x0-1),
+      height:ch.sy(0)-ch.sy(dens[b]), fill:S1, "fill-opacity":0.5, rx:1}, ch.plot);
+  }
+  line(ch, fnPath(ch, x=>normPdf(x,0,1), -CLIP, CLIP, 200), S2, "8 6");
+  line(ch, fnPath(ch, x=>tpdf(x,nu), -CLIP, CLIP, 240), S3);
+  const sdEmp = Math.sqrt(sumsq/REPS);
+  const sdTh = nu>2 ? Math.sqrt(nu/(nu-2)) : Infinity;
+  document.getElementById("w4read").innerHTML =
+    `<span><span class="k">degrees of freedom n−2</span> <b>= ${nu}</b></span>` +
+    `<span><span class="k">SD of T (theory √(ν/(ν−2)))</span> <b>= ${fmt(sdEmp,3)}</b> (${isFinite(sdTh)?fmt(sdTh,3):"∞"})</span>` +
+    `<span><span class="k">P(|T| > 1.96): simulated</span> <b>= ${fmt(100*tail/REPS,1)}%</b> (normal 5%)</span>`;
+}
+bindControls(document.getElementById("w4"), drawW4); drawW4();
+
+/* KaTeX */
+document.addEventListener("DOMContentLoaded", () => {
+  if (window.renderMathInElement) renderMathInElement(document.body, {
+    delimiters:[{left:"\\(",right:"\\)",display:false},{left:"$$",right:"$$",display:true}],
+    macros:{"\\E":"\\mathrm{E}","\\Var":"\\operatorname{Var}","\\trn":"^{\\top}"}
+  });
+});
+</script>
+</body>
+</html>
