@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Homework 11 · Interactive — STAT S4204</title>
+<meta name="description" content="Interactive companion to Homework 11: simple linear regression with known variance — the covariance matrix as the inverse information, the slope's score combination orthogonalized against the intercept, and the slope as a projection onto the centered covariate in the three-subspace geometry.">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="icon" href="favicon.ico" sizes="32x32">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<link rel="stylesheet" href="assets/hw.css">
+</head>
+<body>
+  <div class="band"><div class="in">
+    <div class="topnav"><a href="./">← Notes in Statistical Inference</a></div>
+    <p class="course">STAT&nbsp;S4204 · Summer&nbsp;2026 · Problem Sets</p>
+    <h1>Homework 11 — Interactive Companion</h1>
+    <p class="sub">Simple linear regression, read three ways: the covariance as inverse information, the slope orthogonalized against the intercept, and the slope as a projection onto the centered covariate</p>
+  </div></div>
+  <div class="wrap">
+
+    <p class="lead">Assignment 11 takes the simple linear regression model—an intercept and one
+    covariate, normal errors, and a <em>known</em> common variance—and reads it through the
+    information matrix, the score vector, and the orthogonal geometry of \(n\)-dimensional space,
+    showing the three tell one story. The three laboratories below animate that story: the
+    coefficient covariance \(\sigma^2(X^\top X)^{-1}\) shown to equal the inverse information
+    \(\mathcal I^{-1}\) (Parts&nbsp;1--2); the slope's estimate written from the scores, its error
+    uncorrelated with the intercept score and unit-correlated with its own (Part&nbsp;3); and the
+    slope read off as the coefficient of the projection of \(Y\) onto the centered covariate
+    \(\tilde x=x-\bar x\mathbf 1\), the second of three orthogonal subspaces (Parts&nbsp;4--5).</p>
+    <div class="pdfbar">
+      <a class="btn" href="homework-11.pdf">Read the write-up (PDF)</a>
+      <a class="btn ghost" href="./">All notes</a>
+    </div>
+
+    <!-- ============ Widget 1: covariance = inverse information ============ -->
+    <div class="widget" id="w1">
+      <h2>Parts 1–2 · The covariance is the inverse information</h2>
+      <h3>Where the design puts the covariate, and how precisely the slope is known</h3>
+      <p>The estimates have covariance \(\Sigma=\sigma^2(X^\top X)^{-1}\), and the Fisher
+      information is \(\mathcal I=X^\top X/\sigma^2\); the two are exact inverses,
+      \(\Sigma=\mathcal I^{-1}\). Both depend on the design only through the spread of the
+      \(x\)'s: \(\operatorname{Var}(\hat\beta_1)=\sigma^2/S_{xx}\) shrinks as the covariate
+      spreads out. Slide the \(x\)-spread and the intercept-carrying mean \(\bar x\); the
+      ellipse is the joint confidence set of \((\hat\beta_0,\hat\beta_1)\), whose shape is
+      \(\Sigma\).</p>
+      <div class="controls">
+        <span class="ctl"><label>x-spread (SD of the xᵢ)</label>
+          <input type="range" min="0.4" max="4" step="0.1" value="1.5" id="w1s" data-out="w1sv" data-dec="1">
+          <span class="val" id="w1sv"></span></span>
+        <span class="ctl"><label>x̄ (mean of the xᵢ)</label>
+          <input type="range" min="0" max="4" step="0.1" value="1.5" id="w1m" data-out="w1mv" data-dec="1">
+          <span class="val" id="w1mv"></span></span>
+        <span class="ctl"><label>n</label>
+          <input type="range" min="4" max="80" step="1" value="24" id="w1n" data-out="w1nv" data-fmt="int">
+          <span class="val" id="w1nv"></span></span>
+      </div>
+      <div class="charts">
+        <div class="chartwrap" style="max-width:520px" id="w1c"></div>
+      </div>
+      <div class="legend">
+        <span class="chip"><span class="sw" style="border-color:var(--s1)"></span>95% set for \((\hat\beta_0,\hat\beta_1)\), shape \(\Sigma=\mathcal I^{-1}\)</span>
+        <span class="chip"><span class="sw dot" style="background:var(--s2)"></span>truth \((\beta_0,\beta_1)\)</span>
+      </div>
+      <div class="readout" id="w1read"></div>
+      <p class="note">Spreading the \(x\)'s tightens the slope (the ellipse narrows vertically);
+      centering them at \(\bar x=0\) uprights the ellipse, because
+      \(\operatorname{Cov}(\hat\beta_0,\hat\beta_1)=-\sigma^2\bar x/S_{xx}\) vanishes there. The
+      tilt you see when \(\bar x\neq0\) is exactly that off-diagonal—the intercept and slope
+      estimates are correlated whenever the covariate is not centered, which is the design-level
+      reason Part&nbsp;3 must orthogonalize the slope against the intercept.</p>
+    </div>
+
+    <!-- ============ Widget 2: the slope's score combination ============ -->
+    <div class="widget" id="w2">
+      <h2>Part 3 · The slope, written from the scores</h2>
+      <h3>Uncorrelated with the intercept score, unit-correlated with its own</h3>
+      <p>Across many simulated data sets the slope error
+      \(\hat\beta_1-\beta_1=\tfrac{\sigma^2}{S_{xx}}(l_1-\bar x\,l_0)\) is plotted against each
+      score: the intercept score \(l_0\propto\sum\varepsilon_i\) (left) and the slope score
+      \(l_1\propto\sum x_i\varepsilon_i\) (right). The theory says the covariances are exactly
+      \(0\) and \(1\)—a flat cloud on the left, a tilted one on the right. Slide the design and
+      toggle which score is on the horizontal axis.</p>
+      <div class="controls">
+        <span class="ctl"><label>x̄ (mean of the xᵢ)</label>
+          <input type="range" min="0" max="4" step="0.1" value="2" id="w2m" data-out="w2mv" data-dec="1">
+          <span class="val" id="w2mv"></span></span>
+        <span class="ctl"><label>n</label>
+          <input type="range" min="4" max="60" step="1" value="20" id="w2n" data-out="w2nv" data-fmt="int">
+          <span class="val" id="w2nv"></span></span>
+        <span class="ctl">
+          <button id="w2b0" class="on">vs intercept score l₀</button>
+          <button id="w2b1">vs slope score l₁</button>
+        </span>
+      </div>
+      <div class="charts">
+        <div class="chartwrap" style="max-width:600px" id="w2c"></div>
+      </div>
+      <div class="legend">
+        <span class="chip"><span class="sw dot" style="background:var(--s1)"></span>\((\text{score},\ \hat\beta_1-\beta_1)\) across 1500 data sets</span>
+        <span class="chip"><span class="sw dash" style="border-color:var(--s2)"></span>least-squares fit through the cloud</span>
+      </div>
+      <div class="readout" id="w2read"></div>
+      <p class="note">The cloud against the intercept score has essentially zero slope and
+      \(\widehat{\operatorname{cov}}\approx0\): the slope estimate's error carries no information
+      about the intercept score, no matter how far off-center the covariate sits. Against its own
+      score the covariance sits at \(1\). Under normality uncorrelated means independent, so the
+      slope estimate is genuinely orthogonalized against the intercept—it uses only the part of
+      the data the ones cannot explain.</p>
+    </div>
+
+    <!-- ============ Widget 3: slope as a projection, three subspaces ============ -->
+    <div class="widget" id="w3">
+      <h2>Parts 4–5 · The slope is a projection onto the centered covariate</h2>
+      <h3>\(\hat\beta_1\) is the coordinate of \(Y\) along \(\tilde x=x-\bar x\mathbf 1\)</h3>
+      <p>The least-squares slope is
+      \(\hat\beta_1=\tilde x^\top Y/\tilde x^\top\tilde x\), the coefficient of the projection of
+      \(Y\) onto the line spanned by the centered covariate
+      \(\tilde x=x-\bar x\mathbf 1\)—the residual of \(x\) on the ones, the second of the three
+      orthogonal subspaces \(V_1=\operatorname{span}(\mathbf 1)\),
+      \(V_2=\operatorname{span}(\tilde x)\), \(V_3\). The picture below shows the fit in the
+      \((x,Y)\) plane; slide the true slope and the noise, and watch the fitted line's slope track
+      \(\hat\beta_1\) while the projection onto \(V_2\) carries it.</p>
+      <div class="controls">
+        <span class="ctl"><label>true slope β₁</label>
+          <input type="range" min="-2" max="2" step="0.1" value="0.8" id="w3b" data-out="w3bv" data-dec="1">
+          <span class="val" id="w3bv"></span></span>
+        <span class="ctl"><label>noise σ</label>
+          <input type="range" min="0" max="3" step="0.1" value="1" id="w3s" data-out="w3sv" data-dec="1">
+          <span class="val" id="w3sv"></span></span>
+        <span class="ctl"><label>n</label>
+          <input type="range" min="4" max="60" step="1" value="16" id="w3n" data-out="w3nv" data-fmt="int">
+          <span class="val" id="w3nv"></span></span>
+      </div>
+      <div class="charts">
+        <div class="chartwrap" style="max-width:600px" id="w3c"></div>
+      </div>
+      <div class="legend">
+        <span class="chip"><span class="sw dot" style="background:var(--s1)"></span>data \((x_i,Y_i)\)</span>
+        <span class="chip"><span class="sw" style="border-color:var(--s3)"></span>least-squares fit, slope \(\hat\beta_1\)</span>
+        <span class="chip"><span class="sw dash" style="border-color:var(--s2)"></span>true line, slope \(\beta_1\)</span>
+      </div>
+      <div class="readout" id="w3read"></div>
+      <p class="note">The fit passes through \((\bar x,\bar Y)\)—the intercept subspace \(V_1\)
+      fixes that point—and its slope is the coordinate of \(Y\) along \(\tilde x\). Turning the
+      noise to zero pins \(\hat\beta_1\) exactly on \(\beta_1\); adding noise makes
+      \(\hat\beta_1-\beta_1=\tilde x^\top\varepsilon/S_{xx}\) wander, the whole of it coming from
+      the error's component in \(V_2\). The remaining \(n-2\) dimensions—the subspace
+      \(V_3\)—hold the residuals that, were \(\sigma^2\) unknown, Assignment&nbsp;10 would have
+      used to estimate it.</p>
+    </div>
+
+    <footer>
+      Interactive companion to the Homework&nbsp;11 write-up; the PDF is the submitted document,
+      and it carries the full derivations for all five parts. Any errors are my own.
+      <div class="ln"><a href="homework-11.pdf">homework-11.pdf</a> ·
+        <a href="./">all notes</a> ·
+        <a href="mailto:tyler.sotomayor@columbia.edu">errata</a></div>
+    </footer>
+  </div>
+  <div class="footerband"><div class="in"><img src="assets/summer-logo.svg" alt="Columbia University Summer Session"></div></div>
+
+<script src="assets/hw.js"></script>
+<script>
+"use strict";
+/* cached Box–Muller stream from a mulberry32 seed, for reproducible sims */
+function normalStream(seed){
+  const r = mulberry32(seed); let has = false, cache = 0;
+  return function(){
+    if (has){ has = false; return cache; }
+    const u1 = Math.max(r(), 1e-12), u2 = r();
+    const R = Math.sqrt(-2*Math.log(u1));
+    cache = R*Math.sin(2*Math.PI*u2); has = true;
+    return R*Math.cos(2*Math.PI*u2);
+  };
+}
+const mean = a => a.reduce((s,v)=>s+v,0)/a.length;
+
+/* A fixed design template: n standard positions, reproducible, rescaled per widget. */
+function designX(n, sd, xbar, seed){
+  const rng = normalStream(seed), z = [];
+  for (let i=0;i<n;i++) z.push(rng());
+  const mz = mean(z), sz = Math.sqrt(mean(z.map(v=>(v-mz)*(v-mz))) || 1);
+  // standardize then rescale to requested spread and mean
+  return z.map(v => xbar + sd*(v-mz)/sz);
+}
+
+/* ---------- Widget 1: covariance ellipse = inverse information ---------- */
+const w1host = document.getElementById("w1c");
+function ellipsePath(ch, cx, cy, S, k){
+  // 95% ellipse of a 2D Gaussian with covariance S (2x2), radius^2 = chi2_2(.95)=5.991
+  const a=S[0][0], b=S[0][1], d=S[1][1];
+  const tr=a+d, det=a*d-b*b;
+  const l1=tr/2+Math.sqrt(Math.max(tr*tr/4-det,0)), l2=tr/2-Math.sqrt(Math.max(tr*tr/4-det,0));
+  // eigenvectors
+  let v1;
+  if (Math.abs(b)>1e-12) v1=[l1-d, b]; else v1=[1,0];
+  const nv=Math.hypot(v1[0],v1[1]); v1=[v1[0]/nv, v1[1]/nv];
+  const v2=[-v1[1], v1[0]];
+  const r=Math.sqrt(k), pts=[];
+  for (let t=0;t<=64;t++){
+    const th=2*Math.PI*t/64;
+    const px=cx + r*(Math.sqrt(l1)*Math.cos(th)*v1[0] + Math.sqrt(l2)*Math.sin(th)*v2[0]);
+    const py=cy + r*(Math.sqrt(l1)*Math.cos(th)*v1[1] + Math.sqrt(l2)*Math.sin(th)*v2[1]);
+    pts.push([px,py]);
+  }
+  return pts.map((p,i)=>(i?"L":"M")+ch.sx(p[0]).toFixed(2)+" "+ch.sy(p[1]).toFixed(2)).join("")+"Z";
+}
+function drawW1(){
+  const sd=+document.getElementById("w1s").value;
+  const xbar=+document.getElementById("w1m").value;
+  const n=+document.getElementById("w1n").value;
+  const sig=1, b0=1, b1=0.8;
+  const x=designX(n, sd, xbar, 20250);
+  const Sxx=x.reduce((s,v)=>s+(v-xbar)*(v-xbar),0);
+  const sumx2=x.reduce((s,v)=>s+v*v,0);
+  // Sigma = sigma^2 (X'X)^{-1} = sigma^2/(n Sxx) [[sumx2, -n xbar],[-n xbar, n]]
+  const f=sig*sig/(n*Sxx);
+  const S=[[f*sumx2, -f*n*xbar],[-f*n*xbar, f*n]];
+  const vb0=S[0][0], vb1=S[1][1];
+  const halfx=Math.max(3*Math.sqrt(vb0),1.2), halfy=Math.max(3*Math.sqrt(vb1),1.2);
+  w1host.querySelectorAll("svg,.tip").forEach(s=>s.remove());
+  const ch=makeChart(w1host,{w:520,h:420,xdom:[b0-halfx,b0+halfx],ydom:[b1-halfy,b1+halfy],
+    xticks:[{v:b0-halfx*0.6},{v:b0,l:"β₀"},{v:b0+halfx*0.6}],
+    yticks:[{v:b1-halfy*0.6},{v:b1,l:"β₁"},{v:b1+halfy*0.6}],
+    xlab:"β̂₀ (intercept)", ylab:"β̂₁ (slope)", aria:"coefficient covariance ellipse"});
+  el("path",{d:ellipsePath(ch,b0,b1,S,5.991),fill:S1,"fill-opacity":0.10,stroke:S1,"stroke-width":2},ch.plot);
+  dot(ch,b0,b1,S2,4.5);
+  document.getElementById("w1read").innerHTML =
+    `<span><span class="k">Var(β̂₁) = σ²/Sₓₓ</span> <b>= ${fmt(vb1,4)}</b></span>` +
+    `<span><span class="k">Var(β̂₀)</span> <b>= ${fmt(vb0,4)}</b></span>` +
+    `<span><span class="k">Cov(β̂₀,β̂₁) = −σ²x̄/Sₓₓ</span> <b>= ${fmt(S[0][1],4)}</b></span>` +
+    `<span><span class="k">Sₓₓ</span> <b>= ${fmt(Sxx,2)}</b></span>`;
+}
+bindControls(document.getElementById("w1"), drawW1); drawW1();
+
+/* ---------- Widget 2: slope error vs the two scores ---------- */
+const w2host = document.getElementById("w2c");
+let w2mode = 0;  // 0 = vs l0 (intercept score), 1 = vs l1 (slope score)
+function drawW2(){
+  const xbar=+document.getElementById("w2m").value;
+  const n=+document.getElementById("w2n").value;
+  const sig=1, REPS=1500;
+  const x=designX(n, 1.3, xbar, 71);
+  const Sxx=x.reduce((s,v)=>s+(v-xbar)*(v-xbar),0);
+  const rng=normalStream(4400 + Math.round(xbar*10)*53 + n);
+  const pts=[]; let sx=0,sy=0,sxx=0,sxy=0,syy=0;
+  for (let r=0;r<REPS;r++){
+    let l0=0,l1=0, be=0;   // scores (times sigma^2) and slope error numerator
+    const eps=[];
+    for (let i=0;i<n;i++){ const e=sig*rng(); eps.push(e); }
+    for (let i=0;i<n;i++){ l0+=eps[i]; l1+=x[i]*eps[i]; be+=(x[i]-xbar)*eps[i]; }
+    // scores l0,l1 are (1/sig^2)*these; slope error = be/Sxx
+    const score = (w2mode===0 ? l0 : l1)/(sig*sig);
+    const slopeErr = be/Sxx;
+    pts.push([score, slopeErr]);
+    sx+=score; sy+=slopeErr; sxx+=score*score; sxy+=score*slopeErr; syy+=slopeErr*slopeErr;
+  }
+  const mx=sx/REPS, my=sy/REPS;
+  const cov=sxy/REPS - mx*my;               // empirical covariance
+  const beta=(sxy-REPS*mx*my)/(sxx-REPS*mx*mx); // LS slope through cloud
+  const xs=pts.map(p=>p[0]), ys=pts.map(p=>p[1]);
+  const xlo=Math.min(...xs), xhi=Math.max(...xs), ylo=Math.min(...ys), yhi=Math.max(...ys);
+  const px=(xhi-xlo)*0.08+1e-6, py=(yhi-ylo)*0.08+1e-6;
+  w2host.querySelectorAll("svg,.tip").forEach(s=>s.remove());
+  const ch=makeChart(w2host,{w:600,h:360,xdom:[xlo-px,xhi+px],ydom:[ylo-py,yhi+py],
+    xticks:[{v:xlo,l:fmt(xlo,1)},{v:0,l:"0"},{v:xhi,l:fmt(xhi,1)}],
+    yticks:[{v:ylo,l:fmt(ylo,2)},{v:0,l:"0"},{v:yhi,l:fmt(yhi,2)}],
+    xlab: w2mode===0 ? "intercept score  l₀" : "slope score  l₁",
+    ylab:"β̂₁ − β₁", aria:"slope error versus a score"});
+  vline(ch,0,"crossline"); hline(ch,0,"crossline");
+  pts.forEach(p=>dot(ch,p[0],p[1],S1,2,ch.plot));
+  // fitted line through cloud
+  const bx0=xlo-px, bx1=xhi+px;
+  line(ch,"M"+ch.sx(bx0).toFixed(2)+" "+ch.sy(my+beta*(bx0-mx)).toFixed(2)+
+          "L"+ch.sx(bx1).toFixed(2)+" "+ch.sy(my+beta*(bx1-mx)).toFixed(2), S2, "8 6");
+  document.getElementById("w2read").innerHTML =
+    `<span><span class="k">against</span> <b>${w2mode===0?"intercept score l₀":"slope score l₁"}</b></span>` +
+    `<span><span class="k">empirical cov</span> <b>= ${fmt(cov,3)}</b> (theory ${w2mode===0?"0":"1"})</span>` +
+    `<span><span class="k">cloud slope</span> <b>= ${fmt(beta,3)}</b></span>`;
+}
+document.getElementById("w2b0").addEventListener("click",()=>{
+  w2mode=0; document.getElementById("w2b0").classList.add("on");
+  document.getElementById("w2b1").classList.remove("on"); drawW2();
+});
+document.getElementById("w2b1").addEventListener("click",()=>{
+  w2mode=1; document.getElementById("w2b1").classList.add("on");
+  document.getElementById("w2b0").classList.remove("on"); drawW2();
+});
+bindControls(document.getElementById("w2"), drawW2); drawW2();
+
+/* ---------- Widget 3: the slope as a projection ---------- */
+const w3host = document.getElementById("w3c");
+function drawW3(){
+  const b1=+document.getElementById("w3b").value;
+  const sig=+document.getElementById("w3s").value;
+  const n=+document.getElementById("w3n").value;
+  const b0=1, xbar=2;
+  const x=designX(n, 1.4, xbar, 909);
+  const rng=normalStream(6100 + Math.round(b1*10)*17 + Math.round(sig*10)*3 + n);
+  const Y=x.map(xi => b0 + b1*xi + sig*rng());
+  const ybar=mean(Y);
+  let Sxx=0, Sxy=0;
+  for (let i=0;i<n;i++){ Sxx+=(x[i]-xbar)*(x[i]-xbar); Sxy+=(x[i]-xbar)*(Y[i]-ybar); }
+  const b1hat=Sxy/Sxx, b0hat=ybar-b1hat*xbar;
+  const xs=x, ys=Y;
+  const xlo=Math.min(...xs), xhi=Math.max(...xs), ylo=Math.min(...ys), yhi=Math.max(...ys);
+  const px=(xhi-xlo)*0.08+1e-6, py=(yhi-ylo)*0.10+0.3;
+  w3host.querySelectorAll("svg,.tip").forEach(s=>s.remove());
+  const ch=makeChart(w3host,{w:600,h:380,xdom:[Math.min(xlo-px,0),xhi+px],ydom:[ylo-py,yhi+py],
+    xticks:[{v:0,l:"0"},{v:xbar,l:"x̄"},{v:xhi,l:fmt(xhi,1)}],
+    yticks:[{v:ylo,l:fmt(ylo,1)},{v:ybar,l:"Ȳ"},{v:yhi,l:fmt(yhi,1)}],
+    xlab:"x", ylab:"Y", aria:"least squares fit"});
+  // true line
+  const X0=Math.min(xlo-px,0), X1=xhi+px;
+  line(ch,"M"+ch.sx(X0).toFixed(2)+" "+ch.sy(b0+b1*X0).toFixed(2)+
+          "L"+ch.sx(X1).toFixed(2)+" "+ch.sy(b0+b1*X1).toFixed(2), S2, "8 6");
+  // fitted line
+  line(ch,"M"+ch.sx(X0).toFixed(2)+" "+ch.sy(b0hat+b1hat*X0).toFixed(2)+
+          "L"+ch.sx(X1).toFixed(2)+" "+ch.sy(b0hat+b1hat*X1).toFixed(2), S3);
+  // pivot point (xbar, ybar)
+  for (let i=0;i<n;i++) dot(ch,x[i],Y[i],S1,3,ch.plot);
+  dot(ch,xbar,ybar,S3,4.5);
+  document.getElementById("w3read").innerHTML =
+    `<span><span class="k">β̂₁ = x̃ᵀY / x̃ᵀx̃</span> <b>= ${fmt(b1hat,3)}</b> (true ${fmt(b1,2)})</span>` +
+    `<span><span class="k">β̂₁ − β₁ = x̃ᵀε/Sₓₓ</span> <b>= ${fmt(b1hat-b1,3)}</b></span>` +
+    `<span><span class="k">β̂₀ (fit through x̄,Ȳ)</span> <b>= ${fmt(b0hat,3)}</b></span>`;
+}
+bindControls(document.getElementById("w3"), drawW3); drawW3();
+
+/* KaTeX */
+document.addEventListener("DOMContentLoaded", () => {
+  if (window.renderMathInElement) renderMathInElement(document.body, {
+    delimiters:[{left:"\\(",right:"\\)",display:false},{left:"$$",right:"$$",display:true}],
+    macros:{"\\E":"\\mathrm{E}","\\Var":"\\operatorname{Var}"}
+  });
+});
+</script>
+</body>
+</html>
